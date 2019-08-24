@@ -1,0 +1,23 @@
+ENCUT  = 300
+ALGO  = Conjugate
+ISYM = 2
+NELM = 100        #need to be increased in some cases
+EDIFF  = 1E-05
+PREC = Accurate
+ISMEAR = 0
+SIGMA=0.02
+LORBIT = 11
+
+# Geometry optimization
+IBRION = 1
+ISIF   = 3       # Relax ions only (2), relax everything (3)
+NSW    = 500     # Number of ionic steps
+EDIFFG = -1E-02  # Force convegence condition
+NFREE  = 10
+POTIM  = 0.2
+
+# I/O control
+LCHARG = .FALSE.  # Do not write out charge density
+LWAVE  = .FALSE.  # Do not write wave function file
+
+KSPACING = 0.7

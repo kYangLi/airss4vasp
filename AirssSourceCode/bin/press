@@ -1,0 +1,44 @@
+#!/bin/bash
+
+if [ $# -lt 4 ]; then
+  echo 'press <p_min> <p_step> <p_num> <seed>'
+  exit 999
+fi
+
+mkdir -p hopper
+
+for ((  i = 0 ;  i < $3;  i++  ))
+do
+
+p=$(echo "$1+$2*$i" | bc -l)
+pressure=$(awk -v pr=$p 'BEGIN { printf "%.*f\n", 1 , pr }'|sed 's/-/m/g' | sed 's/\./p/g')
+
+newseed=$4_$pressure
+
+for f in `ls $4.*`
+ do
+  ext="${f##*.}"
+  if [ $ext = param ]; then
+    cp $f $newseed.param
+  fi
+  if [ $ext = cell ]; then
+    sed '/%BLOCK EXTERNAL_PRESSURE/,/%ENDBLOCK EXTERNAL_PRESSURE/d' $f > $newseed.cell
+    cat >> $newseed.cell <<- EOM
+%BLOCK EXTERNAL_PRESSURE
+$p 0 0
+$p 0
+$p
+%ENDBLOCK EXTERNAL_PRESSURE
+EOM
+  fi
+done
+
+for f in `ls $4-*`
+ do
+  cp $f hopper/$4_$pressure-"${f#*-}"
+done
+
+done
+
+exit 0
+

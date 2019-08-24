@@ -1,0 +1,75 @@
+#!/bin/bash
+#######################################################
+# Script to perform a geometry optimistion using psi4 #
+#######################################################
+
+set -e
+
+#########################
+# Test usage is correct #
+#########################
+
+if [ $# -ne 2 ]; then
+         echo 1>&2 "Usage: psi4_relax <exe> <seed>"
+         exit 127
+fi
+
+###########################
+# Set the input variables #
+###########################
+
+exe=$1
+seed=$2
+
+root=${seed%%-*}
+root=${root##*\/}
+
+############
+# Run psi4 #
+############
+
+
+# Build the psi4 input file
+
+cabal cell psi4 < $seed.cell > $seed.psin  
+
+echo "set {" >> $seed.psin
+#echo "reference uks" >> $seed.psin
+#echo "frac_start 1" >> $seed.psin
+echo "basis cc-pvdz" >> $seed.psin
+echo "scf_type df" >> $seed.psin
+echo "guess sad" >> $seed.psin
+echo "}" >> $seed.psin
+echo "optimize('pbe')" >> $seed.psin
+
+# Run psi4
+
+set +e
+$exe $seed.psin $seed.psout 2>/dev/null
+set -e
+
+# Check for failure
+
+if `grep -q coffee $seed.psout` ; then
+    exit 0 # Fail peacefully
+fi
+
+# Construct a fake Castep output file
+
+echo " *  Pressure: 0.0" >  $seed.castep
+grep "Final energy is" $seed.psout | tail -1 | awk '{print " PSI4: Final Enthalpy     = "$4}' >> $seed.castep
+echo "Current cell volume = 0.00000001" >> $seed.castep
+
+# Save the final structure in Castep -out.cell format
+
+if [[ -e $seed.psout ]]; then
+    cabal psi4 cell < $seed.psout > $seed-out.cell
+fi
+
+# Return the key results
+
+grep " *  Pressure: " $seed.castep | awk '{printf "%-20s%10.8f\n", "Pressure: ",$3}'
+grep " PSI4: Final Enthalpy     = " $seed.castep | awk '{printf "%-20s%10.8f\n", "Enthalpy: ",$5}'
+grep "Current cell volume = " $seed.castep | awk '{printf "%-20s%10.8f\n", "Volume: ",$5}'
+
+exit 0

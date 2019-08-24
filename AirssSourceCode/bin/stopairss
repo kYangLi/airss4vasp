@@ -1,0 +1,9 @@
+#!/bin/bash
+
+for i in `grep -v \# ~/.spawn | awk '{print $1}'`
+do
+  (ssh $i 'killall -9 buildcell ; killall -9 perl ; killall -9 castep ; ps h -u $USER | grep -E -v "srun|sleep|slurm" | awk "{print $1}" | xargs kill -9' < /dev/null >& /dev/null &)&
+done
+wait
+exit 0
+

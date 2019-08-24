@@ -1,0 +1,47 @@
+#!/bin/bash
+##############################################################
+# Script to perform a geometry optimistion using the pp code #
+##############################################################
+
+set -e
+
+#########################
+# Test usage is correct #
+#########################
+
+if [ $# -ne 2 ]; then
+         echo 1>&2 "Usage: pp_relax <exe> <seed>"
+         exit 127
+fi
+
+###########################
+# Set the input variables #
+###########################
+
+exe=$1
+seed=$2
+
+root=${seed%%-*}
+root=${root##*\/}
+
+$exe -q $seed > $seed.pout
+
+# Construct a fake Castep output file
+
+echo " Welcome to a b c pp3" > $seed.castep
+(printf " Run started: at " ; date) >> $seed.castep
+(printf " from code version ";airss_version)|sed 's/AIRSS Version//g' >> $seed.castep
+echo "                          Files used for pseudopotentials:" >> $seed.castep
+md5sum $root.pp | awk '{print $2,"("$1")"}' >> $seed.castep
+echo >> $seed.castep
+echo "                           -------------------------------" >> $seed.castep
+
+grep Pressure: $seed.pout | tail -1 | awk '{print " *  Pressure: "$2}' >> $seed.castep
+grep Enthalpy: $seed.pout | tail -1 | awk '{print " PP3: Final Enthalpy     = "$2}' >> $seed.castep
+grep Volume:   $seed.pout | tail -1 | awk '{print "Current cell volume = "$2}' >> $seed.castep
+
+# Return the key results
+
+cat $seed.pout
+
+exit 0

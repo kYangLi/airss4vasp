@@ -1,0 +1,46 @@
+#!/usr/bin/env perl
+
+$seed = shift @ARGV;
+
+my $lammpsinp = "$seed.conf";
+my $lammpsout = "$seed.lammps";
+my $lammpstraj = "$seed.traj";
+
+{
+open (my $fh, "<", $lammpsinp) or die $!;
+@li = <$fh>;
+}
+chomp @li;
+my @spec = split ' ', $li[0];
+
+{
+open (my $fh, "<", $lammpsout) or die $!;
+while (my $line = <$fh>) {
+  if ($line =~ /Lattice parameters/){
+    chomp $line;
+    @box = split ' ', $line;
+  }
+}
+}
+shift @box;
+shift @box;
+
+{
+open (my $fh, "<", $lammpstraj) or die $!;
+@lo = <$fh>;
+}
+chomp @lo;
+$nat = $lo[3];
+
+printf "%%BLOCK LATTICE_ABC\n";
+printf "%10.6f %10.6f %10.6f\n",$box[0],$box[1],$box[2];
+printf "%10.6f %10.6f %10.6f\n",$box[3],$box[4],$box[5];
+printf "%%ENDBLOCK LATTICE_ABC\n\n";
+printf "%%BLOCK POSITIONS_FRAC\n";
+for (my $i=-$nat; $i <= -1; $i++) {
+  my @data = split / /, $lo[$i];
+  printf "%4s ", $spec[$data[1]-1];
+  printf "%14.8f ", $_ for @data[2..4];
+  printf "\n";
+}
+printf "%%ENDBLOCK POSITIONS_FRAC\n";

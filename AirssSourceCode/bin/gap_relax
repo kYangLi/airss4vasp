@@ -1,0 +1,43 @@
+#!/bin/bash
+####################################################################
+# Script to perform a geometry optimistion using the QUIP/GAP code #
+####################################################################
+
+set -e
+
+#########################
+# Test usage is correct #
+#########################
+
+if [ $# -ne 2 ]; then
+         echo 1>&2 "Usage: gap_relax <exe> <seed>"
+         exit 127
+fi
+
+###########################
+# Set the input variables #
+###########################
+
+exe=$1
+seed=$2
+
+
+$exe 2>/dev/null < $seed.cell > $seed.qout
+
+# Construct a fake Castep output file
+
+echo " *  Pressure: 0.0" > $seed.castep
+grep Energy\= $seed.qout | tail -1 | awk '{print " QUIP: Final Enthalpy     = "$2}' >> $seed.castep
+grep Volume\= $seed.qout | tail -1 | awk '{print "Current cell volume = "$2}' >> $seed.castep
+
+# Save the final structure in Castep -out.cell format
+
+sed -n -e '/^%BLOCK [Ll][Aa][Tt]*/, /^%ENDBLOCK [Pp][Oo][Ss]*/p' $seed.qout > $seed-out.cell
+
+# Return the key results
+
+echo "Pressure: 0.0"
+grep Energy\= $seed.qout | tail -1 | awk '{print "Enthalpy: "$2}'
+grep Volume\= $seed.qout | tail -1 | awk '{print "Volume: "$2}'
+
+exit 0

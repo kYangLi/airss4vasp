@@ -1,0 +1,86 @@
+#!/bin/bash
+#######################################################
+# Script to perform a geometry optimistion using gulp #
+#######################################################
+
+set -e
+
+#########################
+# Test usage is correct #
+#########################
+
+if [ $# -ne 4 ]; then
+         echo 1>&2 "Usage: gulp_relax <exe> <cluster> <pressure> <seed>"
+         exit 127
+fi
+
+###########################
+# Set the input variables #
+###########################
+
+exe=$1
+clust=$2
+press=$3
+seed=$4
+
+root=${seed%%-*}
+root=${root##*\/}
+
+############
+# Run gulp #
+############
+
+export GULP_LIB=`pwd`
+
+if [[ $clust -eq 1 ]]; then
+    con="conv"  
+else
+    con="conp"
+fi
+
+# Build the gulp input file
+
+cabal cell gulp < $seed.cell | sed "s/opti prop/opti $con/g" > $seed.gin  
+
+echo "library $root" >> $seed.gin
+echo "output xtl $seed" >> $seed.gin
+echo "pressure $press GPa" >> $seed.gin
+
+# Run gulp
+
+set +e
+$exe < $seed.gin > $seed.gout
+set -e
+
+# Construct a fake Castep output file
+
+echo " Welcome to a b c GULP" > $seed.castep
+grep "Job Started" $seed.gout | sed 's/Job Started/Run started:/g' >> $seed.castep
+grep "\* Version" $seed.gout | sed 's/\* Version =/ from code version/g' | sed 's/* Last modified =  //g' | sed 's/\*//g' >> $seed.castep
+echo "                          Files used for pseudopotentials:" >> $seed.castep
+md5sum $root.lib | awk '{print $2,"("$1")"}' >> $seed.castep
+echo >> $seed.castep
+echo "                           -------------------------------" >> $seed.castep
+
+
+if [[ $clust -eq 1 ]]; then
+    grep "Final en\|Pressure \|Initial " $seed.gout | awk 'NR==2 {print " *  Pressure: "$5}; NR==3 {print " GULP: Final Enthalpy     = "$4}; NR==1 {print "Current cell volume = "$5}' >> $seed.castep
+else
+    grep "Final en\|Pressure \|Primitive " $seed.gout | awk 'NR==1 {print " *  Pressure: "$5}; NR==2 {print " GULP: Final Enthalpy     = "$4}; NR==3 {print "Current cell volume = "$5}' >> $seed.castep
+fi
+
+
+
+# Save the final structure in Castep -out.cell format
+
+if [[ -e $seed.xtl ]]; then
+    cabal xtl cell < $seed.xtl > $seed-out.cell
+fi
+
+# Return the key results
+
+grep " *  Pressure: " $seed.castep | awk '{printf "%-20s%10.8f\n", "Pressure: ",$3}'
+grep " GULP: Final Enthalpy     = " $seed.castep | awk '{printf "%-20s%10.8f\n", "Enthalpy: ",$5}'
+grep "Current cell volume = " $seed.castep | awk '{printf "%-20s%10.8f\n", "Volume: ",$5}'
+
+exit 0

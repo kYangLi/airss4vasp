@@ -1,0 +1,106 @@
+#!/bin/bash
+#########################################################
+# Script to perform a geometry optimistion using lammps #
+#########################################################
+
+set -e
+
+#########################
+# Test usage is correct #
+#########################
+
+if [ $# -ne 3 ]; then
+         echo 1>&2 "Usage: lammps_relax <exe> <pressure> <seed>"
+         exit 127
+fi
+
+###########################
+# Set the input variables #
+###########################
+
+exe=$1
+press=`echo "scale=6;$2*10000.0" | bc -l` # Convert GPa to bar
+seed=$3
+
+root=${seed%%-*}
+root=${root##*\/}
+
+# Build the lammps input file
+
+cat << _EOF > $seed.in
+# Initialisation
+units metal             # distances in A, energies in eV, pressure in Bar
+dimension 3
+boundary p p p          # periodic in x, y, z
+atom_style atomic
+
+# Atom definition
+box tilt large          # relax restictions on box tilt factors
+read_data $seed.conf
+
+neigh_modify every 1 delay 0 check yes # update neigbour every step
+neighbor 2.0 bin                       # neighbour list skin
+
+# Potential definition
+include $seed.pp
+
+compute 1 all temp      # required to compute pressure, apparently
+compute 2 all pressure 1
+
+# Relax the structure
+min_style cg
+min_modify line quadratic
+dump min all atom 1 $seed.traj          # dump the trajectory
+dump_modify min sort id                 # sort atoms by numerical label
+
+# Multiple minimisations to prevent trapping
+fix min all box/relax tri $press vmax 0.1    # not 100% sure about this
+minimize 1.0e-8 1.0e-6 10000 1000000       # do the minimisation
+fix min all box/relax tri $press vmax 0.01
+minimize 1.0e-10 1.0e-6 10000 1000000
+fix min all box/relax tri $press vmax 0.001
+minimize 1.0e-12 1.0e-8 10000 100000
+fix min all box/relax tri $press vmax 0.0001
+minimize 1.0e-12 1.0e-8 10000 100000
+
+# Variables defined for printing
+variable h equal enthalpy
+variable e equal etotal
+variable v equal vol
+variable p equal press/10000.0            # convert Bar to GPa
+variable a equal cella
+variable b equal cellb
+variable c equal cellc
+variable alp equal cellalpha
+variable bet equal cellbeta
+variable gam equal cellgamma
+# Print AIRSS-specific data in $seed.lammps
+print "Lattice parameters:  \${a} \${b} \${c} \${alp} \${bet} \${gam}" file $seed.lammps
+print "Volume: \$v" append $seed.lammps
+print "Pressure: \$p" append $seed.lammps
+print "Enthalpy: \$h" append $seed.lammps
+_EOF
+
+# Run lammps
+
+cell2lammps $seed.cell > $seed.conf
+
+lammps < $seed.in | tail -3 > $seed.lout
+
+rm -f log.lammps
+
+# Construct a fake Castep output file
+
+grep Pressure: $seed.lout | tail -1 | awk '{print " *  Pressure: "$2}' > $seed.castep
+grep Enthalpy: $seed.lout | tail -1 | awk '{print " PP3: Final Enthalpy     = "$2}' >> $seed.castep
+grep Volume:   $seed.lout | tail -1 | awk '{print "Current cell volume = "$2}' >> $seed.castep
+
+# Save the final structure in Castep -out.cell format
+
+lammps2cell $seed > $seed-out.cell
+
+# Return the key results
+
+cat $seed.lout
+
+exit 0

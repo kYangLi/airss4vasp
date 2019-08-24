@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ $# -ne 0 ]; then
+    echo 'despawn'
+    exit 999
+fi
+cat .spawnpids.* > .spawnpids
+while read host pid; do
+    (ssh -n -x $host '(pgid=`ps -o pgid= '$pid'` ; pkill -9 -g $pgid < /dev/null >& /dev/null &)')< /dev/null >& /dev/null &
+done <.spawnpids
+wait
+rm -f .spawnpids*
+exit 0
+

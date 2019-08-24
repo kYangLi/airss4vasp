@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if [ $# -eq 1 ]; then
+    file=$1
+else
+    echo 'csymm <xyz filename>'
+    exit 999
+fi
+
+xyz2sml ()
+{
+    echo '1 1 1 90 90 90'
+    echo '2 1' $1 $1
+    awk 'NR > 2 {printf "%-6s1 %-9.5f%-9.5f%-9.5f%-9.5f%-9.5f%-9.5f\n",$1,$2,$3,$4,0,0,0}' $2
+}
+
+xyz2sml .1 $1 | symmol | awk '{if ($1=="Schoenflies") {print $4} else if ($1=="NO") {print "C1"} else if ($1=="ERROR:") {print "C1"} else if ($9=="*") count++} END {print count}'
+
+exit 0

@@ -1,0 +1,9 @@
+#  C  : J. Tersoff, Phys. Rev. Lett., 61, 2879 (1988)
+species
+C  core 0.0
+botwobody
+C  core C  core 1393.600 346.7400 3.48790 2.2119 1.8000 2.1000
+borepulsive
+C  core C  core 0.0 3 0.72751 2.2119 
+boattractive theta
+C  core C  core 0.00000015724 3 0.72751 2.2119  38049.0  4.3484 -0.57058 

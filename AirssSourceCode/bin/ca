@@ -1,0 +1,31 @@
+#!/bin/bash
+
+if [ $# -lt 1 ]; then
+    echo 'ca [-R(recursive)] [command line arguments for cryan]'
+    exit 999
+fi
+
+recursive=F
+if [ $1 == -R ]; then
+    shift 1;
+    recursive=T
+fi
+commandline=$*
+
+# Need to trap for --delete
+
+while [ $# -gt 0 ] ; do
+    case $1 in
+	--delete) read -p "Deleting files. To confirm type <Enter>" ;shift 1 ;;
+	*) shift 1 ;;
+    esac
+done
+
+if [ $recursive == T ]; then
+    find . -follow -name "*.res" | grep -v temp.res | xargs cat 2>/dev/null | cryan $commandline
+else
+    find . -maxdepth 1 -name "*.res" | grep -v temp.res | xargs cat 2>/dev/null | cryan $commandline
+fi
+
+exit 0
+

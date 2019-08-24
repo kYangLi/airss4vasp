@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -e
+
+#########################
+# Test usage is correct #
+#########################
+
+if [ $# -ne 0 ]; then
+    echo 1>&2 "Usage: ress2xyz"
+    exit 127
+fi
+
+for f in *.res
+do
+        cabal res xyz < $f > ${f%.*}.xyz
+done
+
+exit 0

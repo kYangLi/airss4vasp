@@ -1,0 +1,199 @@
+#!/bin/bash
+#################################################################################
+# Script to perform a full, self consistent, geometry optimisation using Castep #
+#################################################################################
+
+set -e
+
+#########################
+# Test usage is correct #
+#########################
+
+if [ $# -ne 5 ]; then
+         echo 1>&2 "Usage: castep_relax <maxit> <exe> <sim> <symm> <seed>"
+         exit 127
+fi
+
+###########################
+# Set the input variables #
+###########################
+
+maxit=$1
+exe=$2
+sim=$3
+symm=$4
+seed=$5
+
+#############
+# Functions #
+#############
+
+function run_castep ()
+{
+    
+    # Ensure that the spin in the cell and param are consistent
+
+    if [[ `grep SPIN= $seed.cell | wc -l` -gt 0 ]]; then
+	grep -v -i "spin " $seed.param > $seed.param.temp
+	echo "spin : " `grep SPIN= $seed.cell| awk 'BEGIN {FS="SPIN="};{ sum += $2 } END {print sum}'` >> $seed.param.temp
+	mv $seed.param.temp $seed.param
+    fi
+    
+    set +e
+    eval $exe $seed
+    set -e
+    
+    # Trap a crashing of the code
+    
+    crashed=`tail -20 $seed.castep | grep "Total time          = " | awk '{print $1}'`
+    
+    if [[ $crashed != Total ]]; then
+	exit 0 # Fail peacefully
+    fi
+    
+    # Monitor the convergence
+    
+    grep ": finished iteration" $seed.castep | awk 'BEGIN {FS="enthalpy="};{print $2}' | awk '{print $1}' > $seed.conv
+    
+    # Determine how the run finished
+    
+    converged=`grep "Geometry optimization" $seed.castep | tail -1 | awk 'BEGIN {FS="optimization"};{print $2}'| awk '{print $1}'`
+    
+    if [[ $converged == completed ]]; then
+	if [[ $success -gt 1 ]]; then
+	    let success=success-1
+	fi
+    else
+	success=3
+    fi
+    
+    numit=`grep -E -e ': finished iteration' $seed.castep | wc -l`
+    
+    if [[ $numit -ge $maxit ]]; then
+	success=1
+    fi
+    
+    return;
+}
+
+####################
+
+function new_cell ()
+{
+
+    # Symmetrise on the fly
+    
+    if [[ $symm > 0 ]]; then
+
+	nat0=`cabal cell res < $seed-out.cell | wc | awk '{printf $1-5}'`
+	cellsym -e=$symm --primitive $seed-out.cell | cabal cell cell > $seed-out.cell.temp ; mv $seed-out.cell.temp $seed-out.cell
+	nat1=`cabal cell res < $seed-out.cell | wc | awk '{printf $1-5}'`
+	if [ $nat0 != $nat1 ]; then
+	    success=3
+	fi
+	
+    fi
+    
+    sed -n -e '/^%BLOCK [Ll][Aa][Tt]*/, /^%ENDBLOCK [Pp][Oo][Ss]*/p' $seed-out.cell | grep -v -i FIX_VOL | sed -e '/^%BLOCK [Cc][Ee][Ll]*/, /^%ENDBLOCK [Cc][Ee][Ll]*/d' > $seed-out.cell.temp;
+    sed -e '/ANG/d' $seed-out.cell.temp > $seed.cell.temp;
+    sed -e '/^%BLOCK [Ll][Aa][Tt]*/, /^%ENDBLOCK [Pp][Oo][Ss]*/d' $seed.cell >> $seed.cell.temp;
+    mv $seed.cell.temp $seed.cell;
+    rm $seed-out.cell.temp;
+    
+    # If we are doing a spin polarised calculation, store the spins calculated by Mulliken analysis
+
+    if [[ `grep "SPIN=" $seed.cell | wc -l` -gt 0 ]]; then
+
+	nlines=`sed -n '/[pP][oO][sS][iI][tT][iI][oO][nN][sS]/{=; q;}' $seed.cell`
+	printf "\n" > $seed.spin
+	for (( j = 2 ; j <= $nlines; j++ ))
+	do
+	    printf "\n" >> $seed.spin
+	done
+	
+	nions=`grep "Total number of ions in cell =" $seed.castep | tail -1 | awk '{print $8}'`
+
+	sed -n '/Total  Charge (e)  Spin (hbar\/2)/,/Spin       Length (A)/p' $seed.castep | sed '/==/,/==/!d;//d' | awk '{print "SPIN=",$9}'| tail -$nions >> $seed.spin
+	
+	awk 'BEGIN { FS="SPIN=" };{print $1}' $seed.cell | paste - $seed.spin | expand > $seed.cell.temp
+	
+	mv $seed.cell.temp $seed.cell
+	rm $seed.spin
+	
+    fi
+    
+    # Check if we have seen this structure before
+    
+    if [[ $sim > 0 ]]; then
+
+        nat=`cabal cell res < $seed.cell | wc | awk '{printf $1-5}'`
+	name=${seed##*/}
+        known=`(find . -maxdepth 1 -name '*.res' | xargs cat; cabal cell res < $seed.cell | sed "1s/.*/TITL $name 0.0 0.0 0.0 0 0 $nat (P1) n - 1/" ) | cryan -c $sim $name 2> /dev/null | awk '{print $1}' | head -1`
+
+        if [ -e $known.res ]; then 
+
+	    # Add one to the count
+
+	    mv $known.res $known.res.work
+	    grep TITL $known.res.work | awk 'BEGIN { FS = "n -" } ; { print $1,"n -",$2+1 }' > $known.res.new
+	    grep -v TITL $known.res.work  >> $known.res.new
+	    mv $known.res.new $known.res
+	    rm -f $known.res.work
+ 
+	    exit 0 # Fail peacefully
+	    
+	fi
+    fi
+
+	
+    return;
+}
+
+############
+# Optimise #
+############
+
+if [[ $maxit -gt 0 ]]; then
+    
+    # Adjust the number of optimisation steps to two
+    
+    sed 's/geom_max_iter/#geom_max_iter/g' $seed.param > $seed.param.temp
+    mv $seed.param.temp $seed.param
+    echo 'geom_max_iter=3#MARKED' >> $seed.param
+    
+    # Do three short rough runs
+    
+    success=3
+    
+    for ((  i = 1 ;  i <= 3;  i++  ))
+    do
+	run_castep
+	new_cell
+    done
+    
+    # Put the number of optimisation steps back to the original value
+    
+    grep -v "geom_max_iter=3#MARKED" $seed.param | sed 's/#geom_max_iter/geom_max_iter/g' > $seed.param.temp
+    mv $seed.param.temp $seed.param
+    
+else
+    
+    success=2
+    
+fi
+
+# Complete the full optimisation
+
+while [[  $success -gt 1 ]]; do
+    run_castep
+    new_cell
+done
+
+# All is well - finish
+
+grep "Pressure:" $seed.castep | tail -1 | awk 'BEGIN{FS="[*]|[:]"}{printf "%-20s%10.8f\n", "Pressure: ",$3}';
+grep -E -e 'Final free|corrected final free|Final Enthalpy' $seed.castep | tail -1 | awk 'BEGIN {FS="="};{print $2}' | awk '{printf "%-20s%10.8f\n", "Enthalpy: ",$1}'
+
+grep "Current cell volume =" $seed.castep | tail -1 | awk '{printf "%-20s%10.8f\n", "Volume: ",$5}';
+
+exit 0

@@ -1,0 +1,22 @@
+#!/bin/bash
+
+if [ $# -lt 1 ]; then
+  echo 'name <prefix>'
+  exit 999
+fi
+mkdir named
+for f in *.res
+do
+  fn=`cryan -l -r < $f | awk '{print $5"-"$6"-"$7}'`
+  fn=$1-"${fn//\/}"
+  fnu=$fn
+  n=1
+  while [ -f ./named/$fnu.res ] ; do
+    ((++n))
+    fnu=$fn-$n
+  done	
+  cp $f ./named/$fnu.res
+  sed "s/^TITL [^ ]*/TITL $fnu/" ./named/$fnu.res > ./named/$fnu.res.new ; mv ./named/$fnu.res.new ./named/$fnu.res
+done
+
+exit 0

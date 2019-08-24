@@ -1,0 +1,41 @@
+#!/bin/bash
+###############################################################
+# Script to perform a geometry optimistion using the pp0 code #
+###############################################################
+
+set -e
+
+#########################
+# Test usage is correct #
+#########################
+
+if [ $# -ne 2 ]; then
+         echo 1>&2 "Usage: pp0_relax <exe> <seed>"
+         exit 127
+fi
+
+###########################
+# Set the input variables #
+###########################
+
+exe=$1
+seed=$2
+
+(cabal cell xyz < $seed.cell;cat connect 2>/dev/null) | $exe 2> $seed.pout | cabal xyz cell > $seed-out.cell
+
+# Construct a fake Castep output file
+
+echo " *  Pressure: 0" > $seed.castep
+grep energy: $seed.pout | tail -1 | awk '{print " PP0: Final Enthalpy     = "$3}' >> $seed.castep
+echo "Current cell volume = 0" >> $seed.castep
+
+# Return the key results
+
+echo "Volume:   0.00000001"
+echo "Pressure: 0.00000000"
+grep energy: $seed.pout | tail -1 | awk '{print "Energy: "$3}'
+grep energy: $seed.pout | tail -1 | awk '{print "Enthalpy: "$3}'
+echo "Stress: 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000"
+
+
+exit 0

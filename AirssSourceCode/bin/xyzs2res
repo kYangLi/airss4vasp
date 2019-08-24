@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -e
+
+#########################
+# Test usage is correct #
+#########################
+
+if [ $# -ne 1 ]; then
+    echo 1>&2 "Usage: xyzs2res [padding]"
+    exit 127
+fi
+
+for f in *.xyz
+do
+        cabal xyz res $1 < $f > ${f%.*}.res
+done
+
+exit 0

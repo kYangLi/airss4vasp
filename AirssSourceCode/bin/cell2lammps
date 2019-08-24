@@ -1,0 +1,46 @@
+#!/usr/bin/env perl
+
+# This should be set to your cteprouts path, set it to wherever cell2shx is
+
+my $ctpath;
+BEGIN{ $ctpath=`which cell2shx | sed "s/cell2shx//g"`;chomp($ctpath); }
+use lib "$ctpath";
+use ceteprouts;
+
+ReadNewtepCell (\@a, \@b, \@c, \@atomx, \@atomy, \@atomz, \@atyi);
+my @box = (0,1,0,1,0,1);
+
+my ($aa, $bb, $cc, $ag, $bg, $cg) = MATtoABC(\@a, \@b, \@c);
+&ABCtoMATrotaxis($aa,$bb,$cc,$ag,$bg,$cg, \@ar, \@br, \@cr);
+ReBox (\@ar, \@br, \@cr, \@atomx, \@atomy, \@atomz, \@box);
+# LAMMPS tilt factor constraints: br[0] < ar[0]/2 AND
+# ar[0]/2 < cr[0],cr[1] < br[0]/2
+# UNLESS setting "box tilt large" is used
+
+FracToCart(\@ar, \@br, \@cr, \@atomx, \@atomy, \@atomz, \@cartx, \@carty, \@cartz);
+
+$nat = @atyi;
+my %counts;
+$counts{$_}++ for @atyi;
+my $nspec = keys %counts;
+
+for $i (0..$nspec-1) {
+  printf "$ATYPE[$i] ";
+}
+printf "\n\n";
+printf "$nat atoms\n";
+printf "$nspec atom types\n\n";
+
+printf "%7.4f %7.4f xlo xhi\n",0.0,$ar[0];
+printf "%7.4f %7.4f ylo yhi\n",0.0,$br[1];
+printf "%7.4f %7.4f zlo zhi\n",0.0,$cr[2];
+printf "%7.4f %7.4f %7.4f xy xz yz\n\n",$br[0],$cr[0],$cr[1];
+printf "Masses\n\n";
+for $i (1..$nspec) {
+  printf "$i 1.0\n";
+}
+printf "\n";
+printf "Atoms\n\n";
+for $i (0..$nat-1) {
+  printf "%5d %5d %14.8f %14.8f %14.8f\n",$i+1,@atyi[$i]+1,@cartx[$i],@carty[$i],@cartz[$i];
+}

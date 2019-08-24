@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if [ $# -lt 2 ]; then
+    echo 'mc <energy/fu> <nfu>'
+    exit 999
+fi
+
+bc <<< $1*$2 | awk '{print "0",$1,"\n100",$1}' > ref.conv
+
+exit 0

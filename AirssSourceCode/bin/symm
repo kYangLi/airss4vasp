@@ -1,0 +1,36 @@
+#!/bin/bash
+
+if [ $# -eq 1 ]; then
+    mode="crystal"
+    seed=$1
+elif [ $# -eq 2 ]; then
+    mode=$1
+    seed=$2
+else
+    echo 'symm [-cl] <seedname>'
+    exit 999
+fi
+
+if [ $mode == -cl ]; then
+
+    if command -v symmol &>/dev/null; then
+	cabal res xyz < $seed.res > $seed.tmp.xyz
+	csymm $seed.tmp.xyz | head -1 | awk '{print "("$1")"}'
+	rm -f $seed.tmp.xyz
+    else
+	echo '(n/a)'
+    fi
+    
+else
+    
+    if command -v cellsym &>/dev/null; then
+	grep -v REM $seed.res > $seed.temp.res
+	cellsym -e=0.1 --int $seed.temp.res 2>&1 >/dev/null | awk '$2=="International"{print "("$5")"}' | sed 's/_//g'
+	rm -f $seed.temp.res
+    else
+       	echo '(n/a)'
+    fi
+    
+fi
+
+exit 0

@@ -1,0 +1,35 @@
+#!/bin/bash
+
+set -e
+
+#########################
+# Test usage is correct #
+#########################
+
+if [ $# -ne 0 ]; then
+    echo 1>&2 "Usage: prim"
+    exit 127
+fi
+
+for f in *.res
+do
+    seed=`grep TITL $f | awk '{print $2}'`
+    pres=`grep TITL $f | awk '{print $3}'`
+    volu=`grep TITL $f | awk '{print $4}'`
+    enth=`grep TITL $f | awk '{print $5}'`
+    spin=`grep TITL $f | awk '{print $6}'`
+    mspn=`grep TITL $f | awk '{print $7}'`
+    nat0=`grep TITL $f | awk '{print $8}'`
+    spgp=`grep TITL $f | awk '{print $9}'`
+    grep -v REM $f > $f.res
+    cellsym -e=0.1 --primitive $f.res 2>/dev/null | cabal cell res | cabal res res > $f.prim ; mv $f.prim $f
+    nat=`sed -n '/^SFAC/,/^END/p' $f | wc | awk '{printf $1-2}'`
+    volu=`awk "BEGIN {print $volu*$nat/$nat0}"`
+    enth=`awk "BEGIN {print $enth*$nat/$nat0}"`
+    spin=`awk "BEGIN {print $spin*$nat/$nat0}"`
+    mspn=`awk "BEGIN {print $mspn*$nat/$nat0}"`
+    titl=`echo TITL $seed $pres $volu $enth $spin $mspn $nat $spgp "n - 1"`
+    sed "1 s%.*%$titl%" $f > $f.res ; mv $f.res $f
+done
+
+exit 0

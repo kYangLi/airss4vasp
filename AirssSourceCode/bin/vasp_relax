@@ -1,0 +1,64 @@
+#!/bin/bash
+################################################################
+# Script to perform a geometry optimistion using the vasp code #
+################################################################
+
+set -e
+
+#########################
+# Test usage is correct #
+#########################
+
+if [ $# -ne 2 ]; then
+         echo 1>&2 "Usage: vasp_relax <exe> <seed>"
+         exit 127
+fi
+
+###########################
+# Set the input variables #
+###########################
+
+exe=$1
+seed=$2
+
+root=${seed%%-*}
+root=${root##*\/}
+
+mkdir $seed
+cp $seed.POTCAR $seed/POTCAR
+cp $seed.INCAR $seed/INCAR
+cabal cell poscar < $seed.cell > $seed/POSCAR
+cd $seed
+
+for ((  i = 1 ;  i <= 4;  i++  ))
+do
+    $exe
+    cp CONTCAR POSCAR
+done
+
+cd ..
+
+# Construct fake Castep output files
+
+cabal poscar cell < $seed/CONTCAR > $seed-out.cell
+
+echo " Welcome to a b c VASP" > $seed.castep
+(printf " Run started: at " ; grep "executed on" $seed/OUTCAR | awk '{print $5,$6}') >> $seed.castep
+(printf " from code version ";grep build $seed/OUTCAR) >> $seed.castep
+
+echo "                          Files used for pseudopotentials:" >> $seed.castep
+md5sum $root.POTCAR | awk '{print $2,"("$1")"}' >> $seed.castep
+echo >> $seed.castep
+echo "                           -------------------------------" >> $seed.castep
+
+grep pressure $seed/OUTCAR | tail -1 | awk '{print " *  Pressure: "($4+$9)*0.1}' >> $seed.castep
+grep "enthalpy is" $seed/OUTCAR | tail -1 | awk '{print " VASP: Final Enthalpy     = "$5}' >> $seed.castep
+grep "volume of cell"   $seed/OUTCAR | tail -1 | awk '{print "Current cell volume = "$5}' >> $seed.castep
+
+# Return the key results
+
+grep " *  Pressure: " $seed.castep | awk '{printf "%-20s%10.8f\n", "Pressure: ",$3}'
+grep " VASP: Final Enthalpy     = " $seed.castep | awk '{printf "%-20s%10.8f\n", "Enthalpy: ",$5}'
+grep "Current cell volume = " $seed.castep | awk '{printf "%-20s%10.8f\n", "Volume: ",$5}'
+
+exit 0

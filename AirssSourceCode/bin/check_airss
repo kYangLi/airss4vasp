@@ -1,0 +1,162 @@
+#!/bin/bash
+
+# Issue the stopairss command on ^C
+
+trap stop_check SIGINT 
+
+function stop_check ()
+{
+    return
+}
+
+function check_cmd ()
+{
+if command -v $1 &>/dev/null; then
+    echo $1' +'
+else
+    echo $1' - '$2
+fi
+return
+}
+
+echo 'Essential:'
+echo
+check_cmd airss.pl   "Add AIRSS/bin to your path"
+check_cmd run.pl     "Add AIRSS/bin to your path"
+check_cmd crud.pl    "Add AIRSS/bin to your path"
+check_cmd castep2res "Add AIRSS/bin to your path"
+check_cmd buildcell  "Compile buildcell (make ; make install ; make neat), and add AIRSS/bin to your path"
+check_cmd cryan      "Compile cryan (make ; make install ; make neat), and add AIRSS/bin to your path"
+check_cmd pp3        "Compile pp3 (make ; make install ; make neat), and add AIRSS/bin to your path"
+check_cmd cabal      "Compile cabal (make ; make install ; make neat), and add AIRSS/bin to your path"
+check_cmd cellsym    "Install cellsym: http://www.tcm.phy.cam.ac.uk/sw/check2xsf/cellsym.tgz"
+check_cmd symmol     "Patch and install symmol: https://www.mtg.msm.cam.ac.uk/files/symmol.zip"
+echo
+echo 'Recommended:'
+echo
+check_cmd castep     "Install castep: http://www.castep.org/"
+check_cmd optados    "Install optados: http://www.tcm.phy.cam.ac.uk/~ajm255/optados/index.html"
+check_cmd qhull      "Install qhull from package manager, or: http://www.qhull.org/"
+check_cmd qconvex    "Install qhull from package manager, or: http://www.qhull.org/"
+check_cmd xmgrace    "Install grace from package manager or: http://plasma-gate.weizmann.ac.il/Grace/"
+check_cmd Rscript    "Install R/Rscript and ggtern from package manager or: https://cran.r-project.org/"
+echo 
+echo 'Optional:'
+echo
+check_cmd gulp       "Install gulp: http://gulp.curtin.edu.au/gulp/"
+check_cmd cif2cell   "Install cif2cell from: http://cif2cell.sourceforge.net/"
+echo
+echo 'Very optional:'
+echo
+check_cmd lammps     "Install lammps: http://lammps.sandia.gov/"
+check_cmd hull       "Install hull: http://www.netlib.org/voronoi/hull.html"
+check_cmd off_util   "Install antiprism: http://www.antiprism.com/files/antiprism-0.24.1.tar.gz"
+
+
+echo
+echo 'Pseudopotentials:'
+echo
+if [[ -f $PSPOT_DIR/H_00PBE.usp ]]; then
+    echo $PSPOT_DIR' +'
+else
+    echo "pspot - set \$PSPOT_DIR to location of the CASTEP pspot directory"
+fi
+echo
+echo 'Spawn file:'
+echo
+if [[ -f ~/.spawn ]]; then
+    echo '.spawn +'
+else
+    echo '.spawn - '
+fi
+
+rm -fr .check
+mkdir .check
+
+echo
+echo '--------------------'
+echo 'Tests run in .check:'
+echo '--------------------'
+echo
+echo 'Running example 1.1 (Crystals):'
+echo
+cp -r examples/1.1 .check
+cd .check/1.1
+airss.pl -pp3 -max 2 -seed Al
+ca -r
+cd ../..
+
+echo
+echo 'Running example 1.2 (Clusters):'
+echo
+cp -r examples/1.2 .check
+cd .check/1.2
+airss.pl -pp3 -cluster -max 2 -seed Al
+ca -r
+cd ../..
+
+if command -v gulp &>/dev/null; then
+    echo
+    echo 'Running example 3.1 (Gulp):'
+    echo
+    cp -r examples/3.1 .check
+    cd .check/3.1
+    airss.pl -gulp -max 2 -seed C2
+    ca -r
+    cd ../..
+    
+else
+    echo
+    echo 'Skipping example 3.1 (Gulp)'
+    echo
+fi
+
+if command -v castep &>/dev/null; then
+    echo
+    echo 'Running example 2.1a (Castep) - please wait, this is a DFT calculation:'
+    echo
+    cp -r examples/2.1 .check/2.1a
+    cd .check/2.1a
+    sed 's/KPOINTS_MP_SPACING 0.07/KPOINTS_MP_SPACING 0.1/g' C2.cell > temp.cell ; mv temp.cell C2.cell
+    sed 's/geom_max_iter        : 20/geom_max_iter        : 5/g' C2.param > temp.param ; mv temp.param C2.param
+    airss.pl -press 100 -max 1 -step 0 -keep -seed C2
+    if `cat trash/*.err 2>/dev/null| grep -q 'not in keyword list'`; then
+	echo 'Keywords not recognised, upgrade to CASTEP 17, or greater'
+    else
+	cat trash/*.err 2>/dev/null
+    fi
+    ca -r
+    cd ../..
+
+    if command -v mpirun &>/dev/null; then
+	nt=`getconf _NPROCESSORS_ONLN 2>/dev/null || getconf NPROCESSORS_ONLN 2>/dev/null || echo 1`
+	np=`echo $nt/2|bc`
+	echo
+	echo 'Running example 2.1b (mpi Castep on '$np' cores):'
+	echo
+	cp -r examples/2.1 .check/2.1b
+	cd .check/2.1b
+	sed 's/KPOINTS_MP_SPACING 0.07/KPOINTS_MP_SPACING 0.1/g' C2.cell > temp.cell ; mv temp.cell C2.cell
+	sed 's/geom_max_iter        : 20/geom_max_iter        : 5/g' C2.param > temp.param ; mv temp.param C2.param
+	airss.pl -press 100 -mpinp $np -max 1 -step 0 -keep -seed C2
+	if `cat trash/*.err 2>/dev/null| grep -q 'not in keyword list'`; then
+	    echo 'Keywords not recognised, upgrade to CASTEP 17, or greater'
+	else
+	    cat trash/*.err 2>/dev/null
+	fi
+	ca -r
+	cd ../..
+		
+    else
+	echo
+	echo 'Skipping example 2.1b (mpi Castep)'
+	echo
+    fi
+    
+else
+    echo
+    echo 'Skipping example 2.1a (Castep)'
+    echo
+fi
+
+

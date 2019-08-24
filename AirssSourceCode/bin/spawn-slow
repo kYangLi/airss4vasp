@@ -1,0 +1,65 @@
+#!/bin/bash
+
+#==================================================================================#
+#                                   spawn-slow                                     #
+#==================================================================================#
+#                                                                                  #
+# This file is part of the AIRSS structure prediction package.                     #
+#                                                                                  #
+# AIRSS is free software; you can redistribute it and/or modify it under the terms #
+# of the GNU General Public License version 2 as published by the Free Software    #
+# Foundation.                                                                      #
+#                                                                                  #
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY  #
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A  #
+# PARTICULAR PURPOSE.  See the GNU General Public License for more details.        #           
+#                                                                                  #
+# You should have received a copy of the GNU General Public License along with this#
+# program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street,#                   
+# Fifth Floor, Boston, MA  02110-1301, USA.                                        #
+#                                                                                  #
+#----------------------------------------------------------------------------------#
+# Slow job submission through ssh                                                  #
+#----------------------------------------------------------------------------------#
+# Written by Chris Pickard, Copyright (c) 2005-2018                                #
+#----------------------------------------------------------------------------------#
+#                                                                                  #
+#==================================================================================#
+
+
+if [ $# -lt 1 ]; then
+    echo 'spawn [command]'
+    exit 999
+fi
+
+echo `pwd` > ~/.current_project
+
+if ls .spawnpids* &>/dev/null; then
+    echo 'Spawn files detected - aborting ...'
+    exit 127
+fi
+
+command=$*
+mpinp=1
+
+while [ $# -gt 1 ] ; do
+    case $1 in
+	-mpinp) mpinp=$2 ; shift 2 ;;
+	*) shift 1 ;;
+    esac
+done
+
+for i in `grep -v \# ~/.spawn | awk 'BEGIN { FS = "slots=" } ; {print $1}'`
+do  
+    slots=`awk -v host=$i '$1==host {print $2}' ~/.spawn | awk 'BEGIN { FS = "slots=" } ; {print $2}'`
+    root=`awk -v host=$i '$1==host {print $3}' ~/.spawn | awk 'BEGIN { FS = "root=" } ; {print $2}'`
+    p=$root`pwd`
+    jobs=`echo "$slots/$mpinp" | bc`
+    if [ $jobs -gt 0 ]; then 
+	cmd='(cd '$p' ; for j in {1..'$jobs'}; do ( '$command' < /dev/null >& /dev/null & echo '$i' $! >> .spawnpids.'$i'.$j) ; done < /dev/null >& /dev/null &)'
+	ssh -x $i $cmd
+    fi
+done
+wait
+exit 0
+

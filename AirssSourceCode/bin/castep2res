@@ -1,0 +1,169 @@
+#!/bin/bash
+
+set -e
+
+#########################
+# Test usage is correct #
+#########################
+
+#if [ $# -ne 1 ]; then
+#    echo 1>&2 "Usage: castep2res <cluster> <seed>"
+#    exit 127
+#fi
+
+if [ $# -eq 1 ]; then
+    cluster=0
+    seed=$1
+elif [ $# -eq 2 ]; then
+    cluster=$1
+    seed=$2
+else
+    echo 'Usage: castep2res [cluster] <seedname>'
+    exit 127
+fi
+
+root=${seed%%-*}
+
+# Collect information for title string
+
+if [[ -e $seed.castep ]]; then
+    p=`grep "Pressure:" $seed.castep | tail -1 | awk 'BEGIN{FS="[*]|[:]"}{print $3}' | tr -d '[:space:]'`
+    volume=`grep "Current cell volume =" $seed.castep | tail -1 | awk 'BEGIN{FS="[=]"}{print $2}' | awk '{print $1}'`
+    enthalpy=`grep -E -e "Final Enthalpy|corrected final free|Final free energy" $seed.castep | tail -1 | awk 'BEGIN {FS="="};{print $2}' | awk '{print $1}'`
+    spin=`grep " Spin Den" $seed.castep 2> /dev/null | tail -1 | awk '{printf $5}'`
+    modspin=`grep " |Spin Den" $seed.castep 2> /dev/null | tail -1 | awk '{printf $5}'`
+fi
+
+if [[ -z $p ]]; then
+    p=0
+fi
+
+if [[ -z $enthalpy ]]; then
+    enthalpy=0
+fi
+
+if [[ -z $spin ]]; then
+    spin=0
+fi
+
+if [[ -z $modspin ]]; then
+    modspin=0
+fi
+
+if [[ -e $seed.odo ]]; then
+    efd=`grep EfD $seed.odo | tail -1 | awk '{print $7}'`
+    del=`grep DEL $seed.odo | tail -1 | awk '{print $11}'`
+elif [[ -e $seed-dos.odo ]]; then
+    efd=`grep EfD $seed-dos.odo | tail -1 | awk '{print $7}'`
+    del=`grep DEL $seed-dos.odo | tail -1 | awk '{print $11}'`  
+fi
+
+rm -f $seed.temp.res
+if [[ -e $seed-out.cell ]]; then
+    cabal cell  < $seed-out.cell > $seed.temp.res
+elif [[ -e $seed.castep ]]; then
+    cabal castep res < $seed.castep > $seed.temp.res
+elif [[ -e $seed.cell ]]; then
+    cabal cell res < $seed.cell > $seed.temp.res
+fi
+
+if [[ -z $volume ]]; then
+    volume=`awk '$1=="CELL" {print $3*$4*$5*sqrt(1+2*cos($6*atan2(0,-1)/180)*cos($7*atan2(0,-1)/180)*cos($8*atan2(0,-1)/180)-cos($6*atan2(0,-1)/180)^2-cos($7*atan2(0,-1)/180)^2-cos($8*atan2(0,-1)/180)^2)}' $seed.temp.res`
+fi
+
+if [[ $cluster -eq 1 ]]; then
+    sym=`symm -cl $seed.temp`
+elif [[ $cluster -eq 0 ]]; then
+    sym=`symm $seed.temp`
+fi
+
+if [[ -z $sym ]]; then
+    sym='(P1)'
+fi
+
+nat=`sed -n '/^SFAC/,/^END/p' $seed.temp.res | wc | awk '{printf $1-2}'`
+
+echo TITL ${seed##*\/} $p $volume $enthalpy $spin $modspin $del $nat $sym "n - 1"
+
+# Collect information for REM block
+
+projectdir=`pwd`
+host=`hostname`
+
+if [[ -e $seed.castep ]]; then
+	version=`grep " Welcome to " $seed.castep 2> /dev/null | tail -1 | awk '{print $6,$8}'`
+	fromcode=`grep " from code version " $seed.castep 2> /dev/null | tail -1`
+	rundate=`grep " Run started: " $seed.castep 2> /dev/null | tail -1`
+	functional=`grep " using functional " $seed.castep 2> /dev/null | tail -1 | awk 'BEGIN {FS=":"};{print " Functional",$2}'`
+	relativity=`grep " relativistic treatment " $seed.castep 2> /dev/null | tail -1 | awk 'BEGIN {FS=":"};{print " Relativity",$2}'`
+	dispersion=`grep " DFT+D: Semi-empirical dispersion correction " $seed.castep 2> /dev/null | tail -1 | awk 'BEGIN {FS=":"};{print " Dispersion",$3}'`
+
+	if [[ $dispersion == " Dispersion  on" ]]; then
+	  dispersion=`grep " SEDC with " $seed.castep 2> /dev/null | tail -1 | awk '{print " Dispersion",$4}'`
+	fi
+	
+	cutoff=`grep " plane wave basis set cut-off " $seed.castep 2> /dev/null | tail -1 | awk '{print " Cut-off",$7,$8}'`
+	gridscale=`grep " size of standard grid " $seed.castep 2> /dev/null | tail -1 | awk '{print " Grid scale",$6}'`
+	gmax=`grep " size of   fine   gmax " $seed.castep 2> /dev/null | tail -1 | awk '{print " Gmax",$6,$7}'`
+	fbsc=`grep " finite basis set correction  " $seed.castep 2> /dev/null | tail -1 | awk '{print " FBSC",$6}'`
+	
+	mpgrid=`grep " MP grid size for SCF calculation is  " $seed.castep 2> /dev/null | tail -1 | awk '{print " MP grid ",$8,$9,$10}'`
+	offset=`grep " with an offset of  " $seed.castep 2> /dev/null | tail -1 | awk '{print " Offset ",$5,$6,$7}'`
+	nkpts=`grep " Number of kpoints used =  " $seed.castep 2> /dev/null | tail -1 | awk '{print " No. kpts ",$6}'`
+     	psps=`sed '/Files used for pseudopotentials:/, /-------------------------------/!d;//d' $seed.castep 2> /dev/null | sort -r | uniq | sed -e 's/^[ \t]*//' | sed 's/^/REM /'`
+	spinmom=`sed -n '/Total  Charge (e)  Spin (hbar/,/Spin       Length (A)/p' $seed.castep | sed '/==/,/==/!d;//d' | awk '{print $9}' | tail -$nat`
+fi
+
+if [[ -e $seed.cell ]]; then
+    spacing=`grep "KPOINTS_MP_SPACING" $seed.cell 2> /dev/null | tail -1 | awk '{print " Spacing ",$2}'`
+    hubbard=`sed -n '/[hH][uU][bB][bB][aA][rR][dD]/,/[hH][uU][bB][bB][aA][rR][dD]/p' $seed.cell | sed '/[hH][uU][bB][bB][aA][rR][dD]/,/[hH][uU][bB][bB][aA][rR][dD]/!d;//d' | perl -p -e 's/\n/ /' | perl -p -e ' s/ +/ /g'`
+    compiler=`grep "# compiler" $seed.cell 2>/dev/null | sed 's/\#/ /g'` 
+    options=`grep "# options" $seed.cell 2>/dev/null | sed 's/\#/ /g'` 
+    randseed=`grep "# seed" $seed.cell 2>/dev/null | sed 's/\#/ /g'` 
+elif [[ -e $root.cell ]]; then
+    spacing=`grep "KPOINTS_MP_SPACING" $root.cell 2> /dev/null | tail -1 | awk '{print " Spacing ",$2}'`
+    hubbard=`sed -n '/[hH][uU][bB][bB][aA][rR][dD]/,/[hH][uU][bB][bB][aA][rR][dD]/p' $root.cell | sed '/[hH][uU][bB][bB][aA][rR][dD]/,/[hH][uU][bB][bB][aA][rR][dD]/!d;//d' | perl -p -e 's/\n/ /' | perl -p -e ' s/ +/ /g'`
+fi
+
+if [[ -e $root.cell ]]; then
+    md5=`md5sum $root.cell | awk '{print $2,"("$1")"}'`
+fi
+
+airss_version=`airss_version`
+
+echo 'REM'
+echo 'REM' $rundate 'in' $projectdir
+echo 'REM' $version $fromcode
+echo 'REM' $functional $relativity $dispersion
+echo 'REM' $cutoff $gridscale $gmax $fbsc
+echo 'REM' $mpgrid $offset $nkpts $spacing
+echo 'REM'
+echo 'REM' $md5
+echo 'REM' $airss_version
+echo 'REM' $compiler
+echo 'REM' $options
+echo 'REM' $randseed
+echo 'REM'
+
+if [[ ! -z $psps ]]; then
+    echo "$psps""$hubbard"
+fi
+if [[ ! -z $hubbard ]]; then
+    echo 'REM'
+fi
+
+grep 'CELL\|LATT\|SFAC' $seed.temp.res 
+
+if [[ ! -z $spinmom ]]; then
+    echo "$spinmom" > $seed.spinmom
+    grep -v 'TITL\|REM\|CELL\|LATT\|SFAC\|END' $seed.temp.res > $seed.atoms
+    paste -d" " $seed.atoms $seed.spinmom
+    echo "END"
+    rm -f $seed.atoms $seed.spinmom
+else
+    grep -v 'TITL\|REM\|CELL\|LATT\|SFAC' $seed.temp.res
+fi
+
+rm -f $seed.temp.res
+
+exit 0

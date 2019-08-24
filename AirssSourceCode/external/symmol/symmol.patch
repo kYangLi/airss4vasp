@@ -1,0 +1,42 @@
+--- symmol.f	2002-11-04 11:08:52.000000000 +0000
++++ ../SYMMOL/symmol.f	2016-08-14 18:31:04.000000000 +0100
+@@ -18,9 +18,9 @@
+ c if you want address all the output on the standard output, suppress the two
+ c sequent instruction and activate the third
+ c
+-      out=9
+-      OPEN(9,file='symmol.out')
+-c     out=6
++c      out=9
++c      OPEN(9,file='symmol.out')
++      out=6
+ c________________________________________________________________________
+       if(out.eq.9)then
+         write(*,*)'                  ============'
+@@ -328,7 +328,7 @@
+           endif
+         endif
+ 11    continue
+-      pause 'brent exceed maximum iterations'
++      stop 'brent exceed maximum iterations'
+ 3     xmin=x
+       brent=fx
+       return
+@@ -2458,7 +2458,7 @@
+       com=-com
+       call azzera(AA,0.d0,9)
+       go to 1355
+-di ognuna di queste quattro  matrici fare l'equivalente con -z!!!!!
++c     di ognuna di queste quattro  matrici fare l'equivalente con -z!!!!!
+  1360 continue
+  1370 continue
+       go to 2500
+@@ -2620,7 +2620,7 @@
+ C ma riduce la tolleranza accettata fra i momenti di inerzia per il
+ calcolo della degenerazione
+         if(porig.ne.PESO(1))then
+-          deliner=deliner*0.1d0
++          deliner=deliner*0.01d0
+           go to 460
+         endif
+ C 
