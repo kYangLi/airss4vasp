@@ -199,7 +199,7 @@ ${INTEL_MODULE}
 ### Parameter Setting ###
 #########################
 declare -r  SEED_NAME=${SEED_NAME}
-declare -r  NODES_NUM={nodes_num}
+declare -r  NODES_NUM=${nodes_num}
 declare -r  CORES_NUM_PER_NODE=${CORES_NUM_PER_NODE}
 declare -r  IS_2D_MATERIAL=${IS_2D_MATERIAL}
 declare -r  SYMM_PREC=${SYMM_PREC}
