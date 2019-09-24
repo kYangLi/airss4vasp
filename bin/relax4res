@@ -61,6 +61,12 @@ if [ ! -s CONTCAR ]; then
   echo "[error] Task:${task_stamp} CONTCAR not found!!!"
   exit 0
 fi
+# If it has a bad init. str.
+bad_poscar=$(tail -1 OUTCAR | grep 'Error EDDDAV: Call to ZHEGV failed.')
+if ! [ -z "${bad_poscar}" ]; then
+  echo "[error] Bad Initial Structure..."
+  exit
+fi
 # Generate the referance *.res file 
 sed '/Selective dynamics/d' CONTCAR > ${task_stamp}.vasp
 cabal poscar res < ${task_stamp}.vasp > ${task_stamp}.res

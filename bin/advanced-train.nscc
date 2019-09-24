@@ -189,15 +189,15 @@ echo "============== Task Submit =============="
 echo "[do] Generating the PBS task script..."
 cat > ${PBS_SUBMIT_SCRIPT} << EOF
 #!/bin/bash
-#PBS -N ${TASK_NAME}
-#PBS -l nodes=${nodes_num}:ppn=${CORES_NUM_PER_NODE}
-#PBS -j oe
+#
 
 ${INTEL_MODULE}
 #########################
 ### Parameter Setting ###
 #########################
 declare -r  SEED_NAME=${SEED_NAME}
+declare -r  NODES_NUM={nodes_num}
+declare -r  CORES_NUM_PER_NODE=${CORES_NUM_PER_NODE}
 declare -r  IS_2D_MATERIAL=${IS_2D_MATERIAL}
 declare -r  SYMM_PREC=${SYMM_PREC}
 declare -r  RELAX_KP_SEP=${relax_kp_sep}
@@ -209,13 +209,9 @@ cat >> ${PBS_SUBMIT_SCRIPT} << 'EOF'
 ##################################
 ### Perpare Before Calculation ###
 ##################################
-## Enter the Calculate Folder
-cd ${PBS_O_WORKDIR}
 ## Get the Nodes' Info.
-# Copy the machinefile
-cp ${PBS_NODEFILE} ${MPI_MACHINE_FILE}
 # Calc. the total cores number.
-total_cores_num=$(cat ${MPI_MACHINE_FILE} | wc -l)
+((total_cores_num=NODES_NUM*CORES_NUM_PER_NODE))
 ## Get the POSCAR List
 poscar_list=$(ls *.vasp)
 
@@ -242,9 +238,7 @@ for str_poscar in ${poscar_list}; do
   fi
   ## Job Submit
   date >> VASP.log
-  mpirun -machinefile ${MPI_MACHINE_FILE} \
-         -np ${total_cores_num} \
-         vasp >> VASP.log
+  yhrun -N ${NODES_NUM} -n ${total_cores_number} vasp >> VASP.log
   date >> VASP.log
   ## Str. Data Output
   cp CONTCAR ../FINAL-TEAM/${str_id}.final.vasp
@@ -266,9 +260,7 @@ for str_poscar in ${poscar_list}; do
   fi
   ## Job Submit
   date >> VASP.log
-  mpirun -machinefile ../${MPI_MACHINE_FILE} \
-         -np ${total_cores_num} \
-         vasp >> VASP.log
+  yhrun -N ${NODES_NUM} -n ${total_cores_number} vasp >> VASP.log
   date >> VASP.log
   ## Final Enthalpy Output
   enthalpy=$(grep 'TOTEN' OUTCAR | tail -1 | awk '{print $5}')
@@ -326,8 +318,8 @@ EOF
 
 echo "[do] Submitting the Task... "
 read -p '[input] Press <ENTER> to submit the task...'
-echo "[do] qsub ${PBS_SUBMIT_SCRIPT}"
-qsub ${PBS_SUBMIT_SCRIPT}
+echo "[do] yhbatch -N ${nodes_num} -J ${TASK_NAME} ${PBS_SUBMIT_SCRIPT}"
+yhbatch -N ${nodes_num} -J ${TASK_NAME} ${PBS_SUBMIT_SCRIPT}
 echo "[done]"
 
 cd ..
