@@ -231,7 +231,7 @@ for str_poscar in ${poscar_list}; do
   # | 1 -> Structure Relazation |
   # +---------------------------+
   ## Input File Prepare 
-  cp ${str_poscar} POSCAR
+  mv ${str_poscar} POSCAR
   cp INCAR-RELAX INCAR
   if [ -e KPOINTS-RELAX ]; then 
     cp KPOINTS-RELAX KPOINTS
@@ -276,55 +276,56 @@ for str_poscar in ${poscar_list}; do
   ## Final Enthalpy Output
   enthalpy=$(grep 'TOTEN' OUTCAR | tail -1 | awk '{print $5}')
   echo "##  ${str_id}  ${enthalpy}" >> ../FINAL-TEAM/Report.record
+
+  ######################
+  ### Gen *.res file ###
+  ######################
+  ## Collect the calc. res.
+  # If do not obtain the final result
+  if [ ! -s CONTCAR ]; then 
+    echo "[error] Task:${str_id} CONTCAR not found!!!"
+    exit 0
+  fi
+  # Generate the referance *.res file 
+  sed '/Selective dynamics/d' CONTCAR > ${str_id}.vasp
+  cabal poscar res < ${str_id}.vasp > ${str_id}.res
+  rm ${str_id}.vasp
+  # Collect the result from OUTCAR
+  seed_name=${str_id}
+  pressure=$(grep 'PSTRESS' OUTCAR | awk '{print $2}')
+  volume=$(grep 'volume of cell' OUTCAR | tail -1 | awk '{print $5}')
+  enthalpy=$(grep 'TOTEN' OUTCAR | tail -1 | awk '{print $5}')
+  if [ -z ${enthalpy} ]; then
+    enthalpy=88888
+  fi
+  spin=0
+  modspin=0
+  total_atom_num=$(grep 'NIONS' OUTCAR | awk '{print $NF}')
+  symmetry=$(cellsym -e=${SYMM_PREC} --int ${str_id}.res 2>&1 > /dev/null | 
+            grep 'International symmetry is'| 
+            awk '{print "("$NF")"}')
+  if [ -z ${symmetry} ]; then
+    symmetry="(n/a)"
+  fi
+  # Gen. the final *.res file
+  res_title="TITL ${seed_name} ${pressure} ${volume} ${enthalpy} ${spin} \
+                  ${modspin} ${total_atom_num} ${symmetry} n - 1" 
+  res_title=$(echo ${res_title})  # Del. the unnessary blank
+  sed -i "/TITL/c${res_title}" ${str_id}.res
+  mv ${str_id}.res ../FINAL-TEAM/
+  mv OUTCAR ../FINAL-TEAM/${str_id}.outcar
+
+  ####################
+  ### Data Process ###
+  ####################
+  sort -g -k 3 ../FINAL-TEAM/Report.record > Report.sorted.temp
+  head -1 Report.sorted.temp > Report.temp
+  sed -i '1d' Report.sorted.temp
+  awk 'BEGIN{i=1}{print i"  "$2"  "$3; i++}' Report.sorted.temp >> Report.temp
+  column -t Report.temp > Report.column.temp
+  cp Report.column.temp ../FINAL-TEAM/Report.record
+  rm *.temp
 done
-
-######################
-### Gen *.res file ###
-######################
-## Collect the calc. res.
-# If do not obtain the final result
-if [ ! -s CONTCAR ]; then 
-  echo "[error] Task:${str_id} CONTCAR not found!!!"
-  exit 0
-fi
-# Generate the referance *.res file 
-sed '/Selective dynamics/d' CONTCAR > ${str_id}.vasp
-cabal poscar res < ${str_id}.vasp > ${str_id}.res
-# Collect the result from OUTCAR
-seed_name=${str_id}
-pressure=$(grep 'PSTRESS' OUTCAR | awk '{print $2}')
-volume=$(grep 'volume of cell' OUTCAR | tail -1 | awk '{print $5}')
-enthalpy=$(grep 'TOTEN' OUTCAR | tail -1 | awk '{print $5}')
-if [ -z ${enthalpy} ]; then
-  enthalpy=88888
-fi
-spin=0
-modspin=0
-total_atom_num=$(grep 'NIONS' OUTCAR | awk '{print $NF}')
-symmetry=$(cellsym -e=${SYMM_PREC} --int ${str_id}.res 2>&1 > /dev/null | 
-           grep 'International symmetry is'| 
-           awk '{print "("$NF")"}')
-if [ -z ${symmetry} ]; then
-  symmetry="(n/a)"
-fi
-# Gen. the final *.res file
-res_title="TITL ${seed_name} ${pressure} ${volume} ${enthalpy} ${spin} \
-                ${modspin} ${total_atom_num} ${symmetry} n - 1" 
-res_title=$(echo ${res_title})  # Del. the unnessary blank
-sed -i "/TITL/c${res_title}" ${str_id}.res
-mv ${str_id}.res ../FINAL-TEAM/
-cp OUTCAR ../FINAL-TEAM/${str_id}.outcar
-
-####################
-### Data Process ###
-####################
-sort -g -k 3 ../FINAL-TEAM/Report.record > Report.sorted.temp
-head -1 Report.sorted.temp > Report.temp
-sed -i '1d' Report.sorted.temp
-awk 'BEGIN{i=1}{print i"  "$2"  "$3; i++}' Report.sorted.temp >> Report.temp
-column -t Report.temp > Report.column.temp
-cp Report.column.temp ../FINAL-TEAM/Report.record
-rm *.temp
 EOF
 
 echo "[do] Submitting the Task... "
