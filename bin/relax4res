@@ -49,11 +49,14 @@ for ((incar_index=1; incar_index<=incar_quantity; incar_index++)); do
 done
 end_time=$(date +%s)
 echo "[end_time] ${end_time} sec." >> VASP.log
+spend_time_raw=$(echo ${start_time} ${end_time} | 
+                 awk '{print $2-$1}')
 spend_time=$(echo ${start_time} ${end_time} | 
              awk '{print int(($2-$1)/86400)"d:"\
                          int(($2-$1)%86400/3600)"h:"\
                          int(($2-$1)%3600/60)"m:"\
                          ($2-$1)%60"s"}')
+echo "[spend_time_raw] Task ${task_stamp}: ${spend_time_raw}" >> VASP.log
 echo "[spend_time] Task ${task_stamp}: ${spend_time}" >> VASP.log
 ## Collect the calc. res.
 # If do not obtain the final result
@@ -64,7 +67,7 @@ fi
 # If it has a bad init. str.
 bad_poscar=$(tail -1 OUTCAR | grep 'Error EDDDAV: Call to ZHEGV failed.')
 if ! [ -z "${bad_poscar}" ]; then
-  echo "[error] Task ${task_stamp}: Bad Initial Structure..." >> VASP.log
+  echo "[error] Task ${task_stamp}: Bad Initial Structure!!!" >> VASP.log
   exit
 fi
 # Generate the referance *.res file 

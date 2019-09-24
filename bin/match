@@ -34,4 +34,5 @@ if [ ! -z "${delete_files}" ]; then
 fi
 
 # Analysis *.res files use cryan
+echo "Str.Stamp                P(kbar) V(A^3)      E(eV)    N Formula      Symm. Repeat"
 echo ${res_file_list} | xargs cat 2>/dev/null | cryan ${options_input}

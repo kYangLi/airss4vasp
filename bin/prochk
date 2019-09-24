@@ -1,0 +1,68 @@
+#!/bin/bash
+#
+# Author: liyang@cmt.tsinghua
+# Start Date: 2019.9.23
+# Last Update: 2019.9.23
+# Description: Calculation Process Check.
+#
+
+# Check if in the calc. folder
+if [ ! -e PARAM.CONF ] || [ ! -e vasp ]; then
+  echo '[error] Not in a A4V calculation folder!!!'
+  exit -1
+fi
+
+# Traverse and Record all Coaches' Info
+cat /dev/null > VASP.log.temp
+coach_list=$(ls . | grep COACH-)
+for coach in ${coach_list}; do 
+  grep '\[' ${coach}/VASP.log >> VASP.log.temp
+done
+
+# Get some necessary parameters
+seed_name=$(grep SEED_NAME PARAM.CONF | awk -F '=' '{print $2}')
+coach_num=$(echo ${coach_list} | wc -w)
+total_str_num=$(ls POSCAR-POOL/${seed_name}-*.cell 2>/dev/null | wc -w)
+untouched_str_num=$(ls POSCAR-POOL/${seed_name}-*.vasp 2>/dev/null | wc -w)
+finished_str_num=$(ls RES-POOL/*.res 2>/dev/null | wc -w)
+error_str_num=$(grep '\[error\]' VASP.log.temp | wc -l)
+no_contcar_str_num=$(grep '\[error\]' VASP.log.temp | grep 'CONTCAR' | wc -l)
+bad_poscar_str_num=$(grep '\[error\]' VASP.log.temp | grep 'Bad' | wc -l)
+((processed_str_num=error_str_num+finished_str_num))
+if [ "${total_str_num}" == "${processed_str_num}" ]; then 
+  run_state='[done] Mass-election Done!'
+else 
+  run_state='[info] Mass-election in Processing...'
+fi
+average_time_spend=$(grep '\[spend_time_raw\]' VASP.log.temp | 
+                     awk -F ':' '{print $2}' |
+                     awk '{sum+=$1}END{print sum/NR}')
+average_time_spend=${average_time_spend%.*}
+if [ -z "${average_time_spend}" ]; then
+  average_time_spend_format='null'
+  estimate_remain_time_format='null'
+else
+  average_time_spend_format=$(echo ${average_time_spend} | 
+                              awk '{print int($1%86400/3600)"h:"\
+                                          int($1%3600/60)"m:"\
+                                          $1%60"s"}')
+  ((estimate_remain_time=untouched_str_num*average_time_spend))
+  estimate_remain_time_format=$(echo ${estimate_remain_time} | 
+                                awk '{print int($1%86400/3600)"h:"\
+                                            int($1%3600/60)"m:"\
+                                            $1%60"s"}')
+fi
+# Process Summary Output
+echo "==================== Process Check ===================="
+echo "${run_state}"
+echo "[info] Seed Name          :  ${seed_name}"
+echo "[info] Succeed Str        :  ${finished_str_num}/${total_str_num}"
+echo "[info] Error Str          :  ${error_str_num}/${total_str_num}"
+echo "[info] Missing CONTCAR    :  ${no_contcar_str_num}/${error_str_num}"
+echo "[info] Bad Init. POSCAR   :  ${bad_poscar_str_num}/${error_str_num}"
+echo "[info] Ave. Time Per Str. :  ${average_time_spend_format}"
+echo "[info] Time Remain Estim. :  ${estimate_remain_time_format}"
+echo "======================================================="
+
+# Useless file remove 
+rm VASP.log.temp

@@ -149,11 +149,14 @@ echo "[do] match ${match_command_line} > MatchResult.log"
 match ${match_command_line} > MatchResult.log
 echo "[print] Match Result:"
 echo "[file] -------------------------------------------"
+echo "        Str.Stamp                P(kbar) V(A^3)      E(eV)    N Formula      Symm. Repeat"
+sed -i '1d' MatchResult.log
 cat -n MatchResult.log
 echo "[file] -------------------------------------------"
 echo "[input] Please input the Str. index you are intersted in."
 echo "[input] Default: ${DEFAULT_STR_INDEX_LIST}"
 read -p "> " str_index_list
+echo "[do] cd .."
 cd ..
 # Copy the POSCARs
 for str_index in ${str_index_list}; do

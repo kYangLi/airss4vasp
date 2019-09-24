@@ -65,7 +65,7 @@ if [ -z "${task_name}" ]; then
 fi
 echo "[info] Task name: ${task_name}"
 ## Intel Module
-intel_module=$(grep 'INTEL_MODUL12783935E' PARAM.CONF 2>/dev/null | 
+intel_module=$(grep 'INTEL_MODULE' PARAM.CONF 2>/dev/null | 
                awk -F '=' '{print $NF}')
 if [ -z "${intel_module}" ]; then
   intel_module=${DEFAULT_INTEL_MODULE}
@@ -193,10 +193,11 @@ if [ ! -e ${vasp_exec} ]; then
   echo "[error] Please check the value of ::vasp_exec:: in $0!!!"
   exit 0
 fi
-if [ ! -e vasp ]; then
-  echo "[do] Make a soft link from VASP path to current folder..."
-  ln -s ${vasp_exec} vasp
+if [ -e vasp ]; then
+  rm vasp
 fi
+echo "[do] Make a soft link from VASP path to current folder..."
+ln -s ${vasp_exec} vasp
 echo "[do] Adding current folder to env: 'PATH'..."
 export PATH="$(pwd):${PATH}"
 echo "[info] Your are using VASP: ${vasp_exec}"
@@ -336,8 +337,7 @@ rm -rf COACH-*
 rm -rf HEAD-COACH
 rm -r  POSCAR-POOL
 rm -r  RES-POOL
-rm     RES-POOL.record
-rm     POSCAR-POOL.record
+rm     TRAIN.record
 rm     _KILLJOB.sh
 rm     JobID.record
 rm     vasp
@@ -350,7 +350,7 @@ echo "[do] Generating _KILLJOB.sh"
 cat > _KILLJOB.sh << "EOF"
 #!/bin/bash
 #
-job_id=$(cat JobID.record | awk '{print $4}' | xargs./V )
+job_id=$(cat JobID.record | awk '{print $4}' | xargs)
 echo "yhcancel ${job_id}"
 yhcancel ${job_id}
 rm ./_KILLJOB.sh
@@ -455,8 +455,9 @@ while true; do
   # Otherwise, pick up POSCAR from the POSCAR POOL.
   else
     # Get the current POSCAR list in the POSCAR POOL
-    current_poscar_list=$(ls -1 ../POSCAR-POOL/*.vasp 2>/dev/null |
-                          awk -F '/' '{print $NF}')
+    current_poscar_list=$(ls -1 ../POSCAR-POOL/*.vasp 2>/dev/null | 
+                          awk -F '/' '{print $NF}' | sed 's/-/ /g' | 
+                          sort -k 4 -n | sed 's/ /-/g')
     # Check if the job done, on the BUILD BEFORE RELAX mode.
     if [ -z "${current_poscar_list}" ]; then
       echo "[info] ${current_coach} JOB DONE!"
@@ -476,12 +477,15 @@ while true; do
   fi
   # Record the pick up opration
   while true; do
-    io_is_busy=$(echo IO-BUSY-*.remark | awk '{print $1}')
+    io_is_busy=$(echo ../IO-BUSY-*.remark | awk '{print $1}')
     if [ ! -e ${io_is_busy} ]; then
-      touch IO-BUSY-${current_coach}.remark
-      echo "[do] ${current_coach} <-- ${pick_up_poscar}" \
-            >> ../POSCAR-POOL.record
-      rm IO-BUSY-${current_coach}.remark
+      touch ../IO-BUSY-${current_coach}.remark
+      echo "[do] ${pick_up_poscar} --> ${current_coach}" \
+            >> ../TRAIN.record
+      column -t ../TRAIN.record > train.record.temp
+      mv train.record.temp ../TRAIN.record
+      sleep 0.2
+      rm ../IO-BUSY-${current_coach}.remark
       break
     fi
     echo "[info] ${current_coach} is waitting for I/O..."
@@ -508,17 +512,20 @@ while true; do
   if [ -e *.res ]; then
     mv ${name_stamp}.res ../RES-POOL/
     cp OUTCAR ../RES-POOL/${name_stamp}.outcar
-    return_info="[done] ${current_coach} --> ${name_stamp}.res"
+    return_info="[done] ${pick_up_poscar} --> ${current_coach} --> ${name_stamp}.res"
   else
-    return_info="[fail] ${current_coach} -x> ${name_stamp}.res"
+    return_info="[fail] ${pick_up_poscar} --> ${current_coach} xxx ${name_stamp}.res"
   fi
   # Record the collect opration
   while true; do
-    io_is_busy=$(echo IO-BUSY-*.remark | awk '{print $1}')
+    io_is_busy=$(echo ../IO-BUSY-*.remark | awk '{print $1}')
     if [ ! -e ${io_is_busy} ]; then
-      touch IO-BUSY-${current_coach}.remark
-      echo "${return_info}" >> ../RES-POOL.record
-      rm IO-BUSY-${current_coach}.remark
+      touch ../IO-BUSY-${current_coach}.remark
+      sed -i "/${pick_up_poscar}/c${return_info}" ../TRAIN.record
+      column -t ../TRAIN.record > train.record.temp
+      mv train.record.temp ../TRAIN.record
+      sleep 0.2
+      rm ../IO-BUSY-${current_coach}.remark
       break
     fi
     echo "[info] ${current_coach} is waitting for I/O..."
