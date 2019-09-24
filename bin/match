@@ -1,0 +1,37 @@
+#!/bin/bash
+#
+# Descripution: ca
+#
+
+# Tips for usage
+if [ -z "$1" ]; then  
+  echo "[error] Not enough input"
+  echo '[tips] match [-R(recursive)] [command line arguments for cryan]'
+  exit 999
+fi
+
+# Check if need read the *.res file rescurively 
+read_res_recursively=false
+if [ "$1" == "-R" ]; then
+  shift 1;
+  read_res_recursively=true
+fi
+
+# Get the *.res file list
+if ${read_res_recursively}; then
+  res_file_list=$(find . -follow -name "*.res" | grep -v temp.res)
+else
+  res_file_list=$(find . -maxdepth 1 -name "*.res" | grep -v temp.res)
+fi
+
+# Get the input options for cryan
+options_input=$*
+
+# Double check for option: '--delete'
+delete_files=$(echo ${options_input} | grep -oh "\-\-delete")
+if [ ! -z "${delete_files}" ]; then
+  read -p "[input] Deleting files. To confirm type <Enter>"
+fi
+
+# Analysis *.res files use cryan
+echo ${res_file_list} | xargs cat 2>/dev/null | cryan ${options_input}

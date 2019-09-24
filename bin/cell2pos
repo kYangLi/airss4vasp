@@ -1,0 +1,118 @@
+#!/bin/bash
+#
+# Author: liyang@cmt.tsinghua
+# Start Date: 2019.9.19
+# Last Update: 2019.9.23
+# Descripution: Transfrom *.cell to POSCAR 
+#
+
+# Tips for usage
+if [ -z "$1" ]; then
+  echo "[error] Not enough input file."
+  echo "[tips] cell2pos <seed.cell> (<seed.gen.cell>)"
+  exit 0
+fi
+
+# read the file path
+str_cell=$1
+str_gen_cell=$2
+str_poscar="${str_cell%.cell}.vasp"
+
+# Generate the ref POSCAR file
+cabal cell poscar < ${str_cell} > ${str_poscar}
+
+# Read the cell generater file
+if [ ! -z "${str_gen_cell}" ]; then 
+  # If there are atoms need to fix position during vasp relaxzation
+  need_fix_position=$(grep "SD-" ${str_gen_cell})
+  if [ ! -z "${need_fix_position}" ]; then
+    # Pick the atoms position block in the generator file
+    atoms_start_line=$(grep -n '%BLOCK POSITIONS_' ${str_gen_cell} | 
+                      cut -d ':' -f 1)
+    atoms_end_line=$(grep -n '%ENDBLOCK POSITIONS_' ${str_gen_cell} | 
+                    cut -d ':' -f 1)
+    ((atoms_start_line++))
+    ((atoms_end_line--))
+    ((total_atom_lines=atoms_end_line-atoms_start_line+1))
+    sed -n "${atoms_start_line},${atoms_end_line}p" ${str_gen_cell} |
+      sed '/^\s*$/d' > Atoms.temp
+    # Add the 'Selective dynamics' char. in POSCAR
+    sd_insert_line=$(grep -n 'Direct' ${str_poscar} | cut -d ':' -f 1)
+    sed -i "${sd_insert_line}i\ Selective dynamics" ${str_poscar}
+    # If the SD-flag do not exist, then generate one
+    if [ ! -s SelDyn.Flag ] || [ ! -s tac-SelDyn.Flag ]; then
+      # Ordered the generator.cell file
+      cat /dev/null > Ordered.Atoms.temp
+      element_order=$(awk '{print $1}' Atoms.temp | awk '!arr[$0]++')
+      for element in ${element_order}; do
+        grep "${element} " Atoms.temp >> Ordered.Atoms.temp
+      done
+      # Generate the flag using ordered atoms
+      cat /dev/null > SelDyn.Flag
+      for ((atom_set_index=1; atom_set_index<=total_atom_lines; \
+            atom_set_index++)); do
+        current_line_keys=$(sed -n "${atom_set_index}p" Ordered.Atoms.temp | 
+                            awk -F '%' '{print $2}')
+        # Get the number of current atom
+        declare -i atom_num=1
+        num_is_set=$(echo ${current_line_keys}| grep 'NUM=')
+        if [ ! -z "${num_is_set}" ]; then
+          atom_num=$(echo ${current_line_keys#*NUM=} | awk '{print $1}')
+          if [ "${atom_num}" == "0" ]; then
+            echo "[error] Something wrong with the NUM=.. in ${str_gen_cell}" 
+            rm ${str_poscar}
+            exit 0
+          fi
+        fi
+        # Determine the type of flags
+        atom_need_fix_position=$(echo ${current_line_keys} | grep "SD-")
+        if [ ! -z "${atom_need_fix_position}" ]; then
+          fix_flag=${current_line_keys#*SD-}
+          fix_flag=$(echo ${fix_flag} | awk '{print $1}')
+          case ${fix_flag} in 
+          'X'|'FTT')
+            sd_flag='F T T';;
+          'Y'|'TFT')
+            sd_flag='T F T';;
+          'Z'|'TTF')
+            sd_flag='T T F';;
+          'XY'|'YX'|'FFT')
+            sd_flag='F F T';;
+          'YZ'|'ZY'|'TFF')
+            sd_flag='T F F';;
+          'ZX'|'XZ'|'FTF')
+            sd_flag='F T F';;
+          'XYZ'|'FFF')
+            sd_flag='F F F';;
+          *)
+            sd_flag='T T T';;
+          esac
+        else
+          sd_flag='T T T'
+        fi
+        for ((atom_index=1; atom_index<=atom_num; atom_index++)); do
+          echo ${sd_flag} >> SelDyn.Flag
+        done
+      done
+      tac SelDyn.Flag > tac-SelDyn.Flag
+    fi # Endif for SD-flag Generation
+    ## Paste the sd_flag and POSCAR
+    total_atoms_num=$(cat SelDyn.Flag | wc -l)
+    poscar_atom_start_line=$(grep -n 'Direct' ${str_poscar} | cut -d ':' -f 1)
+    ((poscar_atom_end_line=poscar_atom_start_line+total_atoms_num))
+    check_atoms_num=$(sed -n "${poscar_atom_start_line},\$p" ${str_poscar} | 
+                      grep "[0-9]\.[0-9]" | wc -l)
+    if [ "${total_atoms_num}" != "${check_atoms_num}" ]; then
+      echo '[error] Something wrong with the total atoms number in SD-Flag...'
+      rm ${str_poscar}
+      exit 1 
+    fi
+    head -n ${poscar_atom_end_line} ${str_poscar} | tac > tac-${str_poscar}.temp
+    paste -d ' ' tac-${str_poscar}.temp tac-SelDyn.Flag \
+      > tac-${str_poscar}.flaged.temp
+    tac tac-${str_poscar}.flaged.temp > ${str_poscar}
+    rm *.temp
+  fi # Endif for NEED FIX POSITION
+fi
+
+sed -i "1c${str_cell} to POSCAR" ${str_poscar}

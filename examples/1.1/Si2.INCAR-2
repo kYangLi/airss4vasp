@@ -1,0 +1,15 @@
+System  =  diamond Si
+ISTART  =  0
+ICHARG  =  2
+ ENCUT  =  240
+ISMEAR  =  0
+ SIGMA  =  0.1
+   NSW  =  30
+IBRION  =  1 
+  ISIF  =  2
+EDIFFG  =  -1E-02
+ EDIFF  =  1E-05
+  PREC  =  Accurate
+LORBIT  =  11
+LCHARG  =  .FALSE.
+ LWAVE  =  .FALSE.

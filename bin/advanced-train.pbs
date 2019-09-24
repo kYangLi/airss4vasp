@@ -1,0 +1,332 @@
+#!/bin/bash
+#
+# Author: liyang@cmt.tsinghua
+# Start Date: 2019.9.19
+# Last Update: 2019.9.23
+# Descripution: Enable a more percise relaxzation within the structures 
+#                 choose by user.
+#
+
+if ! [ -s PARAM.CONF ]; then
+  echo "[error] PARAM.CONF do not exist!!!"
+  echo "[error] Make sure you are under the main calc. folder!!!"
+  echo "[error] And run mass-election first!!" 
+  exit 0
+fi
+
+#########################
+### Parameter Setting ###
+#########################
+declare -r  SEED_NAME=$(grep 'SEED_NAME' PARAM.CONF | awk -F '=' '{print $NF}')
+declare -r  TASK_NAME=$(grep 'TASK_NAME' PARAM.CONF | 
+                        awk -F '=' '{print $NF}')-at
+declare -r  INTEL_MODULE=$(grep 'INTEL_MODULE' PARAM.CONF | 
+                           awk -F '=' '{print $NF}')
+declare -ri CORES_NUM_PER_NODE=$(grep 'CORES_NUM_PER_NODE' PARAM.CONF | 
+                                 awk -F '=' '{print $NF}')
+declare -r  IS_2D_MATERIAL=$(grep 'IS_2D_MATERIAL' PARAM.CONF | 
+                             awk -F '=' '{print $NF}')
+declare -r  SYMM_PREC=$(grep 'SYMM_PREC' PARAM.CONF | 
+                        awk -F '=' '{print $NF}')
+declare -r  DEFAULT_RELAX_KP_SEP=0.04
+declare -r  DEFAULT_SSC_KP_SEP=0.02
+declare -r  DEFAULT_NODES_NUM=1
+declare -r  DEFAULT_STR_INDEX_LIST='1 2 3 4 5 6'
+declare -r  PBS_SUBMIT_SCRIPT='VaspRematch.pbs.sh'
+declare -r  MPI_MACHINE_FILE='MachineFile'
+
+##########################
+### Parameters Read In ###
+##########################
+echo "=========== Parameters Read In ==========="
+## Nodes Number
+echo "[input] Please input the nodes number used for this task:"
+echo "[input] Default: ${DEFAULT_NODES_NUM}"
+read -p '> ' nodes_num
+if [ "" == "${nodes_num}" ];then
+  nodes_num=${DEFAULT_NODES_NUM}
+fi
+echo "[info] Nodes Number: ${nodes_num}"
+## Kpoints Separations
+if [ ! -e ${SEED_NAME}-KPOINTS-H-RELAX ] || \
+   [ ! -e ${SEED_NAME}-KPOINTS-H-SSC ]; then
+relax_kp_sep=''
+ssc_kp_sep=''
+  if [ ! -e ${SEED_NAME}-KPOINTS-H-RELAX ]; then 
+    echo "[input] Please input the Kpoints Separation for the Relaxztion."
+    echo "[input] Default: ${DEFAULT_RELAX_KP_SEP}"
+    read -p '> ' relax_kp_sep
+    if [ "" == "${relax_kp_sep}" ];then
+      relax_kp_sep="${DEFAULT_RELAX_KP_SEP}"
+    fi
+    echo "[info] Using Relax Sep: ${relax_kp_sep}"
+  else 
+    echo "[info] Use ${SEED_NAME}-KPOINTS-H-RELAX as relaxzation KPOINTS."
+  fi
+  if [ ! -e ${SEED_NAME}-KPOINTS-H-SSC ]; then
+    echo "[input] Please input the Kpoints Separation for the SSC."
+    echo "[input] Default: ${DEFAULT_SSC_KP_SEP}"
+    read -p '> ' ssc_kp_sep
+    if [ "" == "${ssc_kp_sep}" ];then
+      ssc_kp_sep="${DEFAULT_SSC_KP_SEP}"
+    fi
+    echo "[info] Using SSC Sep: ${ssc_kp_sep}"
+  else
+    echo "[info] Use ${SEED_NAME}-KPOINTS-H-SSC as SSC KPOINTS."
+  fi
+fi
+## Match command line options
+if [ "$1" == "" ]; then 
+  echo "[input] Please input the command line options for match."
+  read -p "> match -r " match_command_line
+  match_command_line="-r ${match_command_line}"
+else 
+  match_command_line="-r $@"
+fi
+echo "[info] Execute: match ${match_command_line}"
+echo ""
+
+##################
+### File Check ###
+##################
+## File Check and Process
+echo "=============== File Check & Process ==============="
+## Check the INCAR
+echo "[do] Checking INCAR..."
+if [ ! -e ${SEED_NAME}.INCAR-H-RELAX ]; then
+  echo "[error] ${SEED_NAME}.INCAR-H-RELAX is required!!!" 
+  exit 0
+fi
+if [ ! -e ${SEED_NAME}.INCAR-H-SSC ]; then
+  echo "[error] ${SEED_NAME}.INCAR-H-SSC is required!!!" 
+  exit 0
+fi
+echo "[info] PASS ::INCAR:: PASS"
+echo ""
+## Check the POTCAR
+echo "[do] Checking POTCAR..." 
+if [ ! -e ${SEED_NAME}.POTCAR ]; then 
+  echo "[error] POTCAR is required!!!"
+  exit 0
+fi
+echo "[info] PASS ::POTCAR:: PASS"
+
+# Check Vasp for Relaxzation 
+echo "[do] Checking Vasp..."
+if [ ! -e vasp ]; then 
+  echo "[error] File 'vasp' do not exist in current folder!!!"
+  exit 0
+fi
+vasp_exec=$(readlink vasp)
+if [ ! -e "${vasp_exec}" ]; then 
+  echo "[error] Vasp ${vasp_exec} do not exist!!!"
+  exit 0
+fi
+echo "[do] Adding current folder to env: 'PATH'..."
+export PATH="$(pwd):${PATH}"
+echo "[info] Your are using VASP: ${vasp_exec}"
+echo "[info] PASS ::VASP:: PASS"
+echo ""
+
+####################
+### File Prepare ###
+####################
+echo "[do] Creating the Advanced training Folder..."
+if [ -e HEAD-COACH ]; then 
+  rm -rf HEAD-COACH
+fi
+mkdir HEAD-COACH
+if [ ! -e FINAL-TEAM ]; then
+  echo "[do] Creating the Final Res Collect Folder"
+  mkdir FINAL-TEAM
+fi
+if [ ! -e FINAL-TEAM/Report.record ]; then
+  echo "No.  Str.Index  Enthalpy(eV)" >> FINAL-TEAM/Report.record
+fi
+echo "[do] cd RES-POOL"
+cd RES-POOL
+echo "[do] match ${match_command_line} > MatchResult.log"
+match ${match_command_line} > MatchResult.log
+echo "[print] Match Result:"
+echo "[file] -------------------------------------------"
+cat -n MatchResult.log
+echo "[file] -------------------------------------------"
+echo "[input] Please input the Str. index you are intersted in."
+echo "[input] Default: ${DEFAULT_STR_INDEX_LIST}"
+read -p "> " str_index_list
+cd ..
+# Copy the POSCARs
+for str_index in ${str_index_list}; do
+  str_id=$(sed -n "${str_index}p" RES-POOL/MatchResult.log | awk '{print $1}')
+  echo "[do] Processing ${str_id}.res..."
+  cabal res cell < RES-POOL/${str_id}.res > ${str_id}.cell
+  cell2pos ${str_id}.cell ${SEED_NAME}.cell
+  mv ${str_id}.vasp HEAD-COACH/
+  rm ${str_id}.cell
+done
+if [ -e SelDyn.Flag ]; then
+  rm SelDyn.Flag tac-SelDyn.Flag
+fi 
+# Copy The POTCAR, INCAR and KPOINTS
+cp ${SEED_NAME}.POTCAR HEAD-COACH/POTCAR
+cp ${SEED_NAME}.INCAR-H-RELAX HEAD-COACH/INCAR-RELAX
+cp ${SEED_NAME}.INCAR-H-SSC HEAD-COACH/INCAR-SSC
+if [ -e ${SEED_NAME}-KPOINTS-H-RELAX ]; then
+  cp ${SEED_NAME}-KPOINTS-H-RELAX HEAD-COACH/KPOINTS-RELAX
+fi
+if [ -e ${SEED_NAME}-KPOINTS-H-SSC ]; then
+  cp ${SEED_NAME}-KPOINTS-H-SSC HEAD-COACH/KPOINTS-SSC
+fi
+# Enter the calculation folder
+echo "[do] cd HEAD-COACH"
+cd HEAD-COACH/
+echo ""
+
+############################
+### Main Script Generate ###
+############################
+echo "============== Task Submit =============="
+echo "[do] Generating the PBS task script..."
+cat > ${PBS_SUBMIT_SCRIPT} << EOF
+#!/bin/bash
+#PBS -N ${TASK_NAME}
+#PBS -l nodes=${nodes_num}:ppn=${CORES_NUM_PER_NODE}
+#PBS -j oe
+
+${INTEL_MODULE}
+#########################
+### Parameter Setting ###
+#########################
+declare -r  SEED_NAME=${SEED_NAME}
+declare -r  IS_2D_MATERIAL=${IS_2D_MATERIAL}
+declare -r  SYMM_PREC=${SYMM_PREC}
+declare -r  RELAX_KP_SEP=${relax_kp_sep}
+declare -r  SSC_KP_SEP=${ssc_kp_sep}
+declare -r  MPI_MACHINE_FILE=${MPI_MACHINE_FILE}
+
+EOF
+cat >> ${PBS_SUBMIT_SCRIPT} << 'EOF'
+##################################
+### Perpare Before Calculation ###
+##################################
+## Enter the Calculate Folder
+cd ${PBS_O_WORKDIR}
+## Get the Nodes' Info.
+# Copy the machinefile
+cp ${PBS_NODEFILE} ${MPI_MACHINE_FILE}
+# Calc. the total cores number.
+total_cores_num=$(cat ${MPI_MACHINE_FILE} | wc -l)
+## Get the POSCAR List
+poscar_list=$(ls *.vasp)
+
+########################
+### Main Calculation ###
+########################
+for str_poscar in ${poscar_list}; do
+  str_id=${str_poscar%.vasp}
+  # +---------------------------+
+  # | 1 -> Structure Relazation |
+  # +---------------------------+
+  ## Input File Prepare 
+  cp ${str_poscar} POSCAR
+  cp INCAR-RELAX INCAR
+  if [ -e KPOINTS-RELAX ]; then 
+    cp KPOINTS-RELAX KPOINTS
+  else
+    if ${IS_2D_MATERIAL}; then
+      kpgen -s ${kp_sep} -f
+    else
+      kpgen -s ${kp_sep}
+    fi
+    cp KPOINTS KPOINTS-RELAX
+  fi
+  ## Job Submit
+  date >> VASP.log
+  mpirun -machinefile ${MPI_MACHINE_FILE} \
+         -np ${total_cores_num} \
+         vasp >> VASP.log
+  date >> VASP.log
+  ## Str. Data Output
+  cp CONTCAR ../FINAL-TEAM/${str_id}.final.vasp
+  cp CONTCAR POSCAR
+  # +------------------------------+
+  # | 2 -> Static Self Consistency |
+  # +------------------------------+
+  ## Input File Prepare 
+  cp INCAR-SSC INCAR
+  if [ -e KPOINTS-SSC ]; then 
+    cp KPOINTS-SSC KPOINTS
+  else
+    if ${IS_2D_MATERIAL}; then
+      kpgen -s ${kp_sep} -f
+    else
+      kpgen -s ${kp_sep}
+    fi
+    cp KPOINTS KPOINTS-SSC
+  fi
+  ## Job Submit
+  date >> VASP.log
+  mpirun -machinefile ../${MPI_MACHINE_FILE} \
+         -np ${total_cores_num} \
+         vasp >> VASP.log
+  date >> VASP.log
+  ## Final Enthalpy Output
+  enthalpy=$(grep 'TOTEN' OUTCAR | tail -1 | awk '{print $5}')
+  echo "##  ${str_id}  ${enthalpy}" >> ../FINAL-TEAM/Report.record
+done
+
+######################
+### Gen *.res file ###
+######################
+## Collect the calc. res.
+# If do not obtain the final result
+if [ ! -s CONTCAR ]; then 
+  echo "[error] Task:${str_id} CONTCAR not found!!!"
+  exit 0
+fi
+# Generate the referance *.res file 
+sed '/Selective dynamics/d' CONTCAR > ${str_id}.vasp
+cabal poscar res < ${str_id}.vasp > ${str_id}.res
+# Collect the result from OUTCAR
+seed_name=${str_id}
+pressure=$(grep 'PSTRESS' OUTCAR | awk '{print $2}')
+volume=$(grep 'volume of cell' OUTCAR | tail -1 | awk '{print $5}')
+enthalpy=$(grep 'TOTEN' OUTCAR | tail -1 | awk '{print $5}')
+if [ -z ${enthalpy} ]; then
+  enthalpy=88888
+fi
+spin=0
+modspin=0
+total_atom_num=$(grep 'NIONS' OUTCAR | awk '{print $NF}')
+symmetry=$(cellsym -e=${SYMM_PREC} --int ${str_id}.res 2>&1 > /dev/null | 
+           grep 'International symmetry is'| 
+           awk '{print "("$NF")"}')
+if [ -z ${symmetry} ]; then
+  symmetry="(n/a)"
+fi
+# Gen. the final *.res file
+res_title="TITL ${seed_name} ${pressure} ${volume} ${enthalpy} ${spin} \
+                ${modspin} ${total_atom_num} ${symmetry} n - 1" 
+res_title=$(echo ${res_title})  # Del. the unnessary blank
+sed -i "/TITL/c${res_title}" ${str_id}.res
+mv ${str_id}.res ../FINAL-TEAM/
+
+####################
+### Data Process ###
+####################
+sort -g -k 3 ../FINAL-TEAM/Report.record > Report.sorted.temp
+head -1 Report.sorted.temp > Report.temp
+sed -i '1d' Report.sorted.temp
+awk 'BEGIN{i=1}{print i"  "$2"  "$3; i++}' Report.sorted.temp >> Report.temp
+column -t Report.temp > Report.column.temp
+cp Report.column.temp ../FINAL-TEAM/Report.record
+rm *.temp
+EOF
+
+echo "[do] Submitting the Task... "
+read -p '[input] Press <ENTER> to submit the task...'
+echo "[do] qsub ${PBS_SUBMIT_SCRIPT}"
+qsub ${PBS_SUBMIT_SCRIPT}
+echo "[done]"
+
+cd ..

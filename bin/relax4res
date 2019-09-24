@@ -1,0 +1,88 @@
+#!/bin/bash
+#
+# Author: liyang@cmt.tsinghua
+# Start Date: 2019.9.19
+# Last Update: 2019.9.23
+# Description: Submit the vasp calculation task and get the *.res file.
+#
+
+## Tips for usage
+if [ -z "$1" ] || [ -z "$2" ]; then
+  echo "[error] Not enough input file."
+  echo "[tips] relax4res <task_stamp> <vasp_mpi> <symm_prec>"
+  exit 0
+fi
+
+## Read the necessary paramters
+task_stamp=$1
+parallel_statement=$2
+symm_prec=$3
+if [ -z "${symm_prec}" ]; then
+  symm_prec=0.1
+fi
+
+## Submit the calculation task
+check_incar_file=$(echo INCAR-* | awk '{print $1}')
+if [ ! -e ${check_incar_file} ]; then
+  if [ ! -e INCAR ]; then
+    echo "[error] INCAR not found..."
+    exit 0
+  fi
+  mv INCAR INCAR-1
+  mv KPOINTS KPOINTS-1
+fi
+incar_quantity=$(ls INCAR-* | wc -w)
+echo "[do] Task ${task_stamp} start..." >> VASP.log
+start_time=$(date +%s)
+echo "[start_time] ${start_time} sec." >> VASP.log
+for ((incar_index=1; incar_index<=incar_quantity; incar_index++)); do
+  echo "[sub-do] Calculating ${task_stamp}::${incar_index}..." >> VASP.log
+  cp INCAR-${incar_index} INCAR
+  cp KPOINTS-${incar_index} KPOINTS
+  date >> VASP.log
+  echo "${parallel_statement} vasp >> VASP.log"
+  ${parallel_statement} vasp >> VASP.log
+  date >> VASP.log
+  cp POSCAR POSCAR-${incar_index}
+  cp CONTCAR CONTCAR-${incar_index}
+  cp CONTCAR POSCAR
+done
+end_time=$(date +%s)
+echo "[end_time] ${end_time} sec." >> VASP.log
+spend_time=$(echo ${start_time} ${end_time} | 
+             awk '{print int(($2-$1)/86400)"d:"\
+                         int(($2-$1)%86400/3600)"h:"\
+                         int(($2-$1)%3600/60)"m:"\
+                         ($2-$1)%60"s"}')
+echo "[spend_time] ${spend_time}" >> VASP.log
+## Collect the calc. res.
+# If do not obtain the final result
+if [ ! -s CONTCAR ]; then 
+  echo "[error] Task:${task_stamp} CONTCAR not found!!!"
+  exit 0
+fi
+# Generate the referance *.res file 
+sed '/Selective dynamics/d' CONTCAR > ${task_stamp}.vasp
+cabal poscar res < ${task_stamp}.vasp > ${task_stamp}.res
+# Collect the result from OUTCAR
+seed_name=${task_stamp}
+pressure=$(grep 'PSTRESS' OUTCAR | awk '{print $2}')
+volume=$(grep 'volume of cell' OUTCAR | tail -1 | awk '{print $5}')
+enthalpy=$(grep 'TOTEN' OUTCAR | tail -1 | awk '{print $5}')
+if [ -z ${enthalpy} ]; then
+  enthalpy=88888
+fi
+spin=0
+modspin=0
+total_atom_num=$(grep 'NIONS' OUTCAR | awk '{print $NF}')
+symmetry=$(cellsym -e=${symm_prec} --int ${task_stamp}.res 2>&1 > /dev/null | 
+           grep 'International symmetry is'| 
+           awk '{print "("$NF")"}')
+if [ -z ${symmetry} ]; then
+  symmetry="(n/a)"
+fi
+# Gen. the final *.res file
+res_title="TITL ${seed_name} ${pressure} ${volume} ${enthalpy} ${spin} \
+                ${modspin} ${total_atom_num} ${symmetry} n - 1" 
+res_title=$(echo ${res_title})  # Del. the unnessary blank
+sed -i "/TITL/c${res_title}" ${task_stamp}.res
