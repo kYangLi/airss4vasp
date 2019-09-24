@@ -310,6 +310,7 @@ res_title="TITL ${seed_name} ${pressure} ${volume} ${enthalpy} ${spin} \
 res_title=$(echo ${res_title})  # Del. the unnessary blank
 sed -i "/TITL/c${res_title}" ${str_id}.res
 mv ${str_id}.res ../FINAL-TEAM/
+cp OUTCAR ../FINAL-TEAM/${str_id}.outcar
 
 ####################
 ### Data Process ###
