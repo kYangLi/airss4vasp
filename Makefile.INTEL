@@ -14,7 +14,7 @@ LD=$(FC)
 LDC=$(CC)
 LDCFLAGS=-lm
 
-# 'DFLAGS=-DCOMPAT' is necessary when it cames the error:
+# 'DFLAGS=-DCOMPAT' is necessary when it comes the error:
 #   [COMPILER_VERSION] and [COMPILER_OPTIONS] are invalid in cell.f90.
 #DFLAGS=-DCOMPAT
 
