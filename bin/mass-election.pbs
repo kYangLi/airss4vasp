@@ -511,6 +511,7 @@ while true; do
   # Collect the result
   if [ -e *.res ]; then
     mv ${name_stamp}.res ../RES-POOL/
+    cp OUTCAR ../RES-POOL/${name_stamp}.outcar
     return_info="[done] ${current_coach} --> ${name_stamp}.res"
   else
     return_info="[fail] ${current_coach} -x> ${name_stamp}.res"
@@ -529,7 +530,7 @@ while true; do
   done
   # Remove the unnessary file if permited
   if ${DEL_CALC_DETAILS}; then
-    rm CHG CHGCAR CONTCAR* DOSCAR EIGENVAL IBZKPT OSZICAR OUTCAR PCDAT 
+    rm CHG CHGCAR CONTCAR* DOSCAR EIGENVAL IBZKPT OSZICAR PCDAT OUTCAR
     rm POSCAR* INCAR KPOINTS PROCAR REPORT vasprun.xml WAVECAR XDATCAR
     rm ${pick_up_poscar}
   else
