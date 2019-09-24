@@ -324,5 +324,6 @@ read -p '[input] Press <ENTER> to submit the task...'
 echo "[do] yhbatch -N ${nodes_num} -J ${TASK_NAME} ${PBS_SUBMIT_SCRIPT}"
 yhbatch -N ${nodes_num} -J ${TASK_NAME} ${PBS_SUBMIT_SCRIPT}
 echo "[done]"
-
+echo ""
+echo "============== Submit Done =============="
 cd ..

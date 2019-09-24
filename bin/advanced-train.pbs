@@ -332,5 +332,7 @@ read -p '[input] Press <ENTER> to submit the task...'
 echo "[do] qsub ${PBS_SUBMIT_SCRIPT}"
 qsub ${PBS_SUBMIT_SCRIPT}
 echo "[done]"
+echo ""
+echo "============== Submit Done =============="
 
 cd ..
