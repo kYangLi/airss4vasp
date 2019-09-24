@@ -57,7 +57,7 @@ spend_time=$(echo ${start_time} ${end_time} |
 echo "[spend_time] Task ${task_stamp}: ${spend_time}" >> VASP.log
 ## Collect the calc. res.
 # If do not obtain the final result
-if [ ! -s CONTCAR ]; then 
+if ! [ -s CONTCAR ]; then 
   echo "[error] Task ${task_stamp}: CONTCAR not found!!!" >> VASP.log
   exit 0
 fi
