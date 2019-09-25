@@ -278,7 +278,13 @@ for str_poscar in ${poscar_list}; do
   # If do not obtain the final result
   if [ ! -s CONTCAR ]; then 
     echo "[error] Task:${str_id} CONTCAR not found!!!" >> VASP.log
-    exit 0
+    continue
+  fi
+  # If it has a bad init. str.
+  bad_poscar=$(tail -1 OUTCAR | grep 'Error EDDDAV: Call to ZHEGV failed.')
+  if ! [ -z "${bad_poscar}" ]; then
+    echo "[error] Task ${task_stamp}: Bad Initial Structure!!!" >> VASP.log
+    continue
   fi
   # Generate the referance *.res file 
   sed '/Selective dynamics/d' CONTCAR > ${str_id}.vasp
