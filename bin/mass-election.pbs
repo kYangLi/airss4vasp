@@ -581,6 +581,7 @@ for ((gen_index=1; gen_index<=${coach_num}; gen_index++)); do
   qsub ${PBS_SUBMIT_SCRIPT} >> ../JobID.record
   echo "[info] JobID: $(tail -1 ../JobID.record)"
   cd ..
+  sleep 0.2
 done
 echo '[done]'
 echo ''
