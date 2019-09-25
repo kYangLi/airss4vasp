@@ -70,8 +70,8 @@ echo "[info] Missing CONTCAR    :  ${no_contcar_str_num}/${error_str_num}"
 echo "[info] Bad Init. POSCAR   :  ${bad_poscar_str_num}/${error_str_num}"
 echo "[info] Ave. Time Per Str. :  ${average_time_spend_format}"
 echo "[info] Time Remain Estim. :  ${estimate_remain_time_format}"
-echo "[info] Final Team Finish  :  ${final_team_finished}"
 echo "[info] Final Team UnFin.  :  ${final_team_unfinished}"
+echo "[info] Final Team Finish  :  ${final_team_finished}"
 echo "======================================================="
 
 # Useless file remove 
