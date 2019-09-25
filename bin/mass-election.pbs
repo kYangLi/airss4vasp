@@ -370,7 +370,7 @@ if [ ! -e POSCAR-POOL ]; then
 else
   echo "[info] POSCAR-POOL already exist, skip the mkdir."
 fi
-if ${BUILD_CELL_BEFORE}; then
+if ${build_cell_before}; then
   cd POSCAR-POOL
   cp ../${seed_name}.cell .
   strpour ${seed_name} ${str_num}
