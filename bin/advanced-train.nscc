@@ -246,6 +246,9 @@ for str_poscar in ${poscar_list}; do
   ## Str. Data Output
   cp CONTCAR ../FINAL-TEAM/${str_id}.final.vasp
   cp CONTCAR POSCAR
+  ## Remove Files
+  rm CHG CHGCAR CONTCAR DOSCAR EIGENVAL IBZKPT OSZICAR PCDAT OUTCAR
+  rm INCAR KPOINTS PROCAR REPORT vasprun.xml WAVECAR XDATCAR
   # +------------------------------+
   # | 2 -> Static Self Consistency |
   # +------------------------------+
@@ -268,14 +271,13 @@ for str_poscar in ${poscar_list}; do
   ## Final Enthalpy Output
   enthalpy=$(grep 'TOTEN' OUTCAR | tail -1 | awk '{print $5}')
   echo "##  ${str_id}  ${enthalpy}" >> ../FINAL-TEAM/Report.record
-
-  ######################
-  ### Gen *.res file ###
-  ######################
+  # +---------------------+
+  # | 3 -> Gen *.res file |
+  # +---------------------+
   ## Collect the calc. res.
   # If do not obtain the final result
   if [ ! -s CONTCAR ]; then 
-    echo "[error] Task:${str_id} CONTCAR not found!!!"
+    echo "[error] Task:${str_id} CONTCAR not found!!!" >> VASP.log
     exit 0
   fi
   # Generate the referance *.res file 
@@ -306,10 +308,12 @@ for str_poscar in ${poscar_list}; do
   sed -i "/TITL/c${res_title}" ${str_id}.res
   mv ${str_id}.res ../FINAL-TEAM/
   mv OUTCAR ../FINAL-TEAM/${str_id}.outcar
-
-  ####################
-  ### Data Process ###
-  ####################
+  ## Remove Files
+  rm CHG CHGCAR CONTCAR DOSCAR EIGENVAL IBZKPT OSZICAR PCDAT
+  rm INCAR KPOINTS POSCAR PROCAR REPORT vasprun.xml WAVECAR XDATCAR
+  # +-------------------+
+  # | 4 -> Data Process |
+  # +-------------------+
   sort -g -k 3 ../FINAL-TEAM/Report.record > Report.sorted.temp
   head -1 Report.sorted.temp > Report.temp
   sed -i '1d' Report.sorted.temp
