@@ -14,14 +14,20 @@ fi
 
 # Traverse and Record all Coaches' Info
 cat /dev/null > VASP.log.temp
-coach_list=$(ls . | grep COACH-)
+coach_list=$(ls . | grep COACH- | sed 's/-/ /g' | sort -n -k 2 | sed 's/ /-/g')
+current_coach_num=0
 for coach in ${coach_list}; do 
-  grep '\[' ${coach}/VASP.log >> VASP.log.temp
+  if [ -e ${coach}/VASP.log ]; then 
+    grep '\[' ${coach}/VASP.log >> VASP.log.temp
+    ((current_coach_num++))
+  else
+    echo "[info] ${coach} is not working..."
+  fi
 done
 
 # Get some necessary parameters
 seed_name=$(grep SEED_NAME PARAM.CONF | awk -F '=' '{print $2}')
-coach_num=$(echo ${coach_list} | wc -w)
+total_coach_num=$(echo ${coach_list} | wc -w)
 total_str_num=$(ls POSCAR-POOL/${seed_name}-*.cell 2>/dev/null | wc -w)
 untouched_str_num=$(ls POSCAR-POOL/${seed_name}-*.vasp 2>/dev/null | wc -w)
 finished_str_num=$(ls RES-POOL/*.res 2>/dev/null | wc -w)
@@ -29,7 +35,9 @@ error_str_num=$(grep '\[error\]' VASP.log.temp | wc -l)
 no_contcar_str_num=$(grep '\[error\]' VASP.log.temp | grep 'CONTCAR' | wc -l)
 bad_poscar_str_num=$(grep '\[error\]' VASP.log.temp | grep 'Bad' | wc -l)
 ((processed_str_num=error_str_num+finished_str_num))
+calc_done=false
 if [ "${total_str_num}" == "${processed_str_num}" ]; then 
+  calc_done=true
   run_state='[done] Mass-election Done!'
 else 
   run_state='[info] Mass-election in Processing...'
@@ -46,7 +54,7 @@ else
                               awk '{print int($1%86400/3600)"h:"\
                                           int($1%3600/60)"m:"\
                                           $1%60"s"}')
-  ((estimate_remain_time=untouched_str_num*average_time_spend/${coach_num}))
+  ((estimate_remain_time=untouched_str_num*average_time_spend/current_coach_num))
   estimate_remain_time_format=$(echo ${estimate_remain_time} | 
                                 awk '{print int($1%86400/3600)"h:"\
                                             int($1%3600/60)"m:"\
@@ -63,6 +71,9 @@ fi
 # Process Summary Output
 echo "====================== Process Check ======================"
 echo "${run_state}"
+if ! ${calc_done}; then
+  echo "[info] Curr. Work Coach   :  ${current_coach_num}/${total_coach_num}"
+fi
 echo "[info] Seed Name          :  ${seed_name}"
 echo "[info] Succeed Str.       :  ${finished_str_num}/${total_str_num}"
 echo "[info] Error Str.         :  ${error_str_num}/${total_str_num}"
