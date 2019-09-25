@@ -500,7 +500,7 @@ while true; do
   kp_index=0
   for kp_sep in ${KP_SEP_LIST}; do
     ((kp_index++))
-    if [ "null" != ${kp_sep} ]; then
+    if [ "null" != "${kp_sep}" ]; then
       if ${IS_2D_MATERIAL}; then
         kpgen -s ${kp_sep} -f
       else
