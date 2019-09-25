@@ -46,7 +46,7 @@ else
                               awk '{print int($1%86400/3600)"h:"\
                                           int($1%3600/60)"m:"\
                                           $1%60"s"}')
-  ((estimate_remain_time=untouched_str_num*average_time_spend))
+  ((estimate_remain_time=untouched_str_num*average_time_spend/${coach_num}))
   estimate_remain_time_format=$(echo ${estimate_remain_time} | 
                                 awk '{print int($1%86400/3600)"h:"\
                                             int($1%3600/60)"m:"\
@@ -56,8 +56,8 @@ fi
 echo "==================== Process Check ===================="
 echo "${run_state}"
 echo "[info] Seed Name          :  ${seed_name}"
-echo "[info] Succeed Str        :  ${finished_str_num}/${total_str_num}"
-echo "[info] Error Str          :  ${error_str_num}/${total_str_num}"
+echo "[info] Succeed Str.       :  ${finished_str_num}/${total_str_num}"
+echo "[info] Error Str.         :  ${error_str_num}/${total_str_num}"
 echo "[info] Missing CONTCAR    :  ${no_contcar_str_num}/${error_str_num}"
 echo "[info] Bad Init. POSCAR   :  ${bad_poscar_str_num}/${error_str_num}"
 echo "[info] Ave. Time Per Str. :  ${average_time_spend_format}"
