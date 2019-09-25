@@ -267,7 +267,7 @@ if [ $(echo ${kp_sep_list} | wc -w) != ${incar_num} ]; then
       fi
     else
       echo "[info] Use ${seed_name}.KPOINTS-${incar_index} for calculation..."
-      kp_sep='use-kp-${incar_index}'
+      kp_sep='null'
     fi
     kp_sep_list="${kp_sep_list}${kp_sep} "
   done
@@ -429,7 +429,6 @@ str_index=0
 parallel_statement="yhrun -N ${NODES_NUM_PER_COACH} \
                           -n ${total_cores_num} \
                           --time=${time_limit_minutes}"
-
 # +----------------------+
 # | Structure Relazation |
 # +----------------------+

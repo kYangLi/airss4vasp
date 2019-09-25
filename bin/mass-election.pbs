@@ -267,7 +267,7 @@ if [ $(echo ${kp_sep_list} | wc -w) != ${incar_num} ]; then
       fi
     else
       echo "[info] Use ${seed_name}.KPOINTS-${incar_index} for calculation..."
-      kp_sep='use-kp-${incar_index}'
+      kp_sep='null'
     fi
     kp_sep_list="${kp_sep_list}${kp_sep} "
   done
@@ -433,7 +433,6 @@ total_cores_num=$(cat ${MPI_MACHINE_FILE} | wc -l)
 parallel_statement="mpirun -machinefile ${MPI_MACHINE_FILE} \
                            -np ${total_cores_num} \
                            -envall "
-
 # +----------------------+
 # | Structure Relazation |
 # +----------------------+
