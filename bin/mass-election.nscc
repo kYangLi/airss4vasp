@@ -435,8 +435,23 @@ parallel_statement="yhrun -N ${NODES_NUM_PER_COACH} \
 ## Calculation loop
 while true; do
   ## Structure Generate Options 
-  # Generate structures while run if that is what the user recommand
-  if (! ${BUILD_CELL_BEFORE}); then 
+  if ${BUILD_CELL_BEFORE}; then 
+    # Pick up POSCAR from the POSCAR POOL, if in BUILD BEFORE RUN mode.
+    # Get the current POSCAR list in the POSCAR POOL
+    current_poscar_list=$(ls -1 ../POSCAR-POOL/*.vasp 2>/dev/null | 
+                          awk -F '/' '{print $NF}' | sed 's/-/ /g' | 
+                          sort -k 4 -n | sed 's/ /-/g')
+    # Check if the job done, on the BUILD BEFORE RELAX mode.
+    if [ -z "${current_poscar_list}" ]; then
+      echo "[info] ${current_coach} JOB DONE!"
+      echo '[done]'
+      break
+    fi
+    # Pick up one POSCAR
+    pick_up_poscar=$(echo ${current_poscar_list} | awk '{print $1}')
+    mv ../POSCAR-POOL/${pick_up_poscar} .
+  else
+    # Generate structures WHILE RUN, if that is what the user recommand
     # Check if the job done, on the BUILD WHILE RELAX mode.
     current_res_num=$(ls -1 ../RES-POOL/*.res 2>/dev/null | wc -l)
     if [ ${current_res_num} -ge ${STR_NUM} ]; then
@@ -451,21 +466,6 @@ while true; do
     strpour ${SEED_NAME} 1 ${str_stamp}
     mv ${SEED_NAME}-${str_stamp}.cell ../POSCAR-POOL/
     pick_up_poscar=${SEED_NAME}-${str_stamp}.vasp
-  # Otherwise, pick up POSCAR from the POSCAR POOL.
-  else
-    # Get the current POSCAR list in the POSCAR POOL
-    current_poscar_list=$(ls -1 ../POSCAR-POOL/*.vasp 2>/dev/null | 
-                          awk -F '/' '{print $NF}' | sed 's/-/ /g' | 
-                          sort -k 4 -n | sed 's/ /-/g')
-    # Check if the job done, on the BUILD BEFORE RELAX mode.
-    if [ -z "${current_poscar_list}" ]; then
-      echo "[info] ${current_coach} JOB DONE!"
-      echo '[done]'
-      break
-    fi
-    # Pick up one POSCAR
-    pick_up_poscar=$(echo ${current_poscar_list} | awk '{print $1}')
-    mv ../POSCAR-POOL/${pick_up_poscar} .
   fi
   # Check if there is any I/O collision
   cat ${pick_up_poscar} > POSCAR
@@ -571,6 +571,9 @@ for ((gen_index=1; gen_index<=${coach_num}; gen_index++)); do
     for kpoints in ${seed_name}.KPOINTS-*; do
       mv ${kpoints} ${kpoints##*\.}
     done
+  fi
+  if ! ${build_cell_before}; then 
+    cp ../${seed_name}.cell .
   fi
   echo "[do] yhbatch -N ${nodes_num_pre_coach} -J ${task_name}-c${coach_index} \
     ${PBS_SUBMIT_SCRIPT}"
