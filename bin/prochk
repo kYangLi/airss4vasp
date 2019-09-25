@@ -56,12 +56,12 @@ if [ -e FINAL-TEAM ]; then
   final_team_unfinished=$(ls HEAD-COACH 2>/dev/null | grep \.vasp | wc -w)
   final_team_finished=$(ls FINAL-TEAM 2>/dev/null | grep \.outcar | wc -w)
 else
-  final_team_unfinished='Final team is not determined...'
-  final_team_finished='Final team is not determined...'
+  final_team_unfinished='Final team not determined...'
+  final_team_finished='Final team not determined...'
 fi
 
 # Process Summary Output
-echo "==================== Process Check ===================="
+echo "====================== Process Check ======================"
 echo "${run_state}"
 echo "[info] Seed Name          :  ${seed_name}"
 echo "[info] Succeed Str.       :  ${finished_str_num}/${total_str_num}"
@@ -72,7 +72,7 @@ echo "[info] Ave. Time Per Str. :  ${average_time_spend_format}"
 echo "[info] Time Remain Estim. :  ${estimate_remain_time_format}"
 echo "[info] Final Team UnFin.  :  ${final_team_unfinished}"
 echo "[info] Final Team Finish  :  ${final_team_finished}"
-echo "======================================================="
+echo "==========================================================="
 
 # Useless file remove 
 rm VASP.log.temp
