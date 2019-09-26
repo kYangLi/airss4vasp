@@ -51,12 +51,14 @@ if [ -z "${average_time_spend}" ]; then
   estimate_remain_time_format='null'
 else
   average_time_spend_format=$(echo ${average_time_spend} | 
-                              awk '{print int($1%86400/3600)"h:"\
+                              awk '{print int($1/86400)"d:"\
+                                          int($1%86400/3600)"h:"\
                                           int($1%3600/60)"m:"\
                                           $1%60"s"}')
   ((estimate_remain_time=untouched_str_num*average_time_spend/current_coach_num))
   estimate_remain_time_format=$(echo ${estimate_remain_time} | 
-                                awk '{print int($1%86400/3600)"h:"\
+                                awk '{print int($1/86400)"d:"\
+                                            int($1%86400/3600)"h:"\
                                             int($1%3600/60)"m:"\
                                             $1%60"s"}')
 fi
