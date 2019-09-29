@@ -96,6 +96,14 @@ The nodes number of each `COACH` is simply calculated as *(int)(nodes_number / c
 
 Frankly speaking, the more coach there are, the faster your calculation will be.
 
+### Build Cell Mode
+
+There are two different mode for `build cell`. `Build All Cell First` and `Build Cell While Run`. 
+
+The first mode will geneate all structure first, and then use `COACH` to pick up each of them to relax. Under this mode, it cannot promise the `RES-POOL` has the same number of structure as `POSCAR-POOL`. And the structure generation will processed on the task submit node, some of the computational cluster may forbidden that. 
+
+The second mode will generate structures one by one during the relaxzation in each `COACH`. The mode can promise the `POSCAR-POOL` and `RES-POOL` has the same number of structures, and structure generation will also processed on calculation nodes.
+
 ### Process Check
 
 During the calculation, after enter the main calulation folder(the folder has `PARAM.CONF`), you can use the command below to check the current processing.
