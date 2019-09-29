@@ -38,7 +38,7 @@ if [ ! -z "${str_gen_cell}" ]; then
       sed '/^\s*$/d' > Atoms.temp
     # Add the 'Selective dynamics' char. in POSCAR
     sd_insert_line=$(grep -n 'Direct' ${str_poscar} | cut -d ':' -f 1)
-    sed -i "${sd_insert_line}i\ Selective dynamics" ${str_poscar}
+    sed -i "${sd_insert_line}i\Selective dynamics" ${str_poscar}
     # If the SD-flag do not exist, then generate one
     if [ ! -s SelDyn.Flag ]; then
       # Ordered the generator.cell file
@@ -100,11 +100,11 @@ if [ ! -z "${str_gen_cell}" ]; then
     poscar_atom_start_line=$(grep -n 'Direct' ${str_poscar} | cut -d ':' -f 1)
     awk -v sl=${poscar_atom_start_line} \
       'BEGIN{r=0;w=0}
-       NR==FNR,NR<=sl{print $0}
-       NR==FNR,NR>sl{a[r]=$0;r++}
+       NR==FNR&&NR<=sl{print $0}
+       NR==FNR&&NR>sl{a[r]=$0;r++}
        NR>FNR{print a[w]"  "$0" ";w++}' ${str_poscar} SelDyn.Flag \
       > ${str_poscar}.flaged.temp
-    mv ${str_poscar}.flaged.temp > ${str_poscar}
+    mv ${str_poscar}.flaged.temp ${str_poscar}
     rm *.temp
   fi # Endif for NEED FIX POSITION
 fi
