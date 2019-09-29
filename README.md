@@ -96,9 +96,6 @@ The nodes number of each `COACH` is simply calculated as *(int)(nodes_number / c
 
 Frankly speaking, the more coach there are, the faster your calculation will be.
 
-1. _ResAnalysis.sh
-2. _ProcessCheck.sh
-
 ### Process Check
 
 During the calculation, after enter the main calulation folder(the folder has `PARAM.CONF`), you can use the command below to check the current processing.
