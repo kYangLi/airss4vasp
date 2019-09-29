@@ -88,7 +88,7 @@ Afte the input file getting ready, input the following command to submit the job
 mass-election.pbs # Use mass-election.nscc if under NSCC system.
 ```
 
-### `COACH`
+### COACH
 
 There is a conception called `COACH` in the main script. Basically, the `COACH` is a parallel unit among the whole task. Each `COACH` will run independently. They will pick up the calculation task from the `POSCAR-POOL`, and push the result to the `RES-POOL`, then pick up another `POSCAR` to calculate. The POSCAR that already be calculated will be marked in the `TRAIN.record` file.
 
