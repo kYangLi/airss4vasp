@@ -79,7 +79,7 @@ E.g. If there is `Si.INCAR-1`, `Si.INCAR-2`, `Si.INCAR-3` in the calculation fil
 ### `<seedname>.POTCAR`
 The order of the elements in `POTCAR` must agree with that in `<seedname>.cell`.
 
-## Strat the Search
+## Start the Search
 
 ### Submit Task
 
