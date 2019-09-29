@@ -40,7 +40,7 @@ if [ ! -z "${str_gen_cell}" ]; then
     sd_insert_line=$(grep -n 'Direct' ${str_poscar} | cut -d ':' -f 1)
     sed -i "${sd_insert_line}i\ Selective dynamics" ${str_poscar}
     # If the SD-flag do not exist, then generate one
-    if [ ! -s SelDyn.Flag ] || [ ! -s tac-SelDyn.Flag ]; then
+    if [ ! -s SelDyn.Flag ]; then
       # Ordered the generator.cell file
       cat /dev/null > Ordered.Atoms.temp
       element_order=$(awk '{print $1}' Atoms.temp | awk '!arr[$0]++')
@@ -94,23 +94,17 @@ if [ ! -z "${str_gen_cell}" ]; then
           echo ${sd_flag} >> SelDyn.Flag
         done
       done
-      tac SelDyn.Flag > tac-SelDyn.Flag
     fi # Endif for SD-flag Generation
     ## Paste the sd_flag and POSCAR
     total_atoms_num=$(cat SelDyn.Flag | wc -l)
     poscar_atom_start_line=$(grep -n 'Direct' ${str_poscar} | cut -d ':' -f 1)
-    ((poscar_atom_end_line=poscar_atom_start_line+total_atoms_num))
-    check_atoms_num=$(sed -n "${poscar_atom_start_line},\$p" ${str_poscar} | 
-                      grep "[0-9]\.[0-9]" | wc -l)
-    if [ "${total_atoms_num}" != "${check_atoms_num}" ]; then
-      echo '[error] Something wrong with the total atoms number in SD-Flag...'
-      rm ${str_poscar}
-      exit 1 
-    fi
-    head -n ${poscar_atom_end_line} ${str_poscar} | tac > tac-${str_poscar}.temp
-    paste -d ' ' tac-${str_poscar}.temp tac-SelDyn.Flag \
-      > tac-${str_poscar}.flaged.temp
-    tac tac-${str_poscar}.flaged.temp > ${str_poscar}
+    awk -v sl=${poscar_atom_start_line} \
+      'BEGIN{r=0;w=0}
+       NR==FNR,NR<=sl{print $0}
+       NR==FNR,NR>sl{a[r]=$0;r++}
+       NR>FNR{print a[w]"  "$0" ";w++}' ${str_poscar} SelDyn.Flag \
+      > ${str_poscar}.flaged.temp
+    mv ${str_poscar}.flaged.temp > ${str_poscar}
     rm *.temp
   fi # Endif for NEED FIX POSITION
 fi

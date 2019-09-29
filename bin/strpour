@@ -22,9 +22,6 @@ str_gen_cell=${seed_name}.cell
 if [ -e SelDyn.Flag ]; then
   rm SelDyn.Flag
 fi
-if [ -e tac-SelDyn.Flag ]; then
-  rm tac-SelDyn.Flag
-fi
  
 # POSCAR generate
 start_time=$(date +%s)

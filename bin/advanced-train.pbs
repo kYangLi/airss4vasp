@@ -168,7 +168,7 @@ for str_index in ${str_index_list}; do
   rm ${str_id}.cell
 done
 if [ -e SelDyn.Flag ]; then
-  rm SelDyn.Flag tac-SelDyn.Flag
+  rm SelDyn.Flag
 fi 
 # Copy The POTCAR, INCAR and KPOINTS
 cp ${SEED_NAME}.POTCAR HEAD-COACH/POTCAR
