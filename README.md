@@ -62,7 +62,7 @@ Here is an example of the `.cell` file.
 %ENDBLOCK LATTICE_CART
  
 %BLOCK POSITIONS_FRAC
-Si 0.0 0.0 0.0 # Si1 % NUM=1 NOMOVE SD-XYZcd
+Si 0.0 0.0 0.0 # Si1 % NUM=1 NOMOVE SD-XYZ
 Si 0.0 0.0 0.0 # Si2 % NUM=1
 %ENDBLOCK POSITIONS_FRAC
  
