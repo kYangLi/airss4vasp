@@ -49,7 +49,7 @@ During the generation of new random structures in `AIRSS`, there are two steps: 
 
 In the `<seedname>.cell`, there are two atom tags called `NOMOVE` and `FIX`. The first one designed for disable the `push` step during the generation, while, the last one designed for disbale the `push` and fix the atom during the `CASTEP` relaxzation. 
 
-Since now we are using `VASP`, in `a4v`,  `FIX` and `NOMOVE` actually have the same effect, and if you mean to fix a atom during the relaxztion, use the tag `SD-*`(`*` can replace with `X`, `Y`, `Z`, `XY`, `YZ`, `ZX`, `XYZ`). This tag will enable the `Selective dynamics` mode of `VASP`, and fix the atoms you mean to.
+Since now we are using `VASP`, in `a4v`,  `FIX` and `NOMOVE` actually have the same effect, and if you mean to fix a atom during the relaxztion, use the tag `SD-*` (the `*` can replace with `X`, `Y`, `Z`, `XY`, `YZ`, `ZX`, `XYZ`). This tag will enable the `Selective dynamics` mode of `VASP`, and fix the atoms you mean to.
 
 Here is an example of the `.cell` file.
 
