@@ -45,7 +45,7 @@ This is the key file for the whole structure searching task. Please first learn 
 
 There is one thing to be care of. 
  
-During the generation of new random structures in `AIRSS`, there is two steps: random move, and push a atom. The step `push` is applied to make sure two atoms are not connected to close.
+During the generation of new random structures in `AIRSS`, there are two steps: random move, and push a atom. The step `push` is applied to make sure two atoms are not connected to close.
 
 In the `<seedname>.cell`, there are two atom tags called `NOMOVE` and `FIX`. The first one designed for disable the `push` step during the generation, while, the last one designed for disbale the `push` and fix the atom during the `CASTEP` relaxzation. 
 
