@@ -159,7 +159,18 @@ build_cell_before=$(grep 'BUILD_CELL_BEFORE' PARAM.CONF 2>/dev/null |
                     awk -F '=' '{print $NF}')
 if [ "${build_cell_before}" != "true" ] && \
    [ "${build_cell_before}" != "false" ]; then
-  build_cell_before=${DEFAULT_BUILD_CELL_BEFORE}
+  echo "[input] Build all CELL before RUN? (y/n)"
+  echo "[input] Default: ${DEFAULT_BUILD_CELL_BEFORE}"
+  read -p '> ' build_cell_before
+  if [ "" == "${build_cell_before}" ];then
+    build_cell_before=${DEFAULT_BUILD_CELL_BEFORE}
+  fi
+  if [ "y" == "${build_cell_before}" ] || \
+     [ "Y" == "${build_cell_before}" ]; then 
+    build_cell_before=true
+  else
+    build_cell_before=false
+  fi
 fi
 if ${build_cell_before}; then
   echo "[info] Build cell strategy: BUILD ALL CELL FIRST."
@@ -239,18 +250,19 @@ kpoints_num=$(ls ${seed_name}.KPOINTS-[0-9]* 2>/dev/null | wc -w)
 if [ "${kpoints_num}" != "${incar_num}" ]; then
   is_2d_material=$(grep 'IS_2D_MATERIAL' PARAM.CONF 2>/dev/null | 
                    awk -F '=' '{print $NF}')
-  if [ -z "${is_2d_material}" ]; then
+  if [ "${is_2d_material}" != "true" ] && \
+     [ "${is_2d_material}" != "false" ]; then
     echo "[input] Is this a 2D material? (y/n)"
     echo "[input] Default: ${DEFAULT_IS_2D_MATERIAL}"
     read -p '> ' is_2d_material
     if [ "" == "${is_2d_material}" ];then
       is_2d_material=${DEFAULT_IS_2D_MATERIAL}
     fi
-  fi
-  if [ "y" == "${is_2d_material}" ] || [ "Y" == "${is_2d_material}" ]; then 
-    is_2d_material=true
-  else
-    is_2d_material=false
+    if [ "y" == "${is_2d_material}" ] || [ "Y" == "${is_2d_material}" ]; then 
+      is_2d_material=true
+    else
+      is_2d_material=false
+    fi
   fi
 fi
 echo "[info] Is a 2D Material: ${is_2d_material}"
