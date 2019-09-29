@@ -100,9 +100,9 @@ Frankly speaking, the more coach there are, the faster your calculation will be.
 
 There are two different mode for `build cell`. `Build All Cell First` and `Build Cell While Run`. 
 
-The first mode will geneate all structure first, and then use `COACH` to pick up each of them to relax. Under this mode, it cannot promise the `RES-POOL` has the same number of structure as `POSCAR-POOL`. And the structure generation will processed on the task submit node, some of the computational cluster may forbidden that. 
+The first mode will geneate all structure first, and then use `COACH` to pick up each of them to relax. Under this mode, it cannot promise the `RES-POOL` has the same number of structure as `POSCAR-POOL`. And the structure generation will execute on the task submit node, some of the computational cluster may forbidden that. 
 
-The second mode will generate structures one by one during the relaxzation in each `COACH`. This mode can promise the `POSCAR-POOL` and `RES-POOL` has the same number of structures, and structure generation will also processed on calculation nodes.
+The second mode will generate structures one by one during the relaxzation in each `COACH`. This mode can promise the `POSCAR-POOL` and `RES-POOL` has the same number of structures, and structure generation will also execute on calculation nodes. But this mode are not that friendly to parallel, compare to the first mode. And you must decided how many structures, nodes, and coaches you want to use at the very begining.
 
 ### Process Check
 
