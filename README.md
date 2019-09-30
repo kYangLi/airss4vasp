@@ -6,27 +6,27 @@
 
 `Start Date` 2019.9.21
 
-`Last Update` 2019.9.29
+`Last Update` 2019.9.30
 
 `Version` Alpha 0.1.0
 
 ## Description
 
-`AIRSS` (Ab Initio Random Structure Searching) is a fantastic, efficient, and easy for parallel calculation package, but with pool supporting for `VASP`. `airss4vasp`, based on `PBS` or `NSCC(Tianhe)` job management system, is an interface program design for the better communication between AIRSS and VASP.
+`AIRSS` (Ab Initio Random Structure Searching) is a fantastic, efficient, and easy to parallel structure searching package, but with pool supporting for `VASP`. `airss4vasp`, based on `PBS` or `NSCC(Tianhe)` job management system, is an interface program design for the better communication between AIRSS and VASP.
 
 ## Installtion
 
-Before the `make`, you may need to check the `Makefile` to modify some setting for libs. There also are some tips inside the `Makefile` for the installtion.
+Before the `make`, please check the `Makefile` to modify some setting for libs. There also are some tips for the installtion inside the `Makefile`.
 ```bash
-vim Makefile # Makefile.GCC & Makefile.INTEL are also ready to use
+vim Makefile # Makefile.GNU & Makefile.INTEL are also ready for use
 ``` 
 
-To compile and install a4v, please excute the following command in current folder.
+To compile and install `a4v`, excute the following command in the main folder.
 ```bash
 make; make install
 ```
 
-After the `make install`, the last step you MUST do is adding the a4v `bin` folder to the env `PATH`. Read the output of `make install` for more details.
+The last step that MUST be done is adding the `bin` folder of `a4v` to the env `PATH`. Read the output of `make install` for more details.
 ```bash
 echo "export PATH=<a4v>/<bin>/<path>/:${PATH}" >> ~/.bashrc
 ```
@@ -37,19 +37,19 @@ To enable this script, you need perpare another 3 or 4 kinds of files:
 
 - `<seedname>.cell`
 - `<seedname>.INCAR-[1-9]`
-- `<seedname>.POTCAR`
 - `<seedname>.KPOINTS-[1-9]` (Optional)
+- `<seedname>.POTCAR`
 
 ### `<seedname>.cell`
-This is the key file for the whole structure searching task. Please first learn how to use `AIRSS` before using `a4v`.
+This is the key file for the whole structure searching task. Please first learn how to use `AIRSS` before using `a4v`. 
 
-There is one thing to be care of. 
- 
-During the generation of new random structures in `AIRSS`, there are two steps: random move, and push a atom. The step `push` is applied to make sure two atoms are not connected to close.
+There is one thing need to be explained more specifically.
 
-In the `<seedname>.cell`, there are two atom tags called `NOMOVE` and `FIX`. The first one designed for disable the `push` step during the generation, while, the last one designed for disbale the `push` and fix the atom during the `CASTEP` relaxzation. 
+During the generation of the new random structures in `AIRSS`, basically, there are two steps for the movement of a single atom: `random shift` and `push`. The step `push` is applied to make sure two atoms are not connected to close.
 
-Since now we are using `VASP`, in `a4v`,  `FIX` and `NOMOVE` actually have the same effect, and if you mean to fix a atom during the relaxztion, use the tag `SD-*` (the `*` can replace with `X`, `Y`, `Z`, `XY`, `YZ`, `ZX`, `XYZ`). This tag will enable the `Selective dynamics` mode of `VASP`, and fix the atoms you mean to.
+In the `<seedname>.cell`, there are two atomic tags called `NOMOVE` and `FIX`. The first one designed for disable the `push` step, while, the last one designed for disbale the `push` **and** fix the atom during the `CASTEP` relaxzation. 
+
+Since now we are using `VASP`, in `a4v`,  `FIX` and `NOMOVE` actually have the same effect, and if you mean to fix a atom during the relaxztion, use the tag `SD-*` (where the `*` can replace with `X`, `Y`, `Z`, `XY`, `YZ`, `ZX`, `XYZ`). This tag will enable the `Selective dynamics` mode of `VASP` in `POSCAR`.
 
 Here is an example of the `.cell` file.
 
@@ -67,19 +67,20 @@ Si 0.0 0.0 0.0 # Si2 % NUM=1
 %ENDBLOCK POSITIONS_FRAC
  
 #MINSEP=2.0
-
 ```
 
 ### `<seedname>.INCAR-[1-9]`
 
 The `INCAR` is a input file for VASP relaxzation. The quantity of `INCAR` decided how many times will the structure be relaxed. 
 
-E.g. If there is `Si.INCAR-1`, `Si.INCAR-2`, `Si.INCAR-3` in the calculation file, then the same `Si` structure will first be relaxed using `INCAR-1`, then `INCAR-2`, and at last `INCAR-3`. you can also setting KPOINTS for each INCAR with name `Si.KPOINTS-*`
+E.g. If there are `Si.INCAR-1`, `Si.INCAR-2`, `Si.INCAR-3` in the calculation file, then the same `Si` structure will first be relaxed using `INCAR-1`, then `INCAR-2`, and at last `INCAR-3`. You can also setting KPOINTS for each INCAR with name `Si.KPOINTS-[1-9]`
 
 ### `<seedname>.POTCAR`
 The order of the elements in `POTCAR` must agree with that in `<seedname>.cell`.
 
 ## Start the Search
+
+### Modify the Default Parameters
 
 ### Submit Task
 
