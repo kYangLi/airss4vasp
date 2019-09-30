@@ -55,7 +55,7 @@ In the `<seedname>.cell`, there are two atomic tags called `NOMOVE` and `FIX`. T
 
 Since now we are using `VASP`, in `a4v`,  `FIX` and `NOMOVE` actually have the same effect, and if you mean to fix a atom during the relaxztion, use the tag `SD-*` (where the `*` can replace with `X`, `Y`, `Z`, `XY`, `YZ`, `ZX`, `XYZ`). This tag will enable the `Selective dynamics` mode of `VASP` in `POSCAR`.
 
-Here is an example of the `.cell` file.
+Here is an example of the `Si2.cell` file.
 
 ```bash
 %BLOCK LATTICE_CART
