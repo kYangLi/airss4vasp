@@ -5,11 +5,11 @@ FFLAGS=-O0 -g # Do not optimise
 CC=icc
 CFLAGS=
 
+LD=$(FC)
 # [tips] You may need to check: 
 # [tips] https://software.intel.com/en-us/articles/intel-mkl-link-line-advisor 
 # [tips] to confirm the LDFLAGS, if you are using intel compilers.
 LDFLAGS=-Wl,--start-group ${MKLROOT}/lib/intel64/libmkl_gf_ilp64.a ${MKLROOT}/lib/intel64/libmkl_intel_thread.a ${MKLROOT}/lib/intel64/libmkl_core.a ${MKLROOT}/lib/intel64/libmkl_blacs_intelmpi_ilp64.a -Wl,--end-group -liomp5 -lpthread -lm -ldl
-LD=$(FC)
 
 LDC=$(CC)
 LDCFLAGS=-lm
@@ -69,4 +69,4 @@ neat_external:
 neat: neat_internal neat_external
 
 clean: neat
-	(rm -f bin/pp3 bin/cabal bin/cryan bin/buildcell bin/symmol bin/cellsym)
+	(rm -f bin/cabal bin/cryan bin/buildcell bin/cellsym)

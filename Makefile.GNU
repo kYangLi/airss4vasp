@@ -5,8 +5,8 @@ FFLAGS=-O0 -g # Do not optimise
 CC=gcc # GCC family only
 CFLAGS=
 
-LDFLAGS=-llapack
 LD=$(FC)
+LDFLAGS=-llapack
 
 LDC=$(CC)
 LDCFLAGS=-lm
@@ -68,4 +68,4 @@ neat_external:
 neat: neat_internal neat_external
 
 clean: neat
-	(rm -f bin/pp3 bin/cabal bin/cryan bin/buildcell bin/symmol bin/cellsym)
+	(rm -f bin/cabal bin/cryan bin/buildcell bin/cellsym)
