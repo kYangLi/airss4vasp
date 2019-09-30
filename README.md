@@ -45,13 +45,13 @@ To enable this script, you need perpare another 3 or 4 kinds of files:
 
 ### `<seedname>.cell`
 
-This is the key file for the whole structure searching task. Please first learn how to use `AIRSS` before using `a4v`. 
+This is the key file for the whole structure searching task. Please first learn how to use `AIRSS` before using `a4v`.
 
 There is one thing need to be explained more specifically.
 
 During the generation of the new random structures in `AIRSS`, basically, there are two steps for the movement of a single atom: `random shift` and `push`. The step `push` is applied to make sure two atoms are not connected to close.
 
-In the `<seedname>.cell`, there are two atomic tags called `NOMOVE` and `FIX`. The first one designed for disable the `push` step, while, the last one designed for disbale the `push` **and** fix the atom during the `CASTEP` relaxzation. 
+In the `<seedname>.cell`, there are two atomic tags called `NOMOVE` and `FIX`. The first one designed for disable the `push` step, while, the last one designed for disbale the `push` **and** fix the atom during the `CASTEP` relaxzation.
 
 Since now we are using `VASP`, in `a4v`,  `FIX` and `NOMOVE` actually have the same effect, and if you mean to fix a atom during the relaxztion, use the tag `SD-*` (where the `*` can replace with `X`, `Y`, `Z`, `XY`, `YZ`, `ZX`, `XYZ`). This tag will enable the `Selective dynamics` mode of `VASP` in `POSCAR`.
 
@@ -75,7 +75,7 @@ Si 0.0 0.0 0.0 # Si2 % NUM=1
 
 ### `<seedname>.INCAR-[1-9]`
 
-The `INCAR` is a input file for VASP relaxzation. The quantity of `INCAR` decided how many times will the structure be relaxed. 
+The `INCAR` is a input file for VASP relaxzation. The quantity of `INCAR` decided how many times will the structure be relaxed.
 
 E.g. If there are `Si.INCAR-1`, `Si.INCAR-2`, `Si.INCAR-3` in the calculation file, then the same `Si` structure will first be relaxed using `INCAR-1`, then `INCAR-2`, and at last `INCAR-3`. You can also setting KPOINTS for each INCAR with name `Si.KPOINTS-[1-9]`
 
@@ -154,7 +154,7 @@ match -r -u 0.01 -t 5
 ./_KILLJOB.sh
 ```
 
-### Clean the Foder to Init.
+### Clean the Foder to Initial
 
 ```bash
 ./_CLEAN.sh
