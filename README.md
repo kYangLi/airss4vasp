@@ -95,6 +95,7 @@ vim $(which mass-election.pbs) # mass-election.nscc if under NSCC system.
 
 Here is the list of the default parameters you can modify:  
 
+
 |Parameter Name            |Type|Descripution|
 |-------------------------:|:----|:-----------|
 |DEFAULT_INTEL_MODULE      |Char |Intel Module load command, if you are using Intel Lib for VASP and AIRSS.|
@@ -108,6 +109,7 @@ Here is the list of the default parameters you can modify:
 |DEFAULT_BUILD_CELL_BEFORE |y/n  |Select the build cell mode.|
 |DEFAULT_IS_2D_MATERIAL    |y/n  |IS this a 2D material? If it is, then add '-f' flag when generate KPOINTS.|
 |DEFAULT_KP_SEP            |Float|K poinnts separation in k-space.|
+
 
 ### Submit Task
 
