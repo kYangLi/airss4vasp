@@ -93,21 +93,21 @@ Before submit the job, please enter the main task submit script to setting the d
 vim $(which mass-election.pbs) # mass-election.nscc if under NSCC system.
 ```
 
-Here is the list of the default parameters you can modify:  
+Here is the list of the default parameters you can modify:
 
-|Parameter Name            |Type|Descripution|
-|-:|:-|:-|
-|DEFAULT_INTEL_MODULE      |Char |Intel Module load command, if you are using Intel Lib for VASP and AIRSS.|
-|DEFAULT_VASP_EXEC         |Char |Path of VASP executive program.|
-|DEFAULT_NODES_NUM         |Int  |Nodes number used in task.|
-|DEFAULT_CORES_NUM_PER_NODE|Int  |The number of cores of each nodes in your machine.|
-|DEFAULT_STR_NUM           |Int  |Total structure number you want to search.|
-|DEFAULT_SYMM_PREC         |Float|Symmetry precise used in `cellsym`.|
-|DEFAULT_TIME_LIMIT        |Int  |Wall time for a single VASP relazation(one INCAR step).|
-|DEFAULT_DEL_CALC_DETAILS  |Bool |Keep the calculation detail file or not.|
-|DEFAULT_BUILD_CELL_BEFORE |y/n  |Select the build cell mode.|
-|DEFAULT_IS_2D_MATERIAL    |y/n  |IS this a 2D material? If it is, then add '-f' flag when generate KPOINTS.|
-|DEFAULT_KP_SEP            |Float|K poinnts separation in k-space.|
+Parameter Name            |Type|Descripution
+-:|:-|:-
+DEFAULT_INTEL_MODULE      |Char |Intel Module load command, if you are using Intel Lib for VASP and AIRSS.
+DEFAULT_VASP_EXEC         |Char |Path of VASP executive program.
+DEFAULT_NODES_NUM         |Int  |Nodes number used in task.
+DEFAULT_CORES_NUM_PER_NODE|Int  |The number of cores of each nodes in your machine.
+DEFAULT_STR_NUM           |Int  |Total structure number you want to search.
+DEFAULT_SYMM_PREC         |Float|Symmetry precise used in `cellsym`.
+DEFAULT_TIME_LIMIT        |Int  |Wall time for a single VASP relazation(one INCAR step).
+DEFAULT_DEL_CALC_DETAILS  |Bool |Keep the calculation detail file or not.
+DEFAULT_BUILD_CELL_BEFORE |y/n  |Select the build cell mode.
+DEFAULT_IS_2D_MATERIAL    |y/n  |IS this a 2D material? If it is, then add '-f' flag when generate KPOINTS.
+DEFAULT_KP_SEP            |Float|K poinnts separation in k-space.
 
 ### Submit Task
 
