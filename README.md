@@ -93,7 +93,7 @@ Before submit the job, please enter the main task submit script to setting the d
 vim $(which mass-election.pbs) # mass-election.nscc if under NSCC system.
 ```
 
-Here is the list of the default parameters you can modify:
+Here is the list of the default parameters you can modify:  
 
 |Parameter Name            |Type|Descripution|
 |-------------------------:|:----|:-----------|
