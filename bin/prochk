@@ -42,10 +42,16 @@ if [ "${total_str_num}" == "${processed_str_num}" ]; then
 else 
   run_state='[info] Mass-election in Processing...'
 fi
-total_time_spend=$(grep '\[spend_time_raw\]' VASP.log.temp | 
-                   awk -F ':' '{print $2}' |
-                   awk '{sum+=$1}END{print sum}')
-total_time_spend=${total_time_spend%.*}
+start_time=$(grep '\[start_time\]' VASP.log.temp | awk '{print $2}' | 
+             sort -n | head -1)
+if ${calc_done}; then
+  current_time=$(date +%s)
+  ((total_time_spend=current_time-start_time))
+else
+  end_time=$(grep '\[end_time\]' VASP.log.temp | awk '{print $2}' | 
+             sort -n | tail -1)
+  ((total_time_spend=end_time-start_time))
+fi
 average_time_spend=$(grep '\[spend_time_raw\]' VASP.log.temp | 
                      awk -F ':' '{print $2}' |
                      awk '{sum+=$1}END{print sum/NR}')
