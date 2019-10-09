@@ -44,7 +44,7 @@ else
 fi
 start_time=$(grep '\[start_time\]' VASP.log.temp | awk '{print $2}' | 
              sort -n | head -1)
-if ${calc_done}; then
+if ! ${calc_done}; then
   current_time=$(date +%s)
   ((total_time_spend=current_time-start_time))
 else
