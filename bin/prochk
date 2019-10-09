@@ -42,14 +42,24 @@ if [ "${total_str_num}" == "${processed_str_num}" ]; then
 else 
   run_state='[info] Mass-election in Processing...'
 fi
+total_time_spend=$(grep '\[spend_time_raw\]' VASP.log.temp | 
+                   awk -F ':' '{print $2}' |
+                   awk '{sum+=$1}END{print sum}')
+total_time_spend=${total_time_spend%.*}
 average_time_spend=$(grep '\[spend_time_raw\]' VASP.log.temp | 
                      awk -F ':' '{print $2}' |
                      awk '{sum+=$1}END{print sum/NR}')
 average_time_spend=${average_time_spend%.*}
 if [ -z "${average_time_spend}" ]; then
+  total_time_spend_format='null'
   average_time_spend_format='null'
   estimate_remain_time_format='null'
 else
+  total_time_spend_format=$(echo ${total_time_spend} | 
+                            awk '{print int($1/86400)"d:"\
+                                        int($1%86400/3600)"h:"\
+                                        int($1%3600/60)"m:"\
+                                        $1%60"s"}')
   average_time_spend_format=$(echo ${average_time_spend} | 
                               awk '{print int($1/86400)"d:"\
                                           int($1%86400/3600)"h:"\
@@ -82,6 +92,7 @@ echo "[info] Error Str.         :  ${error_str_num}/${total_str_num}"
 echo "[info] Missing CONTCAR    :  ${no_contcar_str_num}/${error_str_num}"
 echo "[info] Bad Init. POSCAR   :  ${bad_poscar_str_num}/${error_str_num}"
 echo "[info] Ave. Time Per Str. :  ${average_time_spend_format}"
+echo "[info] Total Time Spend   :  ${total_time_spend_format}"
 echo "[info] Time Remain Estim. :  ${estimate_remain_time_format}"
 echo "[info] Final Team UnFin.  :  ${final_team_unfinished}"
 echo "[info] Final Team Finish  :  ${final_team_finished}"
