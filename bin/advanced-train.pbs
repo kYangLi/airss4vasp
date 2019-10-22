@@ -272,7 +272,7 @@ for str_poscar in ${poscar_list}; do
   fi
   ## Job Submit
   date >> VASP.log
-  mpirun -machinefile ../${MPI_MACHINE_FILE} \
+  mpirun -machinefile ${MPI_MACHINE_FILE} \
          -np ${total_cores_num} \
          vasp >> VASP.log
   date >> VASP.log
