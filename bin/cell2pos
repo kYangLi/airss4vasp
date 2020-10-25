@@ -106,7 +106,8 @@ if [ ! -z "${str_gen_cell}" ]; then
       > ${str_poscar}.flaged.temp
     mv ${str_poscar}.flaged.temp ${str_poscar}
     rm *.temp
+    rm SelDyn.Flag
   fi # Endif for NEED FIX POSITION
-fi
+fi # Endif for gen cell file
 
 sed -i "1c${str_cell} to POSCAR" ${str_poscar}

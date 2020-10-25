@@ -1,0 +1,587 @@
+#!/bin/bash
+#
+
+declare -r A4V_PATH=$(cd "$(dirname "$0")";pwd)
+declare -r MPI_MECHINEFILE='cores-list'
+declare -r INPUT_FILE='a4v.input'
+
+a4v_in_path=$(echo ${PATH} | grep "${A4V_PATH}")
+if [ -z "${a4v_in_path}" ]; then 
+  echo "[error] a4v is not in the PATH..."
+  echo "[tips] Add the following command in your ~/.bashrc:"
+  echo "[tips]   export PATH=\"${A4V_PATH}:\${PATH}\""
+  echo "[tips] Or simply run:"
+  echo "[tips]   echo 'export PATH=\"${A4V_PATH}:\${PATH}\"' >> ~/.bashrc"
+  exit 1
+fi
+
+#===================#
+#   Tools Defined   #
+#===================#
+grep_input_file(){
+  keyword="$1"
+  res=$(grep "${keyword}" ${INPUT_FILE} 2>/dev/null | tail -1 | 
+        awk -F '#' '{print $1}' | awk -F '=' '{print $NF}')
+  echo ${res}
+}
+
+str_repalce(){
+  taget=$1
+  res=$2
+  file=$3
+  sed "s|${taget}|${res}|g" ${file} > .sed.tmp
+  mv .sed.tmp ${file}
+}
+
+echo "================== Tools Defined =================="
+# Clean file script
+echo "[do] Create _CLEAN.sh"
+cat > _CLEAN.sh << EOF
+#!/bin/bash
+#
+if [ -e _KILLJOB.sh ]; then 
+  echo "[warning] _KILLJOB still exist, make sure the job is done..."
+fi
+read -p '[input] Press <Enter> to confirm the delete. '
+rm -rf COACH-*
+rm -r  POSCAR-POOL
+rm -r  RES-POOL
+rm     TRAIN.record
+rm     JOBID.record
+rm     ${task_name}.o*
+rm     slurm-*.o*
+rm     a4v.*.sh
+rm     a4v.allparas
+rm     _KILLJOB.sh
+rm     _CLEAN.sh
+EOF
+chmod 740 _CLEAN.sh
+echo ""
+
+#===================#
+#   Paras Read In   #
+#===================#
+echo "================== Read In Paras =================="
+## Seed Name
+default_seed_name=$(ls -1 *.cell | sed 's/.cell//g' | head -1)
+if [ -z "${default_seed_name}" ]; then 
+  echo '[error] No seed file was found!!!'
+  exit 0
+fi
+echo "[input] Please input the SEED NAME:"
+echo "[input] Default: ${default_seed_name}"
+read -p '[input]> ' seed_name
+if [ -z "${seed_name}" ];then
+  seed_name="${default_seed_name}"
+fi
+echo "[info] Seed name: ${seed_name}"
+echo ""
+## Task Name
+default_task_name=$(grep_input_file 'TASK_NAME')
+if [ -z "${default_task_name}" ]; then
+  default_task_name=a4v-${seed_name}
+fi
+echo "[input] Please input the TASK NAME:"
+echo "[input] Default: ${default_task_name}"
+read -p '[input]> ' task_name
+if [ -z "${task_name}" ];then
+  task_name="${default_task_name}"
+fi
+echo "[info] Task name: ${task_name}"
+echo ""
+## Intel Module
+default_intel_module=$(grep_input_file 'INTEL_MODULE')
+echo "[input] Please input the INTEL MODULE:"
+echo "[input] Default: ${default_intel_module}"
+read -p '[input]> ' intel_module
+if [ -z "${intel_module}" ];then
+  intel_module="${default_intel_module}"
+fi
+echo "[info] Intel module: ${intel_module}"
+mklroot=$(echo "${intel_module}; echo \${MKLROOT}" | bash)
+echo "[info] You are using MKL: ${mklroot}"
+echo ""
+## Vasp Program
+default_vasp_prog=$(grep_input_file 'VASP_PROG')
+echo "[input] Please input the VASP PROG:"
+echo "[input] Default: ${default_vasp_prog}"
+read -p '[input]> ' vasp_prog
+if [ -z "${vasp_prog}" ];then
+  vasp_prog="${default_vasp_prog}"
+fi
+echo "[info] VASP program: ${vasp_prog}"
+echo ""
+## Nodes Number
+default_nodes_num=$(grep_input_file 'NODES_NUM')
+echo "[input] Please input the NODES NUM."
+echo "[input] Default: ${default_nodes_num}"
+read -p '[input]> ' nodes_num
+if [ -z "${nodes_num}" ];then
+  nodes_num=${default_nodes_num}
+fi
+if ! [ "${nodes_num}" -gt "0" ] 2>/dev/null; then
+  echo "[error] NODES NUM input invalid..."
+  exit 1
+fi
+echo "[info] Using nodes number: ${nodes_num}"
+echo ""
+## Cores Number Per Node
+default_cores_per_node=$(grep_input_file 'CORES_PER_NODE')
+echo "[input] Please input the CORES PER NODE."
+echo "[input] Default: ${default_cores_per_node}"
+read -p '[input]> ' cores_per_node
+if [ -z "${cores_per_node}" ];then
+  cores_per_node=${default_cores_per_node}
+fi
+if ! [ "${cores_per_node}" -gt "0" ] 2>/dev/null; then
+  echo "[error] CORES PER NODE input invalid..."
+  exit 1
+fi 
+echo "[info] Using cores per node: ${cores_per_node}"
+echo ""
+## Coach Number
+default_coach_num=$(grep_input_file 'COACH_NUM')
+if [ -z "${default_coach_num}" ]; then 
+  default_coach_num=${nodes_num}
+fi 
+echo "[input] Please input the COACH NUM."
+echo "[input] Default: ${default_coach_num}"
+read -p '[input]> ' coach_num
+if [ -z "${coach_num}" ];then
+  coach_num=${default_coach_num}
+fi
+if ! [ "${coach_num}" -gt "0" ] 2>/dev/null; then
+  echo "[error] COACH NUM input invalid..."
+  exit 1
+fi
+nodes_pre_coach=$(echo ${nodes_num} ${coach_num} | awk '{print $1/$2}')
+coach_num_is_correct=$(echo ${nodes_pre_coach} | grep "\.")
+if [ ! -z "${coach_num_is_correct}"]; then 
+  echo "[error] the COACH NUMBER must be a factor of NODES NUMBER!!!"
+  exit 0
+fi 
+echo "[info] Using coach number: ${coach_num}"
+echo "[info] Each coach will use '${nodes_pre_coach}' nodes."
+echo ""
+## Structure Number
+default_str_num=$(grep_input_file 'STR_NUM')
+echo "[input] Please input the STR NUM"
+echo "[input] Default: ${default_str_num}"
+read -p '[input]> ' str_num
+if [ -z "${str_num}" ];then
+  str_num=${default_str_num}
+fi
+declare -i str_num=${str_num}
+echo "[info] Totally '${str_num}' structures will be searched."
+echo ""
+## Symmetry Precise
+default_symm_prec=$(grep_input_file 'SYMM_PREC')
+if [ -z "${default_symm_prec}" ]; then
+  default_symm_prec=0.1
+fi
+echo "[input] Please input the PRECISION for finding the SYMMETRY."
+echo "[input] Default: ${default_symm_prec}"
+read -p '[input]> ' symm_prec
+if [ -z "${symm_prec}" ];then
+  symm_prec=${default_symm_prec}
+fi
+echo "[info] Using symmetry precision: ${symm_prec}"
+echo ""
+## Kpoints separation
+need_read_is_2d=0
+incar_index=0
+kp_sep_list=""
+for incar in ${seed_name}.INCAR-[0-9]*; do
+  ((incar_index++))
+  kpoints=$(echo ${incar} | sed 's|INCAR|KPOINTS|g')
+  if [ -s "${kpoints}" ]; then
+    kp_sep_list="${kp_sep_list}null,"
+    echo "[info] Using ${kpoints} for ${incar} calualtion."
+    continue
+  fi
+  ((need_read_is_2d++))
+  if [ "${need_read_is_2d}" == "1" ]; then
+    default_kp_sep_list=$(grep_input_file 'KP_SEP_LIST')
+    default_is_2d_material=$(grep_input_file 'IS_2D_MATERIAL')
+    echo "[input] Is this a 2D material? (T/F)"
+    echo "[input] Default: ${default_is_2d_material}"
+    echo "[tips] Please make sure the vaccum layer is in Z direction."
+    read -p '[input]> ' is_2d_material
+    if [ -z "${is_2d_material}" ];then
+      is_2d_material=${default_is_2d_material}
+    fi
+    is_2d_material=$(echo ${is_2d_material} | awk '{print toupper($0)}')
+    if [ "${is_2d_material}" != "T" ] && [ "${is_2d_material}" != "F" ]; then
+      echo "[error] input invalid, please input 'T'(true) or 'F'(false)..."
+      exit 1
+    fi
+    echo "[info] Is a 2D Material: ${is_2d_material}"
+    echo ""
+  fi
+  default_kp_sep=$(echo ${default_kp_sep_list} | cut -d ',' -f ${incar_index})
+  read -p "[input] KPSEP for ${incar},[${default_kp_sep}]> " kp_sep
+  if [ -z "${kp_sep}" ];then
+    kp_sep=${default_kp_sep}
+  fi
+  kp_sep_list="${kp_sep_list}${kp_sep},"
+done
+kp_sep_list=$(echo ${kp_sep_list} | sed s/[[:space:]]//g  | sed 's/.$//')
+echo "[info] Using kpoints separation list: [${kp_sep_list}]"
+echo ""
+## System type
+default_sys_type=$(grep_input_file 'SYS_TYPE')
+echo "[input] Please input the SYS TYPE:"
+echo "[input] Default: ${default_sys_type}"
+read -p '[input]> ' sys_type
+if [ -z "${sys_type}" ];then
+  sys_type="${default_sys_type}"
+fi
+is_correct_sys_type=$(echo 'pbs,slrum,nscc,direct' | grep ${sys_type})
+if [ -z "${is_correct_sys_type}" ];then
+  echo "[error] Invalid system type."
+  echo "[tips] choice one from: pbs, slurm, nscc, direct."
+  exit 1
+fi
+echo "[info] Intel module: ${sys_type}"
+echo ""
+if [ "${sys_type}" == "pbs" ]; then
+  ## PBS walltime
+  default_pbs_walltime=$(grep_input_file 'PBS_WALLTIME')
+  if ! [ "${default_pbs_walltime}" -gt "0" ] 2>/dev/null; then
+    default_pbs_walltime=96
+  fi
+  echo "[input] Please input the Max Time Limit for the PBS job."
+  echo "[input] Default: ${default_pbs_walltime} (h)"
+  read -p '[input]> ' pbs_walltime
+  if [ -z "${pbs_walltime}" ];then
+    pbs_walltime="${default_pbs_walltime}"
+  fi
+  echo "[info] Using PBS walltime: ${pbs_walltime} hours."
+  echo ""
+  ## PBS Queue
+  default_pbs_queue=$(grep_input_file 'PBS_QUEUE')
+  if [ -z "${default_pbs_queue}" ]; then
+    default_pbs_queue='unset_pbs_queue'
+  fi
+  echo "[input] Please input PBS queue."
+  echo "[input] Default: ${default_pbs_queue}"
+  read -p '[input]> ' pbs_queue
+  if [ -z "${pbs_queue}" ];then
+    pbs_queue="${default_pbs_queue}"
+  fi
+  echo "[info] Using PBS queue: ${pbs_queue}."
+  echo ""
+fi
+## VASP walltime
+default_vasp_walltime=$(grep_input_file 'VASP_WALLTIME')
+if ! [ "${default_vasp_walltime}" -gt "0" ] 2>/dev/null; then
+  default_vasp_walltime=43200
+fi
+echo "[input] Please input the Max Time Limit for single VASP Calculation."
+echo "[input] Default: ${default_vasp_walltime} (s)"
+read -p '[input]> ' vasp_walltime
+if [ -z "${vasp_walltime}" ];then
+  vasp_walltime="${default_vasp_walltime}"
+fi
+echo "[info] Using VASP walltime: ${vasp_walltime} seconds."
+echo ""
+## Delete Calculation Files
+default_keep_calc_details=$(grep_input_file 'KEEP_CALC_DETAILS')
+if [ -z "${default_keep_calc_details}" ];then
+  default_keep_calc_details='F'
+fi 
+echo "[input] Keep all calculation details? (T/F)"
+echo "[input] Default: ${default_keep_calc_details}"
+read -p '[input]> ' keep_calc_details
+if [ -z "${keep_calc_details}" ];then
+  keep_calc_details="${default_keep_calc_details}"
+fi
+keep_calc_details=$(echo ${keep_calc_details} | awk '{print toupper($0)}')
+echo "[info] Keep calculation details: ${keep_calc_details}"
+echo ""
+
+#======================#
+#   Paras Write Down   #
+#======================#
+echo "================== Record the Paras =================="
+echo "[do] Generate a4v.allparas"
+cat > a4v.allparas << EOF
+A4V_PATH          = ${A4V_PATH}
+PBS_SUBMIT_SCRIPT = ${PBS_SUBMIT_SCRIPT}
+MPI_MECHINEFILE   = ${MPI_MECHINEFILE}
+INPUT_FILE        = ${INPUT_FILE}
+#
+SEED_NAME         = ${seed_name}
+TASK_NAME         = ${task_name}
+INTEL_MODULE      = ${intel_module}
+VASP_PROG         = ${vasp_prog}
+NODES_NUM         = ${nodes_num}
+CORES_PER_NODE    = ${cores_per_node}
+COACH_NUM         = ${coach_num}
+NODES_PER_COACH   = ${nodes_pre_coach}
+STR_NUM           = ${str_num}
+IS_2D_MATERIAL    = ${is_2d_material}
+KP_SEP_LIST       = ${kp_sep_list}
+SYMM_PREC         = ${symm_prec}
+SYS_TYPE          = ${sys_type}
+PBS_WALLTIME      = ${pbs_walltime}
+PBS_QUEUE         = ${pbs_queue}
+VASP_WALLTIME     = ${vasp_walltime}
+KEEP_CALC_DETAILS = ${keep_calc_details}
+EOF
+echo "[do] Update a4v.input"
+cat > a4v.input << EOF
+SEED_NAME         = ${seed_name}
+TASK_NAME         = ${task_name}
+INTEL_MODULE      = ${intel_module}
+VASP_PROG         = ${vasp_prog}
+NODES_NUM         = ${nodes_num}
+CORES_PER_NODE    = ${cores_per_node}
+COACH_NUM         = ${coach_num}
+STR_NUM           = ${str_num}
+IS_2D_MATERIAL    = ${is_2d_material}
+KP_SEP_LIST       = ${kp_sep_list}
+SYMM_PREC         = ${symm_prec}
+SYS_TYPE          = ${sys_type}
+PBS_WALLTIME      = ${pbs_walltime}
+PBS_QUEUE         = ${pbs_queue}
+VASP_WALLTIME     = ${vasp_walltime}
+KEEP_CALC_DETAILS = ${keep_calc_details}
+EOF
+echo ""
+
+#================#
+#   Envs Check   #
+#================#
+echo "================== Check Files =================="
+## Check AIRSS
+echo "[do] Checking AIRSS..."
+nessary_modules='buildcell cabal cryan cellsym cell2pos genkp genpos a4v-prg a4v-res'
+for nessary_module in ${nessary_modules}; do
+  if [ ! -e ${A4V_PATH}/${nessary_module} ]; then 
+    echo "[error] '${A4V_PATH}/${nessary_module}' do not exist..."
+    exit 1
+  fi
+done
+echo "[info] PASS ::AIRSS:: PASS"
+echo ""
+## Check VASP
+echo "[do] Checking VASP..."
+if [ ! -e ${vasp_prog} ]; then 
+  echo "[error] '${vasp_prog}' do not exist..."
+  exit 0
+fi
+echo "[info] PASS ::VASP:: PASS"
+echo ""
+## Check INCAR
+echo "[do] Checking INCAR..."
+check_incar_file=$(echo ${seed_name}.INCAR-[0-9]* | awk '{print $1}')
+if [ ! -e ${check_incar_file} ]; then
+  echo "[error] ${seed_name}.INCAR-[0-9]* is required..." 
+  exit 1
+fi
+incar_num=$(ls ${seed_name}.INCAR-[0-9]* | wc -w)
+incar_file_index_list=$(ls -1 ${seed_name}.INCAR-[0-9]* | 
+                        awk -F '-' '{print $NF}' | sort -n | xargs)
+incar_index=0
+for incar_file_index in ${incar_file_index_list}; do
+  ((incar_index++))
+  if [ "${incar_index}" != "${incar_file_index}" ]; then
+    echo "[info] Name: ${seed_name}.INCAR-${incar_file_index} are not correct!"
+    echo "[do] Rename it with ${seed_name}.INCAR-${incar_index}..."
+    mv ${seed_name}.INCAR-${incar_file_index} ${seed_name}.INCAR-${incar_index}
+    if [ -e ${seed_name}.KPOINTS-${incar_index} ]; then
+      rm ${seed_name}.KPOINTS-${incar_index}
+    fi
+    if [ -e ${seed_name}.KPOINTS-${incar_file_index} ]; then
+      mv ${seed_name}.KPOINTS-${incar_file_index} \
+         ${seed_name}.KPOINTS-${incar_index}
+    fi
+  else
+   echo "[info] ${seed_name}.INCAR-${incar_file_index} pass..."
+  fi
+done
+echo "[info] Totally ${incar_num} INCAR was used for relazation."
+echo "[info] PASS ::INCAR:: PASS"
+echo ""
+## Generate TEMP POSCAR
+echo "[do] Generating Temporary POSCAR for POTCAR check..."
+buildcell < ${seed_name}.cell > CELL.TEMP 2>&1
+cabal cell poscar < CELL.TEMP > POSCAR.TEMP
+## Check KPOINTS
+echo "[do] Checking KPOINTS..."
+for ((incar_index=1; incar_index<=incar_num; incar_index++)); do
+  if [ ! -s ${seed_name}.KPOINTS-${incar_index} ]; then
+    kp_sep=$(echo ${kp_sep_list} | cut -d ',' -f ${incar_index})
+    if [ -z "${kp_sep}" ] || [ "null"  == "${kp_sep}" ]; then 
+      echo "[error] ${seed_name}.KPOINTS-${incar_index} not exist..."
+      exit 1
+    fi
+    mv POSCAR.TEMP POSCAR
+    if [ "${is_2d_material}" == "T" ]; then
+      genkp -s ${kp_sep} -f
+    else
+      genkp -s ${kp_sep}
+    fi
+    mv POSCAR POSCAR.TEMP
+    mv KPOINTS KPOINTS.TEMP
+    kp_num=$(sed -n '4p' KPOINTS.TEMP | awk '{print $1","$2","$3}')
+    echo "[info] Using KPSEP=${kp_sep} for ${seed_name}.INCAR-${incar_index} calculation with kp-num: [${kp_num}]"
+  else
+    kp_num=$(sed -n '4p' ${seed_name}.KPOINTS-${incar_index} | 
+             awk '{print $1","$2","$3}')
+    echo "[info] Using ${seed_name}.KPOINTS-${incar_index} for ${seed_name}.INCAR-${incar_index} calculation with kp-num: [${kp_num}]"
+  fi
+done
+echo "[info] PASS ::KPOINTS:: PASS"
+echo ""
+## Check POTCAR
+echo "[do] Checking POTCAR..." 
+if [ ! -e ${seed_name}.POTCAR ]; then 
+  echo "[error] POTCAR do not exist..."
+  exit 0
+fi
+element_order_potcar=$(echo $(grep VRH ${seed_name}.POTCAR | 
+                              cut -d '=' -f 2 | 
+                              cut -d ':' -f 1))
+element_pickup=$(echo ${element_order_potcar} | cut -d ' ' -f 1)
+element_order_poscar=$(echo $(sed -n '6p' POSCAR.TEMP | 
+                       grep "${element_pickup}"))
+rm *.TEMP
+if [ "${element_order_potcar}" == "${element_order_poscar}" ]; then 
+  echo "[info] POTCAR and POSCAR element match well."
+else 
+  echo "[error] Elements of POTCAR and POSCAR do not match!!!"
+  exit 0
+fi 
+echo "[info] PASS ::POTCAR:: PASS"
+echo ""
+
+#===========================#
+#   Prepare Before Submit   #
+#===========================#
+## Generate POSCAR pool
+echo "================== Prepare Before Submit =================="
+if [ ! -e POSCAR-POOL ]; then
+  echo "[do] Creating POSCAR-POOL..."
+  mkdir POSCAR-POOL
+else
+  echo "[info] POSCAR-POOL already exist, skip the mkdir."
+fi
+cd POSCAR-POOL
+cp ../${seed_name}.cell .
+genpos ${seed_name} ${str_num}
+gen_str_num=$(echo $(ls | wc -w) | awk '{print ($1-1)/2}')
+echo "[info] There are ${gen_str_num} structures in the POSCAR-POOL, now."
+cd ..
+## Make the Result directory
+if [ ! -e RES-POOL ]; then
+  echo '[do] Creating RES-POOL...'
+  mkdir RES-POOL
+else
+  echo '[info] RES-POOL already exist, skip the mkdir.'
+fi
+echo ""
+
+#=================#
+#   Submit Jobs   #
+#=================#
+echo "================== Submit Jobs =================="
+echo "[do] Prepare the submitting files..."
+vasp_calc_script="${A4V_PATH}/vasp_submit/vasp_calc_script.sh"
+submit_script="${A4V_PATH}/vasp_submit/submit_${sys_type}.sh"
+curr_sub_scrp="a4v.${sys_type}.sh"
+cp ${submit_script} ${curr_sub_scrp}
+((total_cores_num=cores_per_node*nodes_pre_coach))
+case ${sys_type} in
+'pbs')
+  str_repalce "__task_name__"        "${task_name}__tag__" "${curr_sub_scrp}"
+  str_repalce "__nodes_num__"        "${nodes_pre_coach}"  "${curr_sub_scrp}"
+  str_repalce "__cores_per_node__"   "${cores_per_node}"   "${curr_sub_scrp}"
+  str_repalce "__pbs_walltime__"     "${pbs_walltime}"     "${curr_sub_scrp}"
+  str_repalce "__mpi_mechinefile__"  "${MPI_MECHINEFILE}"  "${curr_sub_scrp}"
+  str_repalce "__vasp_calc_script__" "${vasp_calc_script}" "${curr_sub_scrp}"
+  if [ "${pbs_queue}" == "unset-pbs-queue" ]; then 
+    str_repalce '#PBS -q' '##PBS -q' "${curr_sub_scrp}"
+  else 
+    str_repalce "__pbs_queue__" "${pbs_queue}" "${curr_sub_scrp}"
+  fi
+  submit_command="qsub ${curr_sub_scrp}"
+  kill_command='qdel'
+  ;;
+'slurm')
+  str_repalce "__task_name__"        "${task_name}__tag__" "${curr_sub_scrp}"
+  str_repalce "__nodes_num__"        "${nodes_pre_coach}"  "${curr_sub_scrp}"
+  str_repalce "__total_cores__"  "${total_cores_num}"  "${curr_sub_scrp}"
+  str_repalce "__vasp_calc_script__" "${vasp_calc_script}" "${curr_sub_scrp}"
+  if [ "${pbs_queue}" == "unset-pbs-queue" ]; then 
+    str_repalce '#SBATCH -p' '##SBATCH -p' "${curr_sub_scrp}"
+  else 
+    str_repalce "__pbs_queue__" "${pbs_queue}" "${curr_sub_scrp}"
+  fi
+  submit_command="sbatch ${curr_sub_scrp}"
+  kill_command='scancel'
+  ;;
+'nscc')
+  str_repalce "__task_name__"        "${task_name}__tag__" "${curr_sub_scrp}"
+  str_repalce "__nodes_num__"        "${nodes_pre_coach}"  "${curr_sub_scrp}"
+  str_repalce "__total_cores__"  "${total_cores_num}"  "${curr_sub_scrp}"
+  str_repalce "__vasp_calc_script__" "${vasp_calc_script}" "${curr_sub_scrp}"
+  submit_command="yhbatch ${curr_sub_scrp}"
+  kill_command='yhcancel'
+  ;;
+'direct')
+  str_repalce "__task_name__"        "${task_name}__tag__" "${curr_sub_scrp}"
+  str_repalce "__vasp_calc_script__" "${vasp_calc_script}" "${curr_sub_scrp}"
+  submit_command="nohup bash ${curr_sub_scrp} > ${task_name}__tag__.out 2>&1 &"
+  kill_command='kill'
+  ;;
+esac
+echo "[done] ${curr_sub_scrp}"
+read -p "Press <Enter> to confirm the submition..."
+echo ""
+# Submit the jobs
+echo "[do] Submitting the jobs..."
+cat /dev/null > JOBID.record
+declare -i current_max_coach_index=$(ls -1 . | grep 'COACH-' | 
+                                     awk -F '-' '{print $NF}' | 
+                                     sort -n | tail -1)
+for ((gen_index=1; gen_index<=${coach_num}; gen_index++)); do
+  ((coach_index=current_max_coach_index+gen_index))
+  echo "[do] Creating COACH-${coach_index}..."
+  mkdir COACH-${coach_index}
+  cd COACH-${coach_index}
+  cp ../${curr_sub_scrp} .
+  str_repalce "__tag__" "-c${coach_index}" ${curr_sub_scrp}
+  cp ../a4v.allparas .
+  cp ../${seed_name}.POTCAR POTCAR
+  cp ../${seed_name}.INCAR-[0-9]* .
+  for incar in ${seed_name}.INCAR-*; do
+    mv ${incar} ${incar##*\.}
+  done
+  cp ../${seed_name}.KPOINTS-[0-9]* . 2>/dev/null
+  for kpoints in ${seed_name}.KPOINTS-*; do
+    mv ${kpoints} ${kpoints##*\.} 2>/dev/null
+  done
+  echo " |--[sub-do] ${submit_command}"
+  job_id=$(${submit_command})
+  if [ "${sys_type}" == "nscc" ] || [ "${sys_type}" == "slurm" ]; then 
+    job_id=$(echo ${job_id} | awk '{print $NF}')
+  fi 
+  echo ${job_id} >> ../JOBID.record
+  echo " +--[info] Job ID: ${job_id}"
+  cd ..
+  sleep 1
+done
+# Kill job script
+echo "[do] Generating _KILLJOB.sh"
+echo '#!/bin/bash' >> _KILLJOB.sh
+echo '#          ' >> _KILLJOB.sh
+echo 'job_id=$(cat JOBID.record | xargs)' >> _KILLJOB.sh
+echo 'echo "'${kill_command}' ${job_id}"' >> _KILLJOB.sh
+echo "${kill_command}"' ${job_id}' >> _KILLJOB.sh
+chmod 740 _KILLJOB.sh
+echo '[done]'
+echo ""
+echo "============== a4v Over =============="
+

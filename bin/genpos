@@ -1,0 +1,47 @@
+#!/bin/bash
+#
+# Author: liyang@cmt.tsinghua
+# Start Date: 2019.9.19
+# Last Update: 2020.10.24
+# Description: generate POSCAR Structure Pool
+#
+
+# Tips for usage
+if [ -z "$1" ]; then
+  echo "[error] Not enough input file."
+  echo "[tips] genpos <seed_name> <str_number>"
+  exit 0
+fi
+
+# Seed name and the structure number read in
+seed_name=$1
+if [ -z "$2" ]; then
+  str_quantity=1
+else 
+  declare -i str_quantity=$2
+fi
+str_gen_cell=${seed_name}.cell
+ 
+# POSCAR generate
+start_time=$(date +%s)
+echo "[do] Start generating the structures..."
+str_stamp=$(echo $(date +%j)-$(date +%H)$(date +%M)$(date +%S))
+for ((str_index=1; str_index<=str_quantity; str_index++)); do 
+  str_cell="${seed_name}-${str_stamp}-${str_index}.cell"
+  buildcell < ${str_gen_cell} > ${str_cell} 2>/dev/null
+  cell2pos ${str_cell} ${str_gen_cell}
+  # Buildcell Process Report
+  process_percent=$((str_index*100/str_quantity))
+  printf "[info] Generating Str.%d of %d. (%d%%)\r" \
+          "${str_index}" "${str_quantity}" "${process_percent}"
+done
+echo ''  # done for process report
+
+# Time spend report
+end_time=$(date +%s)
+spend_time=$(echo ${start_time} ${end_time} | 
+             awk '{print int(($2-$1)/3600)"h:"\
+                         int(($2-$1)%3600/60)"m:"\
+                         ($2-$1)%60"s"}')
+echo "[spend_time] ${spend_time}"
+echo "[done] Generation done." 

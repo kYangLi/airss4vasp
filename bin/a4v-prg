@@ -7,7 +7,15 @@
 #
 
 # Check if in the calc. folder
-if [ ! -e PARAM.CONF ] || [ ! -e vasp ]; then
+
+grep_input_file(){
+  keyword="$1"
+  res=$(grep "${keyword}" a4v.allparas 2>/dev/null | tail -1 | 
+        awk -F '#' '{print $1}' | awk -F '=' '{print $NF}')
+  echo ${res}
+}
+
+if [ ! -e a4v.input ]; then
   echo '[error] Not in a A4V calculation folder!!!'
   exit -1
 fi
@@ -26,21 +34,25 @@ for coach in ${coach_list}; do
 done
 
 # Get some necessary parameters
-seed_name=$(grep SEED_NAME PARAM.CONF | awk -F '=' '{print $2}')
+seed_name=$(grep_input_file 'SEED_NAME')
 total_coach_num=$(echo ${coach_list} | wc -w)
 total_str_num=$(ls POSCAR-POOL/${seed_name}-*.cell 2>/dev/null | wc -w)
 untouched_str_num=$(ls POSCAR-POOL/${seed_name}-*.vasp 2>/dev/null | wc -w)
 finished_str_num=$(ls RES-POOL/*.res 2>/dev/null | wc -w)
 error_str_num=$(grep '\[error\]' VASP.log.temp | wc -l)
-no_contcar_str_num=$(grep '\[error\]' VASP.log.temp | grep 'CONTCAR' | wc -l)
-bad_poscar_str_num=$(grep '\[error\]' VASP.log.temp | grep 'Bad' | wc -l)
+not_conv_str_num=$(grep '\[error\]' VASP.log | 
+                   grep 'Not reach the required accuracy' | wc -l)
+no_contcar_str_num=$(grep '\[error\]' VASP.log.temp | 
+                     grep 'CONTCAR not found' | wc -l)
+bad_poscar_str_num=$(grep '\[error\]' VASP.log.temp | 
+                     grep 'Bad initial structure' | wc -l)
 ((processed_str_num=error_str_num+finished_str_num))
 calc_done=false
 if [ "${total_str_num}" == "${processed_str_num}" ]; then 
   calc_done=true
-  run_state='[done] Mass-election Done!'
+  run_state='[done] Random searching done!'
 else 
-  run_state='[info] Mass-election in Processing...'
+  run_state='[info] Random searching in processing...'
 fi
 start_time=$(grep '\[start_time\]' VASP.log.temp | awk '{print $2}' | 
              sort -n | head -1)
@@ -59,7 +71,7 @@ average_time_spend=${average_time_spend%.*}
 if [ -z "${average_time_spend}" ]; then
   total_time_spend_format='null'
   average_time_spend_format='null'
-  estimate_remain_time_format='null'
+  esti_remain_time_format='null'
 else
   total_time_spend_format=$(echo ${total_time_spend} | 
                             awk '{print int($1/86400)"d:"\
@@ -71,23 +83,16 @@ else
                                           int($1%86400/3600)"h:"\
                                           int($1%3600/60)"m:"\
                                           $1%60"s"}')
-  ((estimate_remain_time=untouched_str_num*average_time_spend/current_coach_num))
-  estimate_remain_time_format=$(echo ${estimate_remain_time} | 
+  ((esti_remain_time=untouched_str_num*average_time_spend/current_coach_num))
+  esti_remain_time_format=$(echo ${esti_remain_time} | 
                                 awk '{print int($1/86400)"d:"\
                                             int($1%86400/3600)"h:"\
                                             int($1%3600/60)"m:"\
                                             $1%60"s"}')
 fi
-if [ -e FINAL-TEAM ]; then 
-  final_team_unfinished=$(ls HEAD-COACH 2>/dev/null | grep \.vasp | wc -w)
-  final_team_finished=$(ls FINAL-TEAM 2>/dev/null | grep \.outcar | wc -w)
-else
-  final_team_unfinished='Final team not determined...'
-  final_team_finished='Final team not determined...'
-fi
 
 # Process Summary Output
-echo "====================== Process Check ======================"
+echo "================== Process Check =================="
 echo "${run_state}"
 if ! ${calc_done}; then
   echo "[info] Curr. Work Coach   :  ${current_coach_num}/${total_coach_num}"
@@ -95,14 +100,13 @@ fi
 echo "[info] Seed Name          :  ${seed_name}"
 echo "[info] Succeed Str.       :  ${finished_str_num}/${total_str_num}"
 echo "[info] Error Str.         :  ${error_str_num}/${total_str_num}"
+echo "[info] Not Converged      :  ${not_conv_str_num}/${error_str_num}"
 echo "[info] Missing CONTCAR    :  ${no_contcar_str_num}/${error_str_num}"
 echo "[info] Bad Init. POSCAR   :  ${bad_poscar_str_num}/${error_str_num}"
 echo "[info] Ave. Time Per Str. :  ${average_time_spend_format}"
 echo "[info] Total Time Spend   :  ${total_time_spend_format}"
-echo "[info] Time Remain Estim. :  ${estimate_remain_time_format}"
-echo "[info] Final Team UnFin.  :  ${final_team_unfinished}"
-echo "[info] Final Team Finish  :  ${final_team_finished}"
-echo "==========================================================="
+echo "[info] Time Remain Estim. :  ${esti_remain_time_format}"
+echo "==================================================="
 
 # Useless file remove 
 rm VASP.log.temp

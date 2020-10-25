@@ -2,7 +2,6 @@
  0.0    2.75    2.75
  2.75   0.0     2.75
  2.75   2.75    0.0
-#FIX
 %ENDBLOCK LATTICE_CART
  
 %BLOCK POSITIONS_FRAC

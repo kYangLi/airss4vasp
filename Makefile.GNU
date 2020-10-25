@@ -23,7 +23,7 @@ export
 
 all: internal external
 
-internal: cabal buildcell cryan kpgen 
+internal: cabal buildcell cryan
 
 external: spglib cellsym
 
@@ -36,9 +36,6 @@ buildcell:
 cryan:
 	(cd src/cryan/src; make)
 
-kpgen:
-	(cd src/kpgen; make)
-
 spglib:
 	(cd external/spglib; make)
 
@@ -49,7 +46,6 @@ install:
 	(cp src/cabal/src/cabal bin/)
 	(cp src/buildcell/src/buildcell bin/)
 	(cp src/cryan/src/cryan bin/)
-	(cp src/kpgen/kpgen bin/)
 	(cp external/cellsym/cellsym-0.16a/cellsym bin/)
 	@echo
 	@echo 'Add '$(PWD)'/bin to your path by placing this line in your ~/.bashrc:'

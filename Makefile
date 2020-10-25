@@ -16,15 +16,15 @@ LDCFLAGS=-lm
 
 # 'DFLAGS=-DCOMPAT' is necessary when it comes the error:
 #   [COMPILER_VERSION] and [COMPILER_OPTIONS] are invalid in cell.f90.
-#DFLAGS=-DCOMPAT
+DFLAGS=-DCOMPAT
 
 PREFIX=$(PWD)
 
 export
 
-all: internal external
+all: internal external install
 
-internal: cabal buildcell cryan kpgen 
+internal: cabal buildcell cryan genkp
 
 external: spglib cellsym
 
@@ -37,8 +37,8 @@ buildcell:
 cryan:
 	(cd src/cryan/src; make)
 
-kpgen:
-	(cd src/kpgen; make)
+genkp:
+	(cd src/genkp; make)
 
 spglib:
 	(cd external/spglib; make)
@@ -50,7 +50,7 @@ install:
 	(cp src/cabal/src/cabal bin/)
 	(cp src/buildcell/src/buildcell bin/)
 	(cp src/cryan/src/cryan bin/)
-	(cp src/kpgen/kpgen bin/)
+	(cp src/genkp/genkp bin/)
 	(cp external/cellsym/cellsym-0.16a/cellsym bin/)
 	@echo
 	@echo 'Add '$(PWD)'/bin to your path by placing this line in your ~/.bashrc:'
@@ -61,6 +61,7 @@ neat_internal:
 	(cd src/cabal/src; make clean)
 	(cd src/buildcell/src; make clean)
 	(cd src/cryan/src; make clean)
+	(cd src/genkp; make clean)
 
 neat_external:
 	(cd external/cellsym; make clean)

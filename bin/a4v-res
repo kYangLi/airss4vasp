@@ -3,10 +3,14 @@
 # Descripution: ca
 #
 
+if [ -e 'TRAIN.record' ]; then 
+  cd RES-POOL 
+fi 
+
 # Tips for usage
 if [ -z "$1" ]; then  
   echo "[error] Not enough input"
-  echo '[tips] match [-R(recursive)] [command line arguments for cryan]'
+  echo '[tips] a4v-res [-R(recursive)] [command line arguments for cryan]'
   exit 999
 fi
 
