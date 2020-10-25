@@ -1,0 +1,1275 @@
+%! TEX program = xelatex
+%
+%liyang
+%2018.1.21-2018.1.27
+%copyleft liyang@JiLin Univ.
+%
+%
+\documentclass[a4paper, 10pt]{article}
+\usepackage{xeCJK}                        %支持中文
+\usepackage[colorlinks=true]{hyperref}    %支持超链接
+\usepackage{indentfirst}                  %支持首行缩进
+\setlength{\parindent}{2em}               %缩进距离
+\usepackage{float}                        %支持浮动体
+\usepackage{booktabs}                     %支持三段式表格
+\usepackage{enumerate}
+
+%-------------Lstlisting代码区块支持-----------------
+\usepackage{listings}                     %支持lstlisting环境
+\usepackage{fontspec}                     %定制代码字段字体
+\usepackage{xcolor}                       %定制代码字段颜色
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+\lstset{% 
+backgroundcolor=\color{white},            %背景颜色
+basicstyle=\footnotesize\ttfamily,        %代码区段字体大小
+columns=fixed,
+tabsize=2,                                %tab缩进空格数
+breaklines=ture,                          %自动换行
+captionpos=b,                             %sets the caption-position to bottom
+commentstyle=\color{blue},                %注释格式
+escapeinside={\%*}{*)},                   %代码内返回latex普通字体
+keywordstyle=\color{mygreen},             %关键字颜色
+otherkeywords={user@machine_name,root@machine_name,mkdir,rm,grep,wget,unzip},    
+                                          %附加关键字
+stringstyle=\color{mymauve}\ttfamily,     %string literal style
+frame=single,
+rulesepcolor=\color{red!20!green!20!blue!20}, 
+}
+%-------------------------------------
+
+\title{\textbf{AIRSS指南}}
+\author{Yang Li\\ \href{mailto:lyang.1915@gmail.com}{lyang.1915@gmail.com}}
+\date{2018.1.21 --- 2018.1.27}
+
+\begin{document}
+  \maketitle
+  \tableofcontents
+  
+  \section{一些简单的说明}
+    AIRSS(Ab Initio Random Structure Searching)是一款由英国剑桥大学 \href{https://www.mtg.msm.cam.ac.uk/People/CJP}{Chris J Pickard} 教授等人自主开发的材料结构搜寻软件. 该软件是开源的, 且受\href{https://en.wikipedia.org/wiki/GNU_General_Public_License}{\textbf{GPL2许可证}}保护. 访问其官方网站便可获取AIRSS安装包源码: \url{https://www.mtg.msm.cam.ac.uk/Codes/AIRSS}.
+    
+    所谓结构搜寻是指, 对于一原子位置甚至是晶格结构未知的体系, 在一定的物理条件(如原子间距, 分布密度, 元素组成及配比等)限制下, 广泛地猜测其结构并计算其能量, 最终取所猜测的能量较低的几个结构作为进一步研究的对象的过程. 显然人工手动猜测或是计算机盲目地遍历式搜寻是极为笨拙耗时甚至是难以实现的. 因此, 需要使用一套成熟的结构搜寻软件, 系统且巧妙地捕捉体系结构.
+    
+    AIRSS正是这样一款软件. Chris教授本人关于此软件的介绍可参见\href{https://www.youtube.com/watch?v=xW6pOYEIKVs&t=1061s}{有关的YouTube视频}. 另外两个较为常用的结构搜寻软件分别是:\href{http://uspex.stonybrook.edu/uspex.html}{USPEX}以及\href{http://www.calypso.cn}{CALYPSO}.
+
+    以下内容算不上指南或教程, 仅仅是学习 AIRSS-0.9 的一些记录. 由于是初学者, 身边又恰好没有人能熟练使用此软件, 再加上网络或是官方上相关说明文档或教程匮乏, 因此, 本文除了一小部分内容是了借鉴软件包自带的\verb|examples|中的说明外, 其他大部分结论是自行分析源码不断尝试摸索所得. 受各种因素限制, 理解和解释上的错误或不可避免.
+  \section{计算准备}
+    \subsection{Linux系统操作} 
+      阅读本记录前, 需要您对Linux操作系统及其相关指令有一定的了解. 例如, 能理解以下指令的含义:
+      \begin{lstlisting}[language={bash}]
+user@machine_name$ ls | grep '.cell'
+      \end{lstlisting}
+      以及下述指令所能引起的灾难性事故:
+      \begin{lstlisting}[language={bash}]
+root@machine_name# rm -rf / home/user_name/trash_directory
+      \end{lstlisting}
+    
+    \subsection{软件安装}
+      \textbf{下面将以 airss-0.9 版本为例, 简要记录AIRSS的安装.}
+
+      AIRSS只支持在命令行(Command Line)使用, 且仅能安装在*nix系统中. 安装此软件前, 您最好已经了解 \href{https://www.gnu.org/software/make/manual/}{GNU make} 的使用方法. 当然, 如果您实在对此不感兴趣, 这不是必须的. 前提是您能完全按照以下步骤操作.
+      
+      \subsubsection{软件主体安装}
+        具体的安装分为以下几步, 非必须步骤已使用\verb|*|标出:
+        \begin{description}
+          \item [*(I)建立安装包文件管理系统] 在开始一切安装之前, 建议作为非\verb|root|用户但是有\verb|sudo|权限的您: 在自己能进行任意操作的家目录\verb|~/|中建立一个安装包管理文件夹, 如\verb|~/install_package|; 同时在系统目录\verb|/usr/local|中建立一个存放airss和其他程序二进制可执行文件的目录, 如\verb|/usr/local/| \verb|airss-0.9/bin|. 
+          
+          之所以这样建议, 是为了减少您安装过程中在系统目录下需要进行的操作, 降低由此可能引发的事故的概率, 同时让安装过程更简洁(避免每个命令都要使用前缀\verb|sudo ...|, \verb|sudo sh -c "...>..."|). 
+          
+          当然, 您也可以完全不将软件安装在系统目录, 一切都凭您的个人喜好.
+          \begin{lstlisting}[language={bash}]
+user@machine_name$ cd /usr/local/
+user@machine_name$ sudo mkdir -p airss-0.9/bin
+Password:
+user@machine_name$ cd airss-0.9
+user@machine_name$ ls -F 
+bin/
+user@machine_name$ cd ~
+user@machine_name$ mkdir -p  install_package/AIRSS
+user@machine_name$ cd install_package
+user@machine_name$ ls -F
+AIRSS/
+          \end{lstlisting}
+
+          \item [(II)AIRSS安装包下载]AIRSS软件包下载地址为:\url{https://www.mtg.msm.cam.ac.uk/files/airss-0.9.tgz}
+           或者, 您可以访问前文所述\href{https://www.mtg.msm.cam.ac.uk/Codes/AIRSS}{官方网站}详细了解相关信息后下载.
+
+           您可以选择在浏览器上下载, 也可以使用\verb|wget|指令.
+           
+           \begin{lstlisting}[language={bash}]
+user@machine_name$ wget -P ~/Downloads https://www.mtg.msm.
+cam.ac.uk/files/airss-0.9.tgz
+          \end{lstlisting}
+
+          \item [(III)拷贝并解压安装包] 将您下载的\verb|airss-0.9-2.tag|拷贝到安装包管理文件夹中, 并使用\verb|tar|解压.
+          \begin{lstlisting}[language={bash}]
+user@machine_name$ cd AIRSS
+user@machine_name$ cp ~/Downloads/airss-0.9-2.tgz .
+user@machine_name$ tar -zxvf airss-0.9-2.tgz
+x airss-0.9/.hg_archival.txt
+x airss-0.9/.hgignore
+x airss-0.9/LICENCE
+x airss-0.9/README
+x airss-0.9/VERSION 
+...
+...
+          \end{lstlisting}
+
+          \item[(IV)使用GNUmake指令安装AIRSS] 使用\verb|make|等指令安装编译安装airss.
+          \begin{lstlisting}[language={bash}]
+user@machine_name$ cd airss-0.9
+user@machine_name$ make
+(cd src/pp3/src; make)
+gfortran -O3 -c ../../common/constants.f90
+gfortran -O3 -c cell.f90
+gfortran -O3 -c pp.f90
+gfortran -O3 -c opt.f90
+gfortran -O3 -c pp3.f90
+...
+...
+user@machine_name$ make install > make_install.log 2>&1
+user@machine_name$
+user@machine_name$ cat make_install.log
+(cp src/pp3/src/pp3 bin/)
+(cp src/cabal/src/cabal bin/)
+(cp src/buildcell/src/buildcell bin/)
+(cp src/cryan/src/cryan bin/)
+user@machine_name$
+          \end{lstlisting}
+          
+          十分鼓励您今后使用\verb|make isntall|指令时, 将其输出重定向到一个记录文件中, 这样会给您卸载软件时提供便利.(即使这里的AIRSS并不必要这样做.)
+
+        \item[*(V)安放可执行文件] \verb|~/install_package/AIRSS/airss-0.9/bin|存放了安装完毕的可执行文件, 将其拷贝至系统目录下.
+        \begin{lstlisting}[language={bash}]
+user@machine_name$ sudo cp -r bin/ /usr/local/airss-0.9/bin
+Password:
+user@machine_name$ ls /usr/local/airss-0.9/bin
+airss.pl     cabal          cell2lammps  crud.pl      
+despawn      gulp_relax mc  pp3_relax    psi4_relax   
+spawn-slow   tidy.pl        buildcell    castep2res   
+check_airss  cryan          gap_relax    lammps2cell  
+niggli       press          run.pl       stopairss    
+ca           castep_relax   comp2minsep  csymm        
+gencell      lammps_relax   pp3          prim         
+spawn        symm
+
+        \end{lstlisting}
+
+        \item[(VI)设置系统环境变量] 完成以上所有设置后, 您实际上就可以通过使用使用命令\verb|/usr/local/airss-0.9/bin/airss.pl -[option] [parameter] ...|来运行AIRSS了. 为了简便, 可以考虑在\verb|~/.bash_profile|文件中加入如下内容
+        \begin{lstlisting}[language={bash}]
+###Setting PATH for AIRSS
+export PATH="/usr/local/airss-0.9/bin:${PATH}"
+        \end{lstlisting}
+
+        修改储存并退出后, 请重新登入终端, 或运行\verb|source|指令完成环境变量的更新.
+        \begin{lstlisting}[language={bash}]
+user@machine_name$ source ~/.bash_profile 
+        \end{lstlisting}
+
+        这样您就可以在系统中的任何路径上执行\verb|airss.pl|等AIRSS的指令了.
+
+        \item[(VII)检查安装情况] 设置好环境变量后, 您可以在\verb|~/install_package/AIRSS/|
+        \\\verb|airss-0.9/|下输入\verb|make check|指令检查AIRSS安装情况. 
+        \begin{lstlisting}[language={bash}]
+user@machine_name$ make check
+(sh bin/check_airss)
+Essential:
+
+airss.pl +
+run.pl +
+crud.pl +
+castep2res +
+buildcell +
+cryan +
+pp3 +
+cabal +
+cellsym - Install cellsym: http://www.tcm.phy.cam.ac.uk/sw
+/check2xsf/cellsym.html
+symmol - Patch and install symmol: http://www.
+ccp14.ac.uk/ccp/web-mirrors/symmol/~pila/symmol.zip
+bob - Get Bob!
+
+Recommended:
+
+castep - Install castep: http://www.castep.org/
+optados - Install optados: http://www.tcm.phy.cam.ac.uk/
+~ajm255/optados/index.html
+qhull - Install qhull from package manager, or: 
+http://www.qhull.org/
+qconvex - Install qhull from package manager, or: 
+http://www.qhull.org/
+xmgrace - Install grace from package manager or: 
+http://plasma-gate.weizmann.ac.il/Grace/
+Rscript - Install R/Rscript and ggtern from package manager
+or: https://cran.r-project.org/
+
+Optional:
+
+gulp - Install gulp: http://projects.ivec.org/gulp/
+cif2cell - Install cif2cell from: http://cif2cell.
+sourceforge.net/
+
+Very optional:
+
+lammps - Install lammps: http://lammps.sandia.gov/
+hull - Install hull: http://www.netlib.org/voronoi/
+hull.html
+off_util - Install antiprism: http://www.antiprism.com/
+files/antiprism-0.24.1.tar.gz
+
+Pseudopotentials:
+
+pspot - set $PSPOT_DIR to location of the CASTEP pspot 
+directory
+
+Spawn file:
+
+.spawn - 
+
+--------------------
+Tests run in .check:
+--------------------
+
+Running example 1.1 (Crystals):
+
+Al-9002-4643-1   -0.00   7.561    -6.659   8 Al     n/a   1
+Al-9002-4643-2    0.00   7.564     0.005   8 Al     n/a   1
+
+Running example 1.2 (Clusters):
+
+Al-9274-4255-2    0.00   615.385  -3.014  13 Al     n/a   1
+Al-9274-4255-1    0.00   615.385   0.019  13 Al     n/a   1
+
+Skipping example 3.1 (Gulp)
+Skipping example 2.1a (Castep)
+        \end{lstlisting}       
+      \end{description}
+      如果您仔细阅读了上述输出文件, 会发现必要的组件中还有\verb|cellsym|和\verb|symmol|没有安装. 这直接导致了晶体和团簇空间群符号输出为\verb|n/a|. 
+      \subsubsection{辅助插件安装}
+      AIRSS支持的全部插件信息可查询\verb|~/install_package/AIRSS/airss-0.9/|
+      \verb|README|文件.下面只演示最核心的\verb|cellsym|和\verb|symmol|插件的安装过程.
+      \begin{description}
+        \item[(I)下载插件安装包]
+        \verb|cellsym|的安装包官方网站是:
+        
+        \url{http://www.tcm.phy.cam.ac.uk/sw/check2xsf/cellsym.html}
+
+        需要注意的是, \verb|cellsym|源码是使用C语言编写的, 安装此程序前, 需要下载并安装库文件\verb|spglib.h|.
+
+        \verb|spglib.h|的下载地址是:
+        
+        \url{http://www.tcm.phy.cam.ac.uk/sw/check2xsf/spglib-1.9.4.tar.gz}
+
+        \verb|cellsym|的下载地址是:
+        
+        \url{http://www.tcm.phy.cam.ac.uk/sw/check2xsf/cellsym.tgz}
+
+        \verb|symmol|插件安装包的下载地址是:
+        
+        \url{http://www.ccp14.ac.uk/ccp/web-mirrors/symmol/~pila/symmol.zip}
+
+        您可以通过浏览器下载上述文件, 也可以使用\verb|wget|指令下载.
+        \begin{lstlisting}[language={bash}]
+user@machine_name$ wget -P ~/Downloads 
+www.tcm.phy.cam.ac.uk/sw/check2xsf/spglib-1.9.4.tar.gz 
+www.tcm.phy.cam.ac.uk/sw/check2xsf/cellsym.tgz 
+www.ccp14.ac.uk/ccp/web-mirrors/symmol/~pila/symmol.zip
+        \end{lstlisting}
+
+        \item[(II)拷贝并解压插件]将您下载的三个压缩包拷贝到安装包管理文件夹中, 并使用\verb|tar|和\verb|unzip|解压.
+        \begin{lstlisting}[language={bash}]
+user@machine_name$ cd ~/Downloads
+user@machine_name$ cp cellsym.tar spglib-1.9.4.tar 
+symmol.zip ~/install_package/AIRSS
+user@machine_name$ cd ~/install_package/AIRSS
+user@machine_name$ tar -xvf cellsym.tar
+...
+user@machine_name$ tar -xvf spglib-1.9.4.tar
+...
+user@machine_name$ unzip symmol.zip -d symmol
+...
+user@machine_name$ ls -F
+airss-0.9/     airss-0.9-2.tgz   cellsym-0.16a/  
+cellsym.tar    spglib-1.9.4/     spglib-1.9.4.tar  
+symmol/        symmol.zip
+        \end{lstlisting}
+        
+        \item[(III)编译插件]将解压好的插件按如下顺序操作.
+
+        首先安装库文件\verb|spglib|.使用GNUmake指令. 
+        \begin{lstlisting}[language={bash}]
+user@machine_name$ cd spglib1.9.4/
+user@machine_name$ ./configure
+...
+user@machine_name$ make
+...
+user@machine_name$ sudo sh -c 'make install > 
+make_install.log 2>&1'
+Password:
+user@machine_name$ cat make_install.log 
+Making install in src
+ .././install-sh -c -d '/usr/local/lib'
+ /bin/sh ../libtool   --mode=install /usr/bin/install -c   libsymspg.la '/usr/local/lib'
+libtool: install: /usr/bin/install -c .libs/libsymspg.0.dylib /usr/local/lib/libsymspg.0.dylib
+libtool: install: (cd /usr/local/lib && { ln -s -f libsymspg.0.dylib libsymspg.dylib || { rm -f libsymspg.dylib && ln -s libsymspg.0.dylib libsymspg.dylib; }; })
+libtool: install: /usr/bin/install -c .libs/libsymspg.lai /usr/local/lib/libsymspg.la
+libtool: install: /usr/bin/install -c .libs/libsymspg.a /usr/local/lib/libsymspg.a
+libtool: install: chmod 644 /usr/local/lib/libsymspg.a
+libtool: install: ranlib /usr/local/lib/libsymspg.a
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib: file: /usr/local/lib/libsymspg.a(debug.o) has no symbols
+ .././install-sh -c -d '/usr/local/include/spglib'
+ /usr/bin/install -c -m 644 arithmetic.h cell.h debug.h delaunay.h hall_symbol.h kgrid.h kpoint.h mathfunc.h niggli.h pointgroup.h primitive.h refinement.h site_symmetry.h sitesym_database.h spacegroup.h spg_database.h spglib.h spin.h symmetry.h version.h '/usr/local/include/spglib'
+make[2]: Nothing to be done for `install-exec-am'.
+make[2]: Nothing to be done for `install-data-am'.
+user@machine_name$
+user@machine_name$
+user@machine_name$ make install check
+...
+...
+...
+PASS: spglib_test
+=====================================
+Testsuite summary for spglib 1.9.4
+=====================================
+# TOTAL: 1
+# PASS:  1
+# SKIP:  0
+# XFAIL: 0
+# FAIL:  0
+# XPASS: 0
+# ERROR: 0
+=====================================
+make[1]: Nothing to be done for `check-am'.
+user@machine_name$
+        \end{lstlisting}
+        使用\verb|make install check|检查PASS后, 就可以开始编译\verb|cellsym|了.
+        \begin{lstlisting}[language={bash}]
+user@machine_name$ cd ../cellsym-0.16a/
+user@machine_name$ make
+...
+user@machine_name$ ls -all cellsym
+-rwxr-xr-x  1 user  groups  53628 Jan 25 12:28 cellsym
+user@machine_name$ 
+        \end{lstlisting}
+        顺利编译完成后, 会生成一个名为\verb|cellsym|的可执行文件.
+        注意, \verb|make|执行过程中可能会出现编译警告, 但这并不影响程序执行, 可忽略.
+
+        编译并确认生成了\verb|cellsym|文件后, 就可以开始编译另一个插件\verb|symmol|了.
+        \verb|symmol|是使用Fortran写成的. 在网站上下载的是其源码, 需要编译使其变为可执行文件.
+        需要注意的是, 原版的\verb|symmol.f|并不兼容AIRSS, 需要为其打上\verb|~/install_package/AIRSS/airss-0.9/misc|中提供的\verb|symmol.patch|补丁.
+        \begin{lstlisting}[language={bash}]
+user@machine_name$ cd ../airss-0.9/misc/
+user@machine_name$ cp ../../symmol/symmol.f .
+user@machine_name$ ls
+symmol.f     symmol.patch
+user@machine_name$ patch -p0 symmol.f symmol.patch 
+patching file symmol.f
+user@machine_name$ gfortran symmol.f -o symmol 
+user@machine_name$ ls 
+symmol       symmol.f     symmol.patch
+user@machine_name$ echo '-o 后跟的文件名一定要是 symmol'
+-o 后跟的文件名一定要是 symmol
+user@machine_name$ ls -all symmol
+-rwxr-xr-x  1 user  group  106800 Jan 25 12:41 symmol
+user@machine_name$
+        \end{lstlisting}
+
+        至此, 我们完成了所有插件的编译. 生成了\verb|symmol|和\verb|cellsym|两个可执行文件.
+
+        \item[(IV)将插件导入AIRSS]
+        这一步的操作十分简单, 将编译好的两个插件复制到系统目录下的\verb|bin/|文件夹即可. 为了以防万一, 可以在安装包管理文件夹保存一个\verb|bin/|的备份
+        \begin{lstlisting}[language={bash}]
+user@machine_name$ pwd
+/home/user_name/install_package/AIRSS/airss-0.9/misc
+user@machine_name$ cp symmol ../bin/
+user@machine_name$ sudo cp symmol /usr/local/airss-0.9/bin
+Password:
+user@machine_name$ cd ../../cellsym-0.16a/
+user@machine_name$ cp cellsym ../airss-0.9/bin/
+user@machine_name$ sudo cp cellsym /usr/local/airss-0.9/bin
+        \end{lstlisting}
+        
+        \item[(V)安装最终检查]
+        回到\verb|airss-0.9|中执行\verb|make|的文件夹. 重新输入\verb|make check|检查安装情况.
+        \begin{lstlisting}[language={bash}]
+user@machine_name$ cd ../airss-0.9
+user@machine_name$ make check
+(sh bin/check_airss)
+Essential:
+
+airss.pl +
+run.pl +
+crud.pl +
+castep2res +
+buildcell +
+cryan +
+pp3 +
+cabal +
+cellsym +
+symmol +
+bob - Get Bob!
+
+Recommended:
+
+castep - Install castep: http://www.castep.org/
+
+...
+...
+...
+
+--------------------
+Tests run in .check:
+--------------------
+
+Running example 1.1 (Crystals):
+
+Al-14776-403-2  -0.00   7.784  -6.398   8 Al    C2/m    1
+Al-14776-403-1   0.00   7.820   0.066   8 Al    P21/m   1
+
+Running example 1.2 (Clusters):
+
+Al-15054-7410-1  0.00   615.385  -3.190  13 Al    Cs    1
+Al-15054-7410-2  0.00   615.385   0.006  13 Al    Cs    1
+
+Skipping example 3.1 (Gulp)
+Skipping example 2.1a (Castep)
+user@machine_name$
+        \end{lstlisting}
+      \end{description}
+
+      成功输出了晶体的空间群名称! 
+
+      至此, 我们完成了AIRSS的基本安装, 您现在已经可以使用AIRSS的pp3模块(默认是CASTEP)进行结构搜寻了.
+
+      另外, 值得一提的是, 上述所有软件(AIRSS及其两个插件)都是开源的, 且受GPL许可证保护. 对此程序, 您有以下三种自由权利:
+      \begin{enumerate}
+        \item [*]以任何目的运行此程序的自由
+        \item [*]再复制的自由
+        \item [*]改进此程序, 并公开发布改进的自由(前提是能得到源代码)
+      \end{enumerate}
+      
+      尤其是AIRSS源码的\verb|buildcell|模块的\verb|symmetry.f90|中, 有230个空间群的Wyckoff点信息, 或许对您会有所帮助.
+      
+      \subsubsection{联合CASTEP}
+      要使用CASTEP联合AIRSS计算, 只需要成功安装CASTEP, 且将CASTEP可执行文件路径添加至系统环境变量\verb|${PATH}|中, 而后将其安装文件夹中的\verb|castep.serial|或者\verb|castep.mpi|重命名(或复制)为\verb|castep|即可.
+
+      \subsubsection{卸载软件}
+      卸载AIRSS是十分简单的, 可分为三步:
+      \begin{description}
+        \item [(I)卸载spglib] 进入安装包管理文件夹, 使用\verb|make uninstall|卸载spglib.
+        \begin{lstlisting}[language={bash}]
+user@machine_name$ cd ~/install_package/AIRSS/spglib-1.9.4
+user@machine_name$ sudo make uninstall
+...
+user@machine_name$
+        \end{lstlisting}
+
+        \item [(II)删除相关文件夹] 删除系统目录中的bin文件. 您可以选择保留安装文件. 保留安装文件可以在您试图恢复使用AIRSS时提供便利.
+        \begin{lstlisting}[language={bash}]
+user@machine_name$ cd /usr/local/
+user@machine_name$ sudo rm -ri airss-0.9 
+Password:
+user@machine_name$ cd ~/install_package/
+user@machine_name$ rm -r AIRSS
+        \end{lstlisting}
+
+        \textbf{强烈建议您对文件进行删除时, 在离此文件较近的路径上操作, 并杜绝使用绝对路径, 以免打出文章开头提到的的毁灭性指令.}
+
+        \item [(III)恢复PATH变量] 进入\verb|~/.bash_profile|文件, 删除修改环境变量的语句即可.
+        \begin{lstlisting}[language={bash}]
+###Setting PATH for AIRSS
+export PATH="/usr/local/airss-0.9/bin:${PATH}"
+        \end{lstlisting}
+      \end{description}
+      执行完上述指令后, AIRSS就完全被卸载了. 要恢复使用, 请跳至本节的开头.
+    \subsection{文件准备}
+      在使用AIRSS预测结构时, 一般需要准备一个扩展名为\verb|.cell|的文件. 如果要使用AIRSS自带的\verb|pp3|计算模块还需要准备一个名为\verb|.pp|文件.
+
+      一般推荐AIRSS结合CASTEP使用, 此时需要准备两种输入文件: \verb|.cell|文件与\verb|.param|文件. 前者用于确定材料结构(包括实空间与倒空间), 后者用于设置CASTEP计算过程中需要使用的配置参数(截断能, 交换关联函等).
+
+      下面详细介绍\verb|.cell|文件与\verb|.param|文件的设置.
+
+      \subsubsection{.cell文件的结构}
+      \verb|.cell|文件相当于结构搜寻的种子文件, 您可以在此文件中设置搜索约束条件.
+
+      \verb|*.cell|文件的内容主要有以下特点:
+          \begin{enumerate}[(1)] 
+            \item   \emph{*.cell文件设置参数时, 需要使用一定的Keywords标明所设参数的含义.}
+            \item   \emph{*.cell文件主要由两部分组成: ``数据区块''和``编译指示''. 相应的, *.cell中的Keywords也可以分为上述两类.}
+            \item   \emph{``数据区块'' 和``编译指示'' 没有书写顺序上的限制.}
+            \item   \emph{*.cell中设定的所有的Keywords和数据均不区分大小写. 同时, 任何标点符号(除了标明注释内容的符号),多余的空格和任何空行都将被自动忽略.}
+            \item   \emph{文件的一行中只能出现一个Keywords及其对应参数.}
+            \item   \emph{``数据区块''的设置需要遵循一定的格式.(稍后具体介绍)}
+            \item   \emph{未出现在*.cell文件中的Keywords都将被设为默认值.}
+          \end{enumerate}
+      
+      以下是预测金属铝结构所用到的\verb|Al.cell|文件:
+      \begin{lstlisting}[language={bash},numbers=left,firstnumber=0]
+user@machine_name$ cat Al.cell
+%BLOCK LATTICE_CART
+2 0 0
+0 2 0
+0 0 2 
+%ENDBLOCK LATTICE_CART
+ 
+%BLOCK POSITIONS_FRAC
+Al 0.0 0.0 0.0 # Al1 % NUM=8
+%ENDBLOCK POSITIONS_FRAC
+
+#MINSEP=1.5
+user@machine_name$
+      \end{lstlisting}
+
+      该文件结构和语法十分类似于CASTEP的\verb|.cell|文件.或者说AIRSS中的\verb|.cell|文件就是CASTEP中结构文件的变形.\footnote{甚至可以直接使用\href{http://jp-minerals.org/vesta/en/}{VESTA}打开AIRSS的.cell文件而不报错} 
+ 
+      文件前9行是由\verb|%BLOCK [keywords]|格式定义的数据读取区块. 这种格式在CASTEP中是十分常见的.  
+      
+      1至5行数据的\verb|[keywords]|是\verb|LATTICE_CART|. 这是 ``cell lattice vectors in Cartesian coordinates''的缩写 , 也即, 使用笛卡尔坐标系定义的单胞基矢. 
+
+      7至9行使用的\verb|[keywords]|是\verb|POSITIONS_FRAC|. 这在CASTEP中的意义是``以分数坐标定义的原子位置''. 而在AIRSS中, 该数据模块不仅可以锁定原子位置, 还可以定义搜寻过程中对单种原子的约束条件. 具体细节将在之后给出. 
+
+      文件第11行的\verb|# MINSEP|是只在AIRSS结构搜寻种子文件中有效的相关参数, 或更官方的, 有效的编译指示(Pragmas).
+      \verb|# MINSEP|\(=1.5\)表明了两原子间距不得低于\(1.5\)\r{A}.
+
+      可以看到, \verb|.cell|文件的结构大致分为两大部分:\textbf{数据区块}和\textbf{编译指示}
+
+      \paragraph{数据区块}\ 
+
+        \emph{首先声明, 由于从官方提供的例子中能提取到的信息十分有限, 从此处开始, 部分结论是分析源码之后得到的, 认识上的错误可能在所难免, 一切请以实践为准.}
+
+        该部分沿用了CASTEP的结构文件中定义数据的模式, 但在细节上又会有所不同.
+        数据区块的具体模式如下所示:
+        \begin{lstlisting}[language={bash}]
+%BLOCK [keywords]
+[...]
+[structure data]
+[...]
+%BLOCKEND [keywords]
+        \end{lstlisting}
+
+        \textbf{可以在AIRSS中使用的}\verb|[keywords]| \textbf{已在表\ref{BLOCK_keywords}中列出.}\footnote{因为时间有限, 源码并未看完, 目前只发现了AIRSS支持这几个关键词的源码}
+
+        CASTEP中其他\verb|[keywords]|的定义和使用方法, 可参见\href{http://www.tcm.phy.cam.ac.uk/castep/documentation/WebHelp/content/modules/castep/keywords/k_main_structure.htm}{CASTEP cell keywords and data blocks}.
+      
+        \begin{table}
+          \centering
+          \caption{CASTEP BOLCK keywords In AIRSS}
+          \label{BLOCK_keywords}  
+          \begin{tabular}{p{13em}|p{19em}}
+            \toprule
+            名称 & 功能\\
+            \midrule
+            \verb|LATTICE_CART|  & 使用笛卡尔坐标系, 以一个\(3\times3\)的矩阵定义\textbf{单胞}基矢.\\
+            \midrule
+            \verb|LATTICE_ABC| & 以一个\(2\times3\)的矩阵定义单胞的晶格参数.矩阵第一行是参数abc, 第二行是三个夹角. 在同一个\verb|.cell|中, 与\verb|LATTICE_CART|二选一即可.\\
+            \midrule
+            \verb|POSITIONS_FRAC| & 以晶格基矢坐标系下的分数坐标定义原子位置.\\
+            \midrule
+            \verb|POSITIONS_ABS| & 以笛卡尔坐标系下的绝对数值坐标定义原子位置.\\
+            \midrule
+            \verb|SYMMETRY_OPS|(不常用) & 定义单胞的对称性信息, 四行一组, 前三行定义旋转操作, 第四行行定义平移操作. 对于一个确定的点, 有几组对称性操作, 就意味着有几个等效点.(不常用, 具体用法可参考\href{http://www.tcm.phy.cam.ac.uk/castep/documentation/WebHelp/content/modules/castep/keywords/k_symmetry_ops_castep.htm}{CASTEP:SYMMETRY OPS}.)\\
+            \midrule
+            \verb|SPECIES_POT|(不常用) & 定义赝势文件的位置和名称, 每行的元素的顺序要和\verb|POSITIONS_*|中的一致. AIRSS和CASTEP联合运行时可以使用的数据块.具体用法可参考\href{http://www.tcm.phy.cam.ac.uk/castep/documentation/WebHelp/content/modules/castep/keywords/k_species_pot_castep.htm}{CASTEP:SPECIES POT}.\\
+            \midrule
+            \verb|HUBBARD_U|(不常用)& This data block defines the Hubbard U values to use for specific orbitals. 更具体的信息请参考\href{http://www.tcm.phy.cam.ac.uk/castep/documentation/WebHelp/content/modules/castep/keywords/k_hubbard_u_castep.htm}{CASTEP:HUBBARD U}.\\
+            \bottomrule
+          \end{tabular} 
+        \end{table}
+        一般进行结构搜寻时, 只需要在AIRSS的\verb|.cell|文件中给出\textbf{晶格参数(单胞基矢)}和\textbf{原子坐标}的数据即可.
+        
+        首先介绍晶格参数的设定, 以\verb|LATTICE_CART|为例.\\
+        \rule{\textwidth}{0.3mm}
+
+        \emph{例1.}
+        \begin{lstlisting}[language={bash},numbers=left]
+%BLOCK LATTICE_CART
+20 0 0
+0 20 0
+0 0 20
+#FIX
+%BLOCKEND LATTICE_CART
+        \end{lstlisting}
+
+        上述字段构建了一个\(20\times20\times20\)\r{A}\(^3\)的正方体作为晶体的单胞. \verb|#FIX|称为晶格标记(Lattice Tags). 
+        
+        它声明了晶格常数在搜寻过程中是不能改变的. 这里的搜寻过程单指猜测结构这一步, 不包括使用CASTEP或pp3进行结构粗略优化的过程. 如果您想确保粗略结构优化时体系晶格常数也不变, 还需要在编译指示区域加上\verb|FIX_ALL_CELL:TRUE|这一句. 同时, 将晶格参数贴上\verb|#FIX|标签还会引起一些``副作用'', 我们将在之后做详细说明. 其他晶格标记还有\verb|#CFIX|和\verb|#ABFIX|, 他们的意义是显然的.
+
+        下面介绍\textbf{原子坐标}的设置方法, 以\verb|POSITIONS_FRAC|为例.\footnote{例子中的物质可能并不存在, 只是作为一种演示.}\\
+        \noindent\rule{\textwidth}{0.3mm}
+
+        \emph{例2.}
+        \hypertarget{Aotic Package}{\ }
+        \begin{lstlisting}[language={bash},numbers=left]
+%BLOCK POSITIONS_FRAC
+Al  0.0 0.0 0.0 # Al1 % NUM=2 
+Mg  0.0 0.0 0.0 # Mg1 % NUM=4 
+O   0.4 0.2 0.3 # O1  % NUM=1 POSAMP=0 FIX
+O   0.1 0.1 0.1 # O2  % NUM=1 POSAMP=0 UNMOVE
+H   0.3 0.3 0.6 # My_H 
+H   0.0 0.0 0.0 # H2 % POSAMP=0 FIX
+%BLOCKEND POSITIONS_FRAC
+        \end{lstlisting}
+
+        通过这个例子, 我们看到, 原子坐标数据区块的基本格式是:
+        \begin{lstlisting}[language={bash}]
+[symbol] [x] [y] [z] # [label] % [tag1] [tag2] [tag3]
+        \end{lstlisting}
+
+        每一行的第一列是元素名称, 二三四列是坐标, \verb|#|号后的第一列是此元素的标签,元素标签可以设置成任意字符, \verb|%|号之后的各个列都是原子标记(Atom Tags).
+        
+        \textbf{表\ref{AIRSS_Atom_Tag}是各个原子标记的具体说明.(如不特殊指出, 表中长度物理量均以埃(\r{A})为单位.)}
+
+        \begin{table}
+          \centering
+          \caption{AIRSS Cheat Sheet -- Atom Tags}
+          \label{AIRSS_Atom_Tag}  
+          \begin{tabular}{p{13em}|p{19em}}
+            \toprule
+            名称及使用格式 & 功能\\
+            \midrule
+            \verb|POSAMP=|& 定义该行元素结构搜寻过程中所能移动的最大距离.\\
+            \midrule
+            \verb|ANGAMP| & (需要进一步解读源码)\\
+            \midrule
+            \verb|MINAMP=|& 定义该行元素结构搜寻过程中偏离初始位置的最小距离.\\
+            \midrule
+            \verb|ZAMP=|&在z轴方向上移动的最大距离, 一般用在层状结构的分析中.其他两个方向也可设置标记\verb|XAMP|和\verb|YAMP|.\\
+            \midrule
+            \verb|NUM=|\(n\) or \(n_{min}-n_{max}\)&定义该行原子在单胞中的个数, 缺省为1.\\
+            \midrule
+            \verb|ADATOM| & 表明该行原子是等前面所有原子结构优化结束后, 后加入的原子.\\
+            \midrule
+            \verb|NOMOVE| & 一般进行结构搜寻要分两步, 首先预测一个结构,而后粗略结构优化求其焓值.\verb|NOMOVE|标签表明该原子结构预测时分数坐标不能改变, 粗略结构优化时可以改变.可以与\verb|POSAMP=0|联用以确保AIRSS不会调整原子坐标初始设定值.\\
+            \midrule
+            \verb|FIX| & 表明该原子预测时分数坐标不能改变, 粗略结构优化时绝对坐标(笛卡尔坐标)不能改变.可以与\verb|POSAMP=0|联用以确保AIRSS不会调整原子坐标初始设定值.\\
+            \midrule
+            \verb|RAD| & (需要进一步解读源码)\\
+            \midrule
+            \verb|OCC| & (需要进一步解读源码)\\
+            \midrule
+            \verb|MULT| & (需要进一步解读源码)\\
+            \midrule
+            \verb|PERM| & (需要进一步解读源码)\\
+            \midrule
+            \verb|COORD| & (需要进一步解读源码)\\
+            \midrule
+            \verb|NN| & (需要进一步解读源码)\\
+            \bottomrule
+          \end{tabular}
+        \end{table}
+
+        最后, 再回到\textbf{晶格标记}, 下面将试图说明使用晶格标记\verb|#FIX|时要十分小心的一点. 
+
+        拿出官方例程1.1来说明这个问题.
+        
+        \noindent\rule{\textwidth}{0.3mm}
+
+        \emph{官方例程1.1}
+        \begin{lstlisting}[language={bash},numbers=left]
+%BLOCK LATTICE_CART
+2 0 0
+0 2 0
+0 0 2 
+%ENDBLOCK LATTICE_CART
+  
+%BLOCK POSITIONS_FRAC
+Al 0.0 0.0 0.0 # Al1 % NUM=8
+%ENDBLOCK POSITIONS_FRAC
+
+#MINSEP=1.5
+        \end{lstlisting}
+
+        以下例3中的内容和官方例程1.1完全等效.
+
+        \noindent\rule{\textwidth}{0.3mm}
+
+        \emph{例3.}
+        \begin{lstlisting}[language={bash},numbers=left]
+%BLOCK LATTICE_CART
+2.52 0 0
+0 2.52 0
+0 0 2.52
+%ENDBLOCK LATTICE_CART
+ 
+%BLOCK POSITIONS_FRAC
+Al 0.0 0.0 0.0 # Al1 % NUM=4
+Al 0.0 0.0 0.0 # Al2 % NUM=4
+%ENDBLOCK POSITIONS_FRAC
+
+#MINSEP=1.5
+         \end{lstlisting}
+
+         您可能会觉得\(2.52\)这个数字很奇怪, 但这其实是\(2\times\sqrt[3]{2} = 2.52\). 
+
+         为了说明上的方便, 我们声明三个概念:\footnote{这都是笔者胡诌的名字, 为了之后方便解释.} 
+
+          \textbf{原子堆垛(atomic package, ap)} :\verb|POSITIONS_FRAC|数据中第一列元素符号(同种元素或不同种元素)简单罗列成的整体.(也可认为是忽略所有行的\verb|NUM|标记后得到的整体)
+
+          \textbf{化学式结构组(formula unit groups, fug)}: \verb|POSITIONS_FRAC|所定义的所有原子组成的整体.
+
+          \textbf{化学式结构单元(formula units, fu)}: 所研究物质化学式的最简配比. 可由fug化简得到.
+               
+         表\ref{AP_FU_fug}是\emph{例2.}和\emph{例3.}以及\emph{官方例程1.1}关于上述三个概念的具体形式: 
+
+         \begin{table}[H]
+          \centering
+          \caption{Example for AP,FU and FUG}
+          \label{AP_FU_fug}  
+          \begin{tabular}{l|c|c|c}
+            \toprule
+              名称& \emph{例2.}&\emph{例3.}&\emph{官方例程1.1}\\
+            \midrule
+            原子堆垛(Atomic Package) & \(MgAlO_2H_2\) & \(2Al\)& \(Al\)\\
+            \midrule
+            化学式结构组(Formula Unit Groups) & \(Al_2Mg_4O_2H_2\) & \(8Al\)& \(8Al\)\\
+            \midrule
+            化学式结构单元(Formula Unit) & \(AlMg_2OH\) & \(Al\)& \(Al\)\\
+            \bottomrule
+          \end{tabular} 
+        \end{table}
+
+         再回到\emph{例3.}与\emph{官方例程1.1}. 仔细研究这两个文件后, 不难发现, 要使二者的内容是等价的, \verb|LATTICE_CART|中所描述的体积必然是一个原子堆垛(ap)的体积. 而\textbf{不是}一个化学式结构组(fug)或者化学式结构单元(fu)的体积.
+         
+         事实上, 实际操作时, AIRSS生成了两个变量, 一个是\verb|targvol|, 用来存储\verb|LATTICE_CART|中矩阵行列式的值; 另一个是\verb|scale_vol|, 用来储存原子总数(fug中原子个数)与原子堆垛中粒子的个数(ap中原子个数, 简单来说就是\verb|POSITIONS_FRAC|中数据行数)的比值. 并将上面两个变量的乘积作为单胞的总体积. 当然, 这里的原子总数不只需要乘以设定的\verb|NUM|个数, 还要乘以由对称性所引起的等效点的个数. 实际程序的逻辑较为复杂, 限于篇幅, 不再做更详细的解释. 
+
+         然而, 当给\verb|LATTICE_CART|贴上\verb|#FIX|的标签后, 上面定义的两个变量会全部失效, 所研究体系的总体积直接等于\verb|LATTICE_CART|中矩阵的行列式. 这意味着, 晶格标记\verb|#FIX|, 不仅仅强制搜索过程中不得改变晶格常数数值, 他还会直接把\verb|LATTICE_CART|中定义的体积直接锁定为整个单胞(或者团簇)的体积. 
+
+         如果不明白这一点, 对比官方例程例1和例2的结果及\verb|.cell|文件 ,就会让您感觉十分疑惑.(怎么\verb|LATTICE_CART|中定义的体积一会儿是单原子的一会儿是整体的?)
+
+         另外, 再次强调, 如果要确保晶格参数不变, 除了在晶格参数数据区块加入\verb|#FIX|, 以保证在猜测晶格结构时保持其为常值外, 还需要在编译指示中添加\verb|FIX_ALL_CELL : true|这样一句, 以保证使用CASTEP结构优化时也不会改变晶格参数. 
+
+         \textbf{同时注意,} 原子标记和晶格标记中都有\verb|FIX|, 但二者的功能和使用格式显然是不同的.
+
+         至此, 完成了对数据区块设置的讨论.
+      
+      \paragraph{编译指示}
+
+      编译指示是\verb|.cell|文件中指明结构搜寻过程中应遵守的条件的语句. 原CASTEP中包含的编译指示均可在AIRSS中使用. 同时, AIRSS另外添加了若干只能由AIRSS识别的编译指示. 这部分额外的编译指示均以\verb|#|开头.
+
+      有些编译指示与原子标记有相同的作用, 此时, 原子标记的优先级要高于编译指示.
+
+      \textbf{部分编译指示详细的使用方法和功能如表\ref{AIRSS_Cheat_Sheet_Pragma}所示.}
+ 
+      \begin{table}
+        \centering
+        \caption{AIRSS Cheat Sheet -- Pragma}
+        \label{AIRSS_Cheat_Sheet_Pragma}  
+        \begin{tabular}{p{13em}|p{25em}}
+          \toprule
+          名称及使用格式 & 功能\\
+          \midrule
+          \verb|#NFORM| \(= n\) or \(n_{min} − n_{max}\) & 定义单胞中化学式结构组(fug)的个数.(??不确定??)\\
+          \midrule
+          \verb|#SUPERCELL| \(n\) or \(a\;b\;c\) or \(a_x\;a_y\;a_z\;b_x\;b_y\;b_z\;c_x\;c_y\;c_z\) & 定义超胞的尺寸. 可以使用超胞中单胞的的个数\(n\), 超胞晶格基矢在三个方向的数值\(a\;b\;c\), 超胞与单胞晶格基矢之间的变换矩阵\(a_x\;a_y\;a_z\;b_x\;b_y\;b_z\;c_x\;c_y\;c_z\)\\
+          \midrule
+          \verb|#SLAB|& 声明超胞生成过程中, 不向z方向上叠加单胞.\\
+          \midrule
+          \verb|#CLUSTER|& 声明要搜寻的体系其实是团簇而不是晶体\\
+          \midrule
+          \verb|#SYMMOPS|\(= n\) or \(n_{min} − n_{max}\)& 搜寻晶体结构的空间群范围\\
+          \midrule
+          \verb|#POSAMP|\(=n\)& 与原子标记中的定义相同, 结构搜寻中原子偏离初始点的最大位置.\\
+          \midrule
+          \verb|#MINAMP| \(= n\)&与原子标记中的定义相同, 结构搜寻中原子偏离初始点的最小位置.\\
+          \midrule
+          \verb|#ZAMP| \(= n\)& 与原子标记中的定义相同, 结构搜寻中原子z方向偏离初始点的最大振幅.\\
+          \midrule
+          \verb|#ANGAMP| \(=\theta\)& (需要进一步解读源码)\\
+          \midrule
+          \verb|#MINSEP| \(=n\) or \(n\;X-X=n_{X−X}\;X-Y=n_{X−Y}\;\ldots\)& 两原子间最小距离, 也可以用来定义两原子距离固定是多少. 比如
+          \verb|#MINSEP=2.0 Li-Li=2.6 Ge-Ge=2.51| \verb| Li-Ge=2.81|\\
+          \midrule
+          \verb!FIX_ALL_CELL:true! & 声明CASTEP结构优化晶体时不得改变其晶格常数.\\
+          \midrule
+          \verb|KPOINTS_MP_SPACING 0.07| & 使用MP方法获取k点时, k点间隔0.07\AA\\
+          \midrule
+          \verb|#VARVOL| & 定义原子堆垛(ap)的体积, 如果与\verb|LATTICE_*|同时出现, 则优先考虑\verb|#VARVOL|所定义的体积.\\
+          \midrule
+          \verb|#TARGVOL|\(=v\) or\(v_{min}-v_{max}\) & 定义原子堆垛的体积, 使用该方法定义的体积结构搜寻过程中, 会保持所设的体积不变.\\
+          \midrule
+          \verb|#SPECIES=[symbol1]%[Tag1]| \verb|[Tag2]...,[symbol2]%[Tag1]| \verb|[Tag2]...,[symbol3]...| & 使用简化记号定义体系原子组分, 不能与\verb|POSITIIONS_*|同时出现.\\
+          \midrule
+          \verb|#NATOM|\(=n\) or \(n_{min}-n_{max}\) & 与\verb|#SPECIES|联用, 定义一个化学式结构组(fug)中有总共多少原子, 一般用于变组分分析(变胞预测). 且使用此编译指示会使\verb|#SPECIES|指令包含的\verb|%|后的原子标记全部失效.\footnote{详细原因请参见源码``/src/buildcell/src/cell.f90''第461行与482行区别.}同时, 使用此指令会使之前定义的原子堆垛体积自动变为单个原子的平均体积.\footnote{代码中直接设置了``scale\_vol=natom''}\\
+          \midrule
+          \verb|#SLACK| & (需要进一步解读源码)\\
+          \midrule
+          \verb|#OVERLAP| & (需要进一步解读源码)\\
+          \midrule
+          \verb|#COMPACT| & (需要进一步解读源码)\\
+          \midrule
+          \verb!SYMMETRY_GENERATE! & 使用CASTEP结构优化前, 首先探测该体系的对称性.\\
+          \midrule
+          \verb!SNAP_TO_SYMMETRY! & CASTEP结构优化过程中, 强制晶格参数和原子位置变化符合晶体对称性.\\
+          \midrule
+          \bottomrule
+        \end{tabular} 
+      \end{table}
+
+      现在您应该可以轻松读懂下述内容了:
+
+      \begin{lstlisting}[language={bash},numbers=left]
+%BLOCK LATTICE_CART
+20 0 0
+0 20 0
+0 0 20
+#FIX
+%ENDBLOCK LATTICE_CART
+%BLOCK POSITIONS_FRAC
+Al 0.0 0.0 0.0 # Al1 % NUM=7-13
+%ENDBLOCK POSITIONS_FRAC
+FIX_ALL_CELL : true
+#MINSEP=1.5
+#CLUSTER
+#POSAMP=3.0
+      \end{lstlisting}
+
+      对于只存在编译指示的结构文件, 只要您对晶体结构(如晶体原子构成, 晶格大概的体积大小等)声明得足够清楚, AIRSS也是可以接受的.  下面是两则合法且十分简洁的AIRSS结构种子文件.
+
+      \noindent\rule{\textwidth}{0.3mm}
+
+        \emph{例4.1}
+      \begin{lstlisting}[language={bash},numbers=left]
+#VARVOL=15
+#SPECIES=A%NUM=4,B%NUM=1
+#NFORM=2 
+#MINSEP=1.5
+       \end{lstlisting}
+
+       \emph{例4.2}
+       \begin{lstlisting}[language={bash},numbers=left]
+#VARVOL=15 
+#SPECIES=A,B,C
+#NATOM=2-8
+#MINSEP=1.5        
+       \end{lstlisting}
+
+       可见, \verb|SPECIES=[symbol1]%NUM=[n1],[symbol2]%NUM=[n2]|相当于一个简化的\verb|POSITIONS_FRAC|原子位置数据区块.
+ 
+
+      至此, 本文的内容已相当繁杂了, 但仍然有大量没有被讨论编译指示. 他们被列在附录章节\ref{Pragma_Unexplain}中.
+
+      最后再说明一点, 书写AIRSS的\verb|.cell|文件时, 您可以根据个人喜好采取字母的大写或小写, 但是为了尽量避免不必要的运算和转换, 仍然推荐您使用大写字母. \footnote{详细原因见源码``airss-0.9/src/buildcell/src/cell.f90''3732行, ``function up(string)''}
+
+      \subsubsection{.param文件的结构}
+      \verb|*.param|是CASTEP的配置文件, 您可以在其中定义CASTEP计算过程中的必要配置参数, 包括, 计算的类型(结构优化, 自洽, 光学性质计算, 能带计算 等), 电荷, 自旋取向, 截断能, 收敛标准等. 该文件通常由若干行组成, 每一行包含一个\verb|Keyword|及其相应的赋值.
+        
+        \verb|*.param|文件的内容主要有以下特点:
+        \begin{enumerate}[(1)]
+          \item   \emph{任何两个Keywords之间没有书写顺序上的限制.}
+          \item   \emph{您可以使用} \verb|#| \emph{或} \verb|;| \emph{或} \verb|!| \emph{甚至是单词} \verb|COMMENT| \emph{来添加注释.}
+          \item   \emph{*.param中设定的所有的Keywords和数据均不区分大小写, 同时, 任何标点符号(除了标明注释内容的符号),多余的空格和任何空行都将被自动忽略.}
+          \item   \emph{文件的任何一行中最多只能出现一个Keywords及其对应参数.}
+          \item   \emph{未出现在*.param文件中的Keywords都将被设为默认值.}
+          \item   \emph{您可以自主设置所设数值的单位(具体细节稍后提及). 如果没有设置相应参数的单位, 则该参数将保持其默认的单位.}
+        \end{enumerate}
+
+        \verb|*.param|文件每一行的基本格式均为:
+        \begin{lstlisting}[numbers=right]
+[keywords] : [value]
+        \end{lstlisting}
+        其中的\verb|:|是为了书写美观便于区分内容所加, 程序实际执行时会自动忽略, 您也可以完全不加入这一符号.
+
+        下述列表是\verb|*.param|文件中全部可用的\verb|Keywords|.\\
+        总计255个关键字.
+        \begin{lstlisting}[numbers=right]
+COMMENT                          VERBOSITY                        
+IPRINT                           CONTINUATION                     
+REUSE                            CHECKPOINT                       
+TASK                             CALCULATE_STRESS                 
+CALCULATE_DENSDIFF               CALCULATE_ELF                    
+CALCULATE_HIRSHFELD              RUN_TIME                         
+BACKUP_INTERVAL                  NUM_BACKUP_ITER                  
+PRINT_CLOCK                      PRINT_MEMORY_USAGE               
+WRITE_NONE                       WRITE_FORMATTED_POTENTIAL        
+WRITE_FORMATTED_DENSITY          WRITE_FORMATTED_ELF              
+WRITE_ORBITALS                   WRITE_CIF_STRUCTURE              
+WRITE_CELL_STRUCTURE             WRITE_BIB                        
+WRITE_OTFG                       WRITE_CST_ESP                    
+WRITE_BANDS                      WRITE_GEOM                      
+WRITE_MD                         WRITE_CHECKPOINT                
+CALC_MOLECULAR_DIPOLE            CML_OUTPUT                      
+CML_FILENAME                     LENGTH_UNIT                     
+MASS_UNIT                        TIME_UNIT                       
+CHARGE_UNIT                      SPIN_UNIT                       
+ENERGY_UNIT                      FORCE_UNIT                      
+VELOCITY_UNIT                    PRESSURE_UNIT                  
+INV_LENGTH_UNIT                  FREQUENCY_UNIT                 
+FORCE_CONSTANT_UNIT              VOLUME_UNIT                    
+IR_INTENSITY_UNIT                DIPOLE_UNIT                    
+EFIELD_UNIT                      ENTROPY_UNIT                   
+PAGE_WVFNS                       RAND_SEED                      
+DATA_DISTRIBUTION                OPT_STRATEGY                   
+OPT_STRATEGY_BIAS                NUM_FARMS                      
+NUM_PROC_IN_SMP                  NUM_PROC_IN_SMP_FINE           
+MESSAGE_SIZE                     STOP                           
+XC_FUNCTIONAL                    XC_DEFINITION                  
+XC_VXC_DERIV_EPSILON             RELATIVISTIC_TREATMENT         
+SEDC_APPLY                       SEDC_SCHEME                    
+SEDC_SR_TS                       SEDC_D_TS                      
+SEDC_S6_G06                      SEDC_D_G06                     
+SEDC_LAMBDA_OBS                  SEDC_N_OBS                     
+SEDC_SR_JCHS                     SEDC_S6_JCHS                   
+SEDC_D_JCHS                      PAGE_EX_POT                    
+NLXC_PAGE_EX_POT                 PPD_INTEGRAL                   
+NLXC_PPD_INTEGRAL                PPD_SIZE_X                     
+NLXC_PPD_SIZE_X                  PPD_SIZE_Y                     
+NLXC_PPD_SIZE_Y                  PPD_SIZE_Z                     
+NLXC_PPD_SIZE_Z                  IMPOSE_TRS                     
+NLXC_IMPOSE_TRS                  EXCHANGE_REFLECT_KPTS          
+NLXC_EXCHANGE_REFLECT_KPTS       K_SCRN_DEN_FUNCTION             
+NLXC_K_SCRN_DEN_FUNCTION         K_SCRN_AVERAGING_SCHEME         
+NLXC_K_SCRN_AVERAGING_SCHEME     RE_EST_K_SCRN                   
+NLXC_RE_EST_K_SCRN               NLXC_EXCHANGE_SCREENING         
+NLXC_EXCHANGE_FRACTION           CALC_FULL_EX_POT                
+NLXC_CALC_FULL_EX_POT            NLXC_DIV_CORR_ON                
+NLXC_DIV_CORR_S_WIDTH            NLXC_DIV_CORR_TOL               
+NLXC_DIV_CORR_NPTS_STEP          PSPOT_NONLOCAL_TYPE             
+PSPOT_BETA_PHI_TYPE              SPIN_ORBIT_COUPLING 
+BASIS_PRECISION                  FIXED_NPW                       
+FINITE_BASIS_CORR                NELECTRONS                      
+CHARGE                           SPIN                            
+NUP                              NDOWN                           
+SPIN_POLARIZED                   SPIN_POLARISED                  
+NBANDS                           SPIN_TREATMENT                  
+ELECTRONIC_MINIMIZER             ELEC_METHOD                     
+METALS_METHOD                    ELEC_ENERGY_TOL                 
+ELEC_EIGENVALUE_TOL              ELEC_FORCE_TOL                  
+FIX_OCCUPANCY                    DIPOLE_CORRECTION               
+DIPOLE_DIR                       ELEC_DUMP_FILE                  
+NUM_DUMP_CYCLES                  ELEC_RESTORE_FILE               
+MIXING_SCHEME                    POPN_CALCULATE                  
+POPN_BOND_CUTOFF                 POPN_WRITE                      
+PDOS_CALCULATE_WEIGHTS           BS_MAX_ITER                     
+BS_NBANDS                        BS_EIGENVALUE_TOL               
+BS_XC_FUNCTIONAL                 BS_XC_DEFINITION                
+BS_WRITE_EIGENVALUES             GEOM_METHOD                     
+GEOM_MAX_ITER                    GEOM_ENERGY_TOL                 
+GEOM_FORCE_TOL                   GEOM_DISP_TOL                   
+GEOM_STRESS_TOL                  GEOM_MODULUS_EST                
+GEOM_FREQUENCY_EST               GEOM_LBFGS_MAX_UPDATES          
+GEOM_TPSD_ITERCHANGE             MD_NUM_ITER                     
+MD_DELTA_T                       MD_ENSEMBLE                     
+MD_USE_PATHINT                   MD_NUM_BEADS                    
+MD_PATHINT_INIT                  MD_PATHINT_STAGING              
+MD_PATHINT_NUM_STAGES            MD_TEMPERATURE                  
+MD_THERMOSTAT                    MD_BAROSTAT                     
+MD_CELL_T                        MD_LANGEVIN_T                   
+MD_EXTRAP                        MD_EXTRAP_FIT                   
+MD_XLBOMD                        MD_DAMPING_SCHEME               
+MD_OPT_DAMPED_DELTA_T            MD_ELEC_FORCE_TOL               
+MD_SAMPLE_ITER                   MD_EQM_METHOD                   
+MD_EQM_ION_T                     MD_EQM_CELL_T                   
+MD_EQM_T                         MD_USE_PLUMED                   
+MD_HUG_METHOD                    MD_HUG_DIR                      
+MD_HUG_T                         MD_HUG_COMPRESSION              
+OPTICS_XC_FUNCTIONAL             OPTICS_XC_DEFINITION            
+TSSEARCH_METHOD                  TSSEARCH_LSTQST_PROTOCOL        
+TSSEARCH_FORCE_TOL               TSSEARCH_DISP_TOL               
+TSSEARCH_ENERGY_TOL              PHONON_CONST_BASIS              
+PHONON_ENERGY_TOL                PHONON_PRECONDITIONER           
+PHONON_USE_KPOINT_SYMMETRY       PHONON_CALCULATE_DOS            
+PHONON_DOS_SPACING               PHONON_DOS_LIMIT                
+PHONON_FINITE_DISP               PHONON_FORCE_CONSTANT_CUTOFF    
+PHONON_FINE_METHOD               PHONON_METHOD                   
+SECONDD_METHOD                   PHONON_SUM_RULE                 
+CALCULATE_BORN_CHARGES           BORN_CHARGE_SUM_RULE            
+CALCULATE_RAMAN                  RAMAN_RANGE_LOW                 
+RAMAN_RANGE_HIGH                 PHONON_WRITE_FORCE_CONSTANTS    
+PHONON_WRITE_DYNAMICAL           EFIELD_ENERGY_TOL               
+THERMO_T_START                   THERMO_T_STOP                   
+THERMO_T_SPACING                 WANNIER_SPREAD_TOL              
+WANNIER_SD_STEP                  WANNIER_SPREAD_TYPE             
+WANNIER_MIN_ALGOR                WANNIER_ION_RMAX                
+WANNIER_ION_CUT_FRACTION         WANNIER_RESTART                 
+WANNIER_ION_CUT_TOL              MAGRES_TASK                     
+MAGRES_METHOD                    MAGRES_CONV_TOL                 
+MAGRES_XC_FUNCTIONAL             MAGRES_XC_DEFINITION            
+MAGRES_JCOUPLING_TASK            ELNES_XC_FUNCTIONAL             
+ELNES_XC_DEFINITION              ELNES_EIGENVALUE_TOL            
+SPECTRAL_THEORY                  SPECTRAL_TASK                   
+SPECTRAL_MAX_ITER                SPECTRAL_NBANDS                 
+SPECTRAL_EIGENVALUE_TOL          SPECTRAL_XC_FUNCTIONAL          
+SPECTRAL_XC_DEFINITION           SPECTRAL_WRITE_EIGENVALUES      
+TDDFT_NUM_STATES                 TDDFT_SELECTED_STATE            
+TDDFT_EIGENVALUE_TOL             TDDFT_XC_FUNCTIONAL             
+TDDFT_XC_DEFINITION              TDDFT_METHOD                    
+TDDFT_EIGENVALUE_METHOD          TDDFT_APPROXIMATION             
+TDDFT_POSITION_METHOD            GA_POP_SIZE                     
+GA_MAX_GENS                      GA_MUTATE_RATE                  
+GA_MUTATE_AMP                    GA_FIXED_N                      
+GA_BULK_SLICE                    CUT_OFF_ENERGY                   
+GRID_SCALE                       FINE_GRID_SCALE
+MAX_SCF_CYCLES                   MIX_CHARGE_AMP 
+MIX_CHARGE_GMAX                  MIX_HISTORY_LENGTH
+        \end{lstlisting}
+
+
+      \subsubsection{.pp文件的结构}
+      \verb|.pp|文件是AIRSS使用自带的\textbf{pp3对势(pair potential)计算模块}进行结构优化\footnote{AIRSS默认使用CASTEP完成此步骤, 需手动设置, 以使用pp3
+      模块计算}时, 需要的参数配置文件. \verb|.pp|中存储了相应的对势参数.
+
+      \verb|.pp|文件的结构十分简单, 如下所示. 
+
+      \begin{lstlisting}[language={bash},numbers=left]
+1 12 6 2.5
+Al
+# Epsilon
+1
+# Sigma
+2
+# Beta
+1
+       \end{lstlisting}
+
+       但是由于知识水平有限, 各个参数的具体意义仍不明确. 仍需进一步学习和源码解析. 
+
+       不过由源码\footnote{``.../airss0.9/src/pp3/src/pp.f90''第99行}已经初步得知, 第一行数据的第一个是原子种类数, 中间两个是对势中排斥势和吸引势的幂次.
+
+  \section{计算指令}
+  初次接触AIRSS, 您可以在终端输入\verb|airss.pl|指令查看软件欢迎界面.
+  
+    \begin{lstlisting}[language={bash}]
+user@machine_name$ airss.pl
+
+      .o.       ooooo ooooooooo.    .oooooo..o  .oooooo..o 
+     .888.      '888' '888   'Y88. d8P'    'Y8 d8P'    'Y8 
+    .8:888.      888   888   .d88' Y88bo.      Y88bo.      
+   .8' '888.     888   888ooo88P'   ':Y8888o.   ':Y8888o.  
+  .88ooo8888.    888   888'88b.         ':Y88b      ':Y88b 
+ .8'     '888.   888   888  '88b.  oo     .d8P oo     .d8P 
+o88o     o8888o o888o o888o  o888o 8::88888P'  8::88888P'  
+                                                      
+     Ab Initio Random Structure Searching             
+     Chris J. Pickard   (cjp20@cam.ac.uk)            
+            Copyright (c) 2005-2017                   
+                                                      
+Please cite the following:                                 
+                                                      
+[1] C.J. Pickard and R.J. Needs, PRL 97, 045504 (2006)     
+[2] C.J. Pickard and R.J. Needs, JPCM 23, 053201 (2011)    
+
+Usage: airss.pl [-pressure] [-build] [-pp3] [-gulp] [-lammps] 
+[-gap] [-psi4] [-cluster] [-dos] [-workdir] [-max] [-num] 
+[-amp] [-mode] [-minmode] [-sim] [-symm] [-mpinp] [-steps] 
+[-best] [-track] [-keep] [-seed]
+  -pressure f  Pressure (0.0)
+  -build       Build structures only (false)
+  -pp3         Use pair potentials rather than Castep (false)
+  -gulp        Use gulp rather than Castep (false)
+  -lammps      Use LAMMPS rather than Castep (false)
+  -gap         Use GAP through QUIP/QUIPPY/ASE (false)
+  -ps4         Use psi4 (false)
+  -cluster     Use cluster settings for symmetry finder (false)
+  -dos         Calculate DOS at Ef (false)
+  -workdir  s  Work directory ('.')
+  -max      n  Maximum number of structures (1000000)
+  -num      n  Number of trials (0)
+  -amp      f  Amplitude of move (-1.5)
+  -mode        Choose moves based on low lying vibrational 
+               modes (false)
+  -minmode  n  Lowest mode (4)
+  -sim      f  Threshold for structure similarity (0.0)
+  -symm     f  Symmetrise on-the-fly (0.0)
+  -mpinp    n  Number of cores per mpi Castep (0)
+  -steps    n  Max number of geometry optimisation steps (400)
+  -best        Only keep the best structures for each 
+               composition (false)
+  -track       Keep the track of good structures during relax 
+               and shake (false)
+  -keep        Keep intermediate files (false)
+  -seed     s  Seedname ('NONE')  
+user@machine_name$
+    \end{lstlisting}
+
+    \verb|airss.pl|是使用AIRSS执行结构搜寻的主要指令. 欢迎界面中已经系统且简要地说明了该指令的用法.
+
+    用法解释中的表格有三列. 第一列是传入参数的调用名称; 第二列是传入参数的数据类型, \verb|f|代表浮点数, \verb|n|代表整数, \verb|s|代表字符串, ``空''代表逻辑\verb!true||false!. 第三列是对此参数的详细解释.
+
+    举一个简单的例子, 使用AIRSS的\verb|pp3|模块作为能量计算软件搜寻Al的结构.
+
+    \begin{lstlisting}[language={bash}]
+user@machine_name$ ls 
+Al.cell Al.pp
+user@machine_name$ airss.pl -pp3 -max 3 -seed Al
+user@machine_name$ ls -1
+Al-43867-3302-1.res
+Al-43867-3302-2.res
+Al-43867-3302-3.res
+Al-43867-3302.cell
+Al.cell
+Al.pp
+user@machine_name$
+    \end{lstlisting}
+
+    AIRSS的计算结果全部储存在了\verb|.res|文件中.
+    \begin{lstlisting}[language={bash}]
+user@machine_name$ cat Al-43867-3302-1.res
+TITL Al-43867-3302-2 0.0000000004 60.4852769773 -53.2712053113 0 0 8 (P63/mmc) n - 1
+REM
+REM in /Users/alex/Documents/ProgramCode/MaterialCalculateProgram/AIRSS/airss-0.9/examples/1.1
+REM
+REM
+REM
+REM
+CELL 1.54180    2.20339    5.24398    5.24398   86.60117   89.99994   90.00000
+LATT -1
+SFAC Al 
+Al     1  0.2544637028970  0.9316224149716  0.6657635302849 1.0
+Al     1  0.7544640475988  0.0982890099295  0.3324301203388 1.0
+Al     1  0.2544640470150  0.3482890078890  0.5824301202379 1.0
+Al     1  0.2544640470479  0.8482890103459  0.0824301202324 1.0
+Al     1  0.7544640476367  0.5982890097930  0.8324301190566 1.0
+Al     1  0.7544637023180  0.1816224159838  0.9157635306900 1.0
+Al     1  0.7544637024482  0.6816224143044  0.4157635299253 1.0
+Al     1  0.2544637030384  0.4316224167828  0.1657635292340 1.0
+END
+
+user@machine_name$
+    \end{lstlisting}
+
+    第一行\verb|TITL|中的第一个元素是软件分配给该结构的名称标签,
+    
+    第二个元素是压力值(GPa), 
+    
+    第三个元素是单胞的总体积, 
+    
+    第五个元素是单胞总的焓, 
+    
+    第六个元素是spin(自旋?), 
+    
+    第七个元素是modspin(??), 
+    
+    第八个元素是空间群名称. 
+    
+    最后一个元素是\verb|n-<#copies>|(??)
+
+  \section{计算数据处理}
+    有了计算数据后, 就需要使用\verb|ca|指令进行数据处理了. 关于此指令的使用, 软件中已经给出了十分详细全面的说明, 这里不再赘述, 只给出查询说明的方法. 
+    
+    首先执行空的\verb|ca|指令. 因为按照\verb|airss.pl|的经验, 猜测作者可能会将说明以这种形式贴出. 
+    \begin{lstlisting}[language={bash}]
+user@machine_name$ ca
+ca [-R(recurcsive)] [command line arguments for cryan]
+user@machine_name$
+    \end{lstlisting}
+
+    很遗憾, 关于\verb|ca|的说明只有短短的一行, 但由这一行我们得知, \verb|ca|是调用了\verb|cryan|这个程序, 于是在终端输入空的\verb|cryan|查询结果.
+    \begin{lstlisting}[language={bash}]
+user@machine_name$ cryan
+Usage: cryan [OPTIONS]
+The structures are read from STDIN, for example:
+     cat *.res | cryan -s
+     gunzip -c lots.res.gz | cryan -f H2O
+     find . -name "*.res" | xargs cat | cryan -m
+cryan options (note - the order matters):
+-r,  --rank                          Rank all structures, of 
+                                     any composition
+-s,  --summary                       Summary, most stable from 
+                                     each composition
+-f,  --formula <formula>             Select structures of a 
+                                     given composition
+-t,  --top [num]                     Output top few results 
+                                     (default 10)
+-u,  --unite <thresh>                Unite similar structures
+-de, --delta_e <energy>              Ignore structures above 
+                                     energy (per atom)
+-sd, --struc_dos <smear>             Plot a structural density 
+                                     of states, smeared
+-p,  --pressure <pressure>           Additional pressure 
+                                     (default 0 GPa)
+...
+user@machine_name$
+    \end{lstlisting}
+
+    由于说明文字过多, 之摘取了其中一小部分.
+
+    如, 对之前结果进行分析.
+    \begin{lstlisting}[language={bash}]
+user@machine_name$ ca -r > analysis.data
+user@machine_name$ cat analysis.data
+Al-43867-3302-2   0.00  7.561  -6.659   8 Al  P63/mmc  1
+Al-43867-3302-1  -0.00  7.561   0.000   8 Al  P63/mmc  1
+Al-43867-3302-3   0.00  7.564   0.005   8 Al  Fm-3m    1
+user@machine_name$
+    \end{lstlisting}
+
+    上述结果:
+    
+    第一列是AIRSS软件分配给该结构的名称标签, 
+    
+    第二列压力值(GPa), 
+    
+    第三列是每个化学式结构单元(fu)的体积, 
+    
+    第四列第一行是一个化学式结构单元(fu)的焓值, 之后的几行是不同结构下相对于第一行的焓值,
+    
+    第五列是单胞中化学式结构单元(fu)的总个数(单胞中fug的个数乘以一个fug中fu的个数.), 
+    
+    第六列是化学式结构单元(fu)的化学式,
+    
+    第七列是空间群名称, 
+    
+    第八列是所有搜索结果中出现该结构的次数.
+
+
+    如果您认为所列结果过多, 可以使用\verb|-u|选项, 但是要注意, \verb|-u|一定要排在\verb|-r|之前使用.
+    \begin{lstlisting}[language={bash}]
+user@machine_name$ ca -u 0.01 -r > analysis.data
+user@machine_name$ cat analysis.data
+Al-43867-3302-2   0.00  7.561  -6.659   8 Al  P63/mmc  2
+Al-43867-3302-3   0.00  7.564   0.005   8 Al  Fm-3m    1
+user@machine_name$
+    \end{lstlisting}
+
+    关于\verb|-u| 后所跟数字的意义, 现仍不明确. 但可以判断这是某种与晶体点阵结构相似度有关的参数. \footnote{详细见源码``.../airss-0.9/src/cryan/src/cryan.f90''2118-2122行}
+
+
+  \section{附录}
+    \subsection{未说明的编译指示}
+    \label{Pragma_Unexplain}
+    \begin{lstlisting}[language={bash},numbers=left]
+ACONS
+ADJGEN
+AUTOSLACK
+BREAKAMP
+CELLADAPT
+CELLAMP
+CELLCON
+CONS
+COORD
+CYLINDER
+FLIP
+FOCUS
+MAXBANGLE
+MAXTIME
+MINBANGLE
+MOLECULES
+NOCOMPACT
+NOPUSH
+OCTET
+PERMFRAC
+PERMUTE
+RASH
+RASH_ANGAMP
+RASH_POSAMP
+REMOVE
+SGRANK
+SHIFT
+SPHERE
+SPIN
+SURFACE
+SYMM
+SYMMNO
+SYMMORPHIC
+SYSTEM
+THREE
+TIGHT
+VACANCIES
+VACUUM
+WIDTH
+      \end{lstlisting}
+
+  \end{document}
+
