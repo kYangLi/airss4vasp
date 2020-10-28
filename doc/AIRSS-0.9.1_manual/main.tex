@@ -79,8 +79,68 @@ root@machine_name# rm -rf / home/user_name/trash_directory
 
 AIRSS主运行脚本使用perl语言书写, 仅能安装在\verb|*nix|系统中, 且只支持在命令行(Command Line)使用. 安装此软件前, 您最好已经了解 \href{https://www.gnu.org/software/make/manual/}{GNU make} 的使用方法.
 
+\subsection{初次运行AIRSS}
+初次接触AIRSS, 您可以在终端输入\verb|airss.pl|指令查看软件欢迎界面.
+
+\begin{lstlisting}[language={bash}]
+user@machine_name$ airss.pl
+
+      .o.       ooooo ooooooooo.    .oooooo..o  .oooooo..o 
+     .888.      '888' '888   'Y88. d8P'    'Y8 d8P'    'Y8 
+    .8:888.      888   888   .d88' Y88bo.      Y88bo.      
+   .8' '888.     888   888ooo88P'   ':Y8888o.   ':Y8888o.  
+  .88ooo8888.    888   888'88b.         ':Y88b      ':Y88b 
+ .8'     '888.   888   888  '88b.  oo     .d8P oo     .d8P 
+o88o     o8888o o888o o888o  o888o 8::88888P'  8::88888P'  
+                                                      
+     Ab Initio Random Structure Searching             
+     Chris J. Pickard   (cjp20@cam.ac.uk)            
+            Copyright (c) 2005-2018                   
+                                                      
+Please cite the following:                                 
+                                                      
+[1] C.J. Pickard and R.J. Needs, PRL 97, 045504 (2006)     
+[2] C.J. Pickard and R.J. Needs, JPCM 23, 053201 (2011)    
+
+Usage: airss.pl [-pressure] [-build] [-pp0] [-pp3] [-gulp] [-lammps] 
+                [-gap] [-psi4] [-cluster] [-slab] [-dos] [-workdir] 
+                [-max] [-num] [-amp] [-mode] [-minmode] [-sim] [-symm]
+                [-nosymm] [-mpinp] [-steps] [-best] [-track] [-keep] 
+                [-seed]
+  -pressure f  Pressure (0.0)
+  -build       Build structures only (false)
+  -pp0         Use pair potentials rather than Castep (0D) (false)
+  -pp3         Use pair potentials rather than Castep (3D) (false)
+  -gulp        Use gulp rather than Castep (false)
+  -lammps      Use LAMMPS rather than Castep (false)
+  -gap         Use GAP through QUIP/QUIPPY/ASE (false)
+  -ps4         Use psi4 (false)
+  -vasp        Use VASP (false)
+  -cluster     Use cluster settings for symmetry finder (false)
+  -slab        Use slab settings (false)
+  -dos         Calculate DOS at Ef (false)
+  -workdir  s  Work directory ('.')
+  -max      n  Maximum number of structures (1000000)
+  -num      n  Number of trials (0)
+  -amp      f  Amplitude of move (-1.5)
+  -mode        Choose moves based on low lying vmodes (false)
+  -minmode  n  Lowest mode (4)
+  -sim      f  Threshold for structure similarity (0.0)
+  -symm     f  Symmetrise on-the-fly (0.0)
+  -nosymm   f  No symmetry (0)
+  -mpinp    n  Number of cores per mpi Castep (0)
+  -steps    n  Max number of geometry optimisation steps (400)
+  -best        Only keep the best str. for each compos. (false)
+  -track       Keep the track of good str. during RESH(false)
+  -keep        Keep intermediate files (false)
+  -seed     s  Seedname ('NONE')
+user@machine_name$
+\end{lstlisting}
+
+\verb|airss.pl|是使用AIRSS执行结构搜索的主要指令. 欢迎界面中已经系统且简要地说明了该指令的用法. 用法解释中的表格有三列. 第一列是传入参数的调用名称; 第二列是传入参数的数据类型, \verb|f|代表浮点数, \verb|n|代表整数, \verb|s|代表字符串, ``空''代表逻辑\verb!true||false!. 第三列是对此参数的详细解释.
+
 \newpage
-\section{buildcell输入文件}
+\section{随机结构的生成}
 在使用AIRSS预测结构时, 一般需要准备一个 \verb|*.cell| 的文件. 如果要使用 AIRSS 自带的 \verb|pp3| 计算模块还需要准备一个名为 \verb|*.pp| 文件.
 
 官方推荐AIRSS结合CASTEP使用, 且构建了 AIRSS 和 CASTEP 较为完善的接口. 使用AIRSS联合CASTEP计算时需要准备两种输入文件: \verb|*.cell| 文件与 \verb|*.param| (与VASP中的INCAR类似)文件. 前者用于确定材料结构(包括实空间与倒空间), 后者用于设置CASTEP计算过程中需要使用的配置参数(截断能, 交换关联函等).
@@ -499,73 +559,13 @@ Al 0.0 0.0 0.0 # Al1 % NUM=7-13 COORD=4
 \newpage
 \section{结构弛豫与能量计算}
 
-\subsection{初次运行AIRSS}
-初次接触AIRSS, 您可以在终端输入\verb|airss.pl|指令查看软件欢迎界面.
-
-\begin{lstlisting}[language={bash}]
-user@machine_name$ airss.pl
-
-      .o.       ooooo ooooooooo.    .oooooo..o  .oooooo..o 
-     .888.      '888' '888   'Y88. d8P'    'Y8 d8P'    'Y8 
-    .8:888.      888   888   .d88' Y88bo.      Y88bo.      
-   .8' '888.     888   888ooo88P'   ':Y8888o.   ':Y8888o.  
-  .88ooo8888.    888   888'88b.         ':Y88b      ':Y88b 
- .8'     '888.   888   888  '88b.  oo     .d8P oo     .d8P 
-o88o     o8888o o888o o888o  o888o 8::88888P'  8::88888P'  
-                                                      
-     Ab Initio Random Structure Searching             
-     Chris J. Pickard   (cjp20@cam.ac.uk)            
-            Copyright (c) 2005-2018                   
-                                                      
-Please cite the following:                                 
-                                                      
-[1] C.J. Pickard and R.J. Needs, PRL 97, 045504 (2006)     
-[2] C.J. Pickard and R.J. Needs, JPCM 23, 053201 (2011)    
-
-Usage: airss.pl [-pressure] [-build] [-pp0] [-pp3] [-gulp] [-lammps] 
-                [-gap] [-psi4] [-cluster] [-slab] [-dos] [-workdir] 
-                [-max] [-num] [-amp] [-mode] [-minmode] [-sim] [-symm]
-                [-nosymm] [-mpinp] [-steps] [-best] [-track] [-keep] 
-                [-seed]
-  -pressure f  Pressure (0.0)
-  -build       Build structures only (false)
-  -pp0         Use pair potentials rather than Castep (0D) (false)
-  -pp3         Use pair potentials rather than Castep (3D) (false)
-  -gulp        Use gulp rather than Castep (false)
-  -lammps      Use LAMMPS rather than Castep (false)
-  -gap         Use GAP through QUIP/QUIPPY/ASE (false)
-  -ps4         Use psi4 (false)
-  -vasp        Use VASP (false)
-  -cluster     Use cluster settings for symmetry finder (false)
-  -slab        Use slab settings (false)
-  -dos         Calculate DOS at Ef (false)
-  -workdir  s  Work directory ('.')
-  -max      n  Maximum number of structures (1000000)
-  -num      n  Number of trials (0)
-  -amp      f  Amplitude of move (-1.5)
-  -mode        Choose moves based on low lying vmodes (false)
-  -minmode  n  Lowest mode (4)
-  -sim      f  Threshold for structure similarity (0.0)
-  -symm     f  Symmetrise on-the-fly (0.0)
-  -nosymm   f  No symmetry (0)
-  -mpinp    n  Number of cores per mpi Castep (0)
-  -steps    n  Max number of geometry optimisation steps (400)
-  -best        Only keep the best str. for each compos. (false)
-  -track       Keep the track of good str. during RESH(false)
-  -keep        Keep intermediate files (false)
-  -seed     s  Seedname ('NONE')
-user@machine_name$
-\end{lstlisting}
-
-\verb|airss.pl|是使用AIRSS执行结构搜索的主要指令. 欢迎界面中已经系统且简要地说明了该指令的用法. 用法解释中的表格有三列. 第一列是传入参数的调用名称; 第二列是传入参数的数据类型, \verb|f|代表浮点数, \verb|n|代表整数, \verb|s|代表字符串, ``空''代表逻辑\verb!true||false!. 第三列是对此参数的详细解释.
-
 \subsection{联合airss-pp3模块弛豫}
 \verb|airss-pp3|是AIRSS自带的pp3对势(pair potential)计算模块. 其功能是使用化学上经典的分子势场(如6-12势能)弛豫原子结构并输出体系能量. 由于这一模块使用的是维象的晶体能量模型, 不涉及任何第一性原理的复杂运算, 因此其实现简单、效果稳定、计算速度快, 适用于简单组分的小体系. 更具体的, AIRSS中计算对势采用了如下公式:
 \begin{subequations}
   \label{eq:pp3}
   \begin{align}
     E_{ij} &= 4\varepsilon_{ij}\left[\left(\dfrac{\sigma_{ij}}{r_{ij}}\right)^m -\beta_{ij}\left(\dfrac{\sigma_{ij}}{r_{ij}}\right)^n\right]\\
-    E &= \sum_{i\ne{}j}^{\text{all ions}} E_{ij}
+    E &= \sum_{i<j}^{\text{all ions}} E_{ij}
   \end{align}
 \end{subequations}
 其中 \(i,j\)标定了不同原子位置, 当元素种类不同时, \(\varepsilon_{ij},\sigma_{ij}\)等变量对应不同的值.
@@ -669,15 +669,20 @@ user@machine_name$
 CASTEP中\verb|[keywords]|的定义和使用方法, 可参考: \href{http://www.tcm.phy.cam.ac.uk/castep/documentation/WebHelp/content/modules/castep/keywords/k_main_structure.htm}{CASTEP cell keywords and data blocks}.
 
 AIRSS默认联合CASTEP计算, 因此运行下述命令即可开始结构搜索.
+\begin{lstlisting}[language={bash},numbers=left]
+user@machine_name$ airss.pl -max 3 -seed Al
+\end{lstlisting}
 
 \subsection{联合VASP弛豫}
-AIRSS自带了 \verb|airss.pl --vasp| 选项用于联合VASP弛豫计算. 但官方自带的接口在有些情况下略显粗糙. 基于AIRSS, 笔者用一套bash命令集重新编写了AIRSS至VASP的接口, 将其命名为airss4vasp(a4v). 后虽考虑过将此命令集使用python重新书写, 但AIRSS本身无法在Windows上运行, 而复写工程又过于庞大且收效甚微, 因此a4v目前仍然主要基于bash实现.
+AIRSS自带了 \verb|airss.pl -vasp| 选项用于联合VASP弛豫计算. 但官方自带的接口在并行计算上还有待开发. 基于AIRSS, 笔者用一套bash命令集重新编写了AIRSS至VASP的接口, 将其命名为airss4vasp(a4v). 后虽考虑过将此命令集使用python重新书写, 但AIRSS本身无法在Windows上运行, 而复写工程又过于庞大且收效甚微, 因此a4v目前仍然主要基于bash实现.
 
 a4v可以看做是AIRSS的改版, 无需安装原生AIRSS便可独立运行. 其主要基于AIRSS原生的\verb|buildcell|模块, 同时内嵌了PBS, NSCC, Slurm等作业提交系统指令, 真正做到了一键提交AIRSS+VASP任务的功能. 其具体用法可参见项目内部的 \verb|README.md| 文件. \footnote{事实上, 该说明手册也在此项目中.(笑} 
 
 a4v增加了对应原子位置弛豫固定的\verb|SD-XYZ|, \verb|SD-XY|, \verb|SD-X|等原子标签, 同时删减了原先buildcell中设置共线自旋数值的全局参数关键字\verb|SPIN=|.
 
-\subsection{查看计算结果}
+\newpage
+\section{输出结果的后处理}
+\subsection{*.res文件的结构}
 AIRSS的计算结果全部储存在了\verb|.res|文件中. 这种 \verb|.res| 结构文件最早在 \href{https://strucbio.biologie.uni-konstanz.de/ccp4wiki/index.php/SHELXL}{SHELX} 中使用. 由于一些历史原因被 CASTEP 和 AIRSS 复用. 由于 SHELX 本身是对Windows友好程序, 因此其书写格式也沿袭了部分Windows文档的特点, 如 \verb|REM| 代表注释行, 文件使用 \verb|END| 结尾等.
 
 \begin{lstlisting}[language={bash}]
@@ -705,7 +710,6 @@ END
 user@machine_name$
 \end{lstlisting}
 
-
 AIRSS输出的\verb|.res|文件各行的含义如下:
 \begin{itemize}
 \item 第一行\verb|TITL|中的第一项是软件分配给该结构的名称标签, 第二项是系统外加静水压(GPa), 第三项是单胞体积, 第五项是每个单胞总的焓(能量), 第六项是原子自旋值的平均值, 第七项是原子自旋绝对值的平均值, 第八项是体系所在空间群名称, 最后一项是固定字符 \verb|n - 1|.
@@ -717,8 +721,7 @@ AIRSS输出的\verb|.res|文件各行的含义如下:
 \item 文件最终以\verb|END|行结尾.
 \end{itemize}
 
-\newpage
-\section{计算数据处理}
+\subsection{数据的批量化处理}
 有了计算数据\verb|.res|文件后, 就可以使用\verb|ca|指令进行数据处理了. \verb|ca| 是对AIRSS中基本分析套件 \verb|cryan| 的封装. 
 \begin{lstlisting}[language={bash}]
 user@machine_name$ ca
@@ -788,9 +791,19 @@ Al-43867-3302-3   0.00  7.564   0.005   8 Al  Fm-3m    1
 user@machine_name$
 \end{lstlisting}
 
-上述结果: 第一列是AIRSS软件分配给该结构的名称标签, 第二列压力值(GPa), 第三列是每个化学式结构单元(fu)的体积, 第四列第一行是一个化学式结构单元(fu)的焓值, 之后的几行是不同结构下相对于第一行的焓值, 第五列是单胞中化学式结构单元(fu)的总个数(单胞中fug的个数乘以一个fug中fu的个数.), 第六列是化学式结构单元(fu)的化学式, 第七列是空间群名称, 第八列是所有搜索结果中出现该结构的次数.
+上述输出结果中, 
+\begin{itemize}
+  \item 第一列是AIRSS软件分配给该结构的名称标签
+  \item 第二列压力值(GPa)
+  \item 第三列是每个化学式结构单元(fu)的体积
+  \item 第四列第一行是一个化学式结构单元(fu)的焓值, 之后的几行是不同结构下相对于第一行的焓值
+  \item 第五列是单胞中化学式结构单元(fu)的总个数(单胞中fug的个数乘以一个fug中fu的个数.)
+  \item 第六列是化学式结构单元(fu)的化学式
+  \item 第七列是空间群名称
+  \item 第八列是所有搜索结果中出现该结构的次数
+\end{itemize}
 
-如果您认为所列结果过多, 可以使用\verb|-u|选项, 但是要注意, \verb|-u|一定要排在\verb|-r|之前使用. \footnote{这可以算作是原程序的BUG, 已在airss4vasp中修正.}
+如果您认为所列结果过多, 可以使用\verb|-u|选项, 但是要注意, \verb|-u| 一定要排在\verb|-r|之前使用. \footnote{这可以算作是原程序的BUG, 已在airss4vasp中修正.}
 \begin{lstlisting}[language={bash}]
 user@machine_name$ ca -u 0.01 -r > analysis.data
 user@machine_name$ cat analysis.data
@@ -799,11 +812,11 @@ Al-43867-3302-3   0.00  7.564   0.005   8 Al  Fm-3m    1
 user@machine_name$
 \end{lstlisting}
 
-指令 \verb|ca -u| 后所跟的数字是一个无量纲的比例. 可以将这一参数简单的做如下理解:  他标定了晶格相似度阈值. 该数值越大, 容忍度越高, 最终展示出来的不同结构越少. 更详细的, 这一参数标定的距离, 是原子结构内部最接近的两个原子之间距离的小数倍. 例如, 现有两个结构十分相似, 晶格中最短键长为1.5 \r{A}, 则\verb|ca -u 0.1| 就意味着, 比较全部的两结构对应原子的两两距离, 如果未能发现这些距离差存在大于0.15 \r{A} 的情况, 则标定这两个结构一致. \footnote{详细见源码``airss-0.9.1/src/cryan/src/cryan.f90''2133行} 该值可根据需求调整, 建议在0.1--0.01之间选择.
+指令 \verb|ca -u| 后所跟的数字是一个无量纲的比例. 可以将这一参数简单的做如下理解:  他标定了晶格相似度阈值. 该数值越大, 容忍度越高, 最终展示出来的不同结构越少. 更详细的, 这一参数标定的距离, 是原子结构内部最接近的两个原子之间距离的小数倍. 例如, 现有两个结构十分相似, 晶格中最短键长为1.5 \r{A}, 则 \verb|ca -u 0.1| 就意味着, 比较全部的两结构对应原子的两两距离, 如果未能发现这些距离差存在大于0.15 \r{A} 的情况, 则标定这两个结构一致. \footnote{详细见源码``airss-0.9.1/src/cryan/src/cryan.f90''2133行} 该值可根据需求调整, 建议在0.1--0.01之间选择.
 
 \newpage
 \appendix
-\section{软件安装}
+\section{安装AIRSS}
 \textbf{下面将以 airss-0.9.0 版本为例, 简要记录AIRSS的安装.}
 
 AIRSS只支持在命令行(Command Line)使用, 且仅能安装在*nix系统中. 安装此软件前, 您最好已经了解 \href{https://www.gnu.org/software/make/manual/}{GNU make} 的使用方法. 当然, 如果您实在对此不感兴趣, 这不是必须的. 前提是您能完全按照以下步骤操作.
