@@ -1,8 +1,8 @@
 %! TEX program = xelatex
-%
-%liyang
-%2018.1.21-2018.1.27
-%copyleft liyang@JiLin Univ.
+
+% Author: Yang Li
+% Date: 2020.10.24-2020.10.28
+% copyleft liyang@Tsinghua Univ.
 %
 
 \documentclass[a4paper, 10pt]{article}
@@ -418,7 +418,7 @@ H   0.0 0.0 0.0 # H-set % ANGAMP=0 POSAMP=0
 \midrule
 \verb|#THREE=|\(p\)& \verb|float| & TODO & 使用三体势能代替TPSD弛豫结构, \textbf{该参数对应的功能尚未在airss-0.9.1中实现}.\\
 \midrule
-\verb|#COMPACT|& \verb|void| & on & 对最终生成的单胞进行 niggli reduce 操作. 在晶格形状没有被锁定时, 该项默认打开. \href{http://atztogo.github.io/niggli/#algorithm}{Numerically stable algorithms for the computation of reduced unit cells, R. W. Grosse-Kunstleve, N. K. Sauter and P. D. Adams, Acta Cryst., A60, 1-6 (2004)} \\
+\verb|#COMPACT|& \verb|void| & on & 对最终生成的单胞进行 niggli reduce 操作. 在晶格形状没有被锁定时(未引入晶格标签\verb|#FIX, #CFIX, #ABFIX|), 该项默认打开. \href{http://atztogo.github.io/niggli/#algorithm}{R. W. Grosse-Kunstleve, N. K. Sauter and P. D. Adams, Acta Cryst., A60, 1-6 (2004)} \\
 \midrule
 \verb|#NOCOMPACT| & \verb|void| & off & 强制关闭 COMPACT 操作.\\
 \midrule
