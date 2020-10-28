@@ -49,17 +49,17 @@ rulesepcolor=\color{red!20!green!20!blue!20}}
 
 \newpage
 \section{关于AIRSS}
-AIRSS(\textbf{A}b \textbf{I}nitio \textbf{R}andom \textbf{S}tructure \textbf{S}earching)是一款由英国剑桥大学 \href{https://www.mtg.msm.cam.ac.uk/People/CJP}{Chris Pickard} 教授\footnote{Chris 教授同时还参与研发过 DFT 计算软件 CASTEP.}等人开发的材料结构搜索软件. 该软件是受\href{https://en.wikipedia.org/wiki/GNU_General_Public_License}{\textbf{GPL2许可证}}保护的开源软件. 访问其官方网站, \url{https://www.mtg.msm.cam.ac.uk/Codes/AIRSS}, 便可获取 AIRSS 安装包源码. 
+AIRSS(\textbf{A}b \textbf{I}nitio \textbf{R}andom \textbf{S}tructure \textbf{S}earching)是一款由英国剑桥大学 \href{https://www.mtg.msm.cam.ac.uk/People/CJP}{Chris Pickard} 教授\footnote{Chris 教授同时还参与研发过 DFT 计算软件 CASTEP.}等人开发的材料结构搜索软件. 该软件是受\href{https://en.wikipedia.org/wiki/GNU_General_Public_License}{\textbf{GPL2许可证}}保护的开源软件. 访问其官方网站, \url{https://www.mtg.msm.cam.ac.uk/Codes/AIRSS}, 便可获取 AIRSS 安装源码. 
   
 所谓结构搜索是指, 对于一晶格结构未知的体系, 在一定的物理条件(如原子间距, 分布密度, 元素构成, 元素配比等)限制下, 广泛地猜测其结构, 而后对所得结构进行弛豫, 计算稳定构型能量, 最终得到DFT计算上全局最稳定晶格结构的过程. 显然人工手动猜测或是计算机盲目地遍历式搜寻是极为笨拙、耗时、甚至是难以实现的. 因此, 就需要使用一套成熟的结构搜索软件, 系统且巧妙地捕捉体系构型.
     
-AIRSS 正是这样一款软件. Chris 教授本人关于此软件的介绍可参见\href{https://www.youtube.com/watch?v=xW6pOYEIKVs&t=1061s}{有关视频}. 另外, 还有两个较为常用的结构搜索软件:\href{http://uspex.stonybrook.edu/uspex.html}{USPEX}和\href{http://www.calypso.cn}{CALYPSO}.
+AIRSS 正是这样一款软件. Chris 教授本人关于此软件的介绍可参见\href{https://www.youtube.com/watch?v=xW6pOYEIKVs&t=1061s}{有关视频}. 另外两个较为常用的结构搜索软件分别是: \href{http://uspex.stonybrook.edu/uspex.html}{USPEX} 和 \href{http://www.calypso.cn}{CALYPSO}.
 
-与 USPEX 或 CALYPSO 中使用的遗传算法不同, AIRSS 基于完全随机的结构搜索策略. 也即, AIRSS 不同结构的产生是完全随机且独立的, 你可以用 AIRSS 随机产生1000个结构, 而后独立弛豫. 这种随机方法的有效性也在 Chris 教授关于 AIRSS 文章中有所证明\footnote{ [1] PRL 97, 045504 (2006); [2] JPCM 23, 053201 (2011)}. AIRSS 最强大之处还是在于其众多可调参数. 这十分类似于傻瓜相机和专业单反相机的区别. 前者简单实用, 可以一键提交任务并获得不错的结果. 后者按键众多参数可调, 但可获得各种专业且自定义极高的结果. AIRSS 可以高度自定义自己所要研究的对象, 使用 AIRSS 我们甚至可以验证结构的稳定性, 以及进行晶格表面势能的计算.
+与 USPEX 或 CALYPSO 中使用的\href{https://en.wikipedia.org/wiki/Genetic_algorithm}{遗传算法}不同, AIRSS 基于完全随机的结构搜索策略. 也即, AIRSS 不同结构的产生是完全随机且独立的, 我们可以用 AIRSS 随机产生1000个结构, 而后独立弛豫. 这种随机方法的有效性在 Chris 教授关于 AIRSS 文章中有所证明\footnote{ [1] PRL 97, 045504 (2006); [2] JPCM 23, 053201 (2011)}. AIRSS 最强大之处还是在于其众多灵活的可调参数, 这可以说是AIRSS这个项目最出众的特点. 这十分类似于傻瓜相机和专业单反相机的区别. 前者简单实用, 可以一键提交任务并获得不错的结果. 后者按键众多参数可调, 但可获得各种专业且自定义极高的结果. AIRSS 可以高度自定义自己所要研究的对象, 使用 AIRSS 我们甚至可以验证结构的稳定性, 以及进行晶格表面势能的计算.
 
-令人遗憾的是, AIRSS作为一个功能强大的结构搜索软件, 其官方手册相对简陋, 未能覆盖全部用途. 再加上网络上相关说明文档或教程十分匮乏, 所以大部分人对 AIRSS 这样一个材料设计领域异常优秀的程序并不熟悉. 
+令人遗憾的是, AIRSS作为一个功能强大的结构搜索软件, 其官方手册相对简陋, 未能覆盖其全部用法. 再加上网络上相关说明文档或教程十分匮乏, 所以大部分人对 AIRSS 这样一个材料设计领域异常优秀的程序并不熟悉. 
 
-以下内容算不上指南或教程, 仅仅是学习 AIRSS 的一些记录. 本文除了一小部分内容是了借鉴软件包自带的\verb|examples|中的说明外, 其他大部分结论是自行分析源码、尝试摸索所得. 受各种因素限制, 理解和解释上的错误或不可避免.
+以下内容算不上指南或教程, 仅仅是学习 AIRSS 的一些记录. 本文除了一小部分内容是了借鉴软件包自带的\verb|examples|中的说明外, 其他大部分结论是自行分析源码、尝试摸索所得. 受各种因素限制, 理解和解释上的错误或不可避免. 如有问题, 还望您不吝指正.
 
 \newpage
 \section{计算前的准备}
@@ -75,12 +75,12 @@ root@machine_name# rm -rf / home/user_name/trash_directory
 \end{lstlisting}
     
 \subsection{AIRSS的安装与卸载}
-\textbf{附录}中以 \verb|airss-0.9.0| 版本为例, 简要记录了AIRSS的安装过程. 最新的\verb|airss-0.9.1| 在安装过程上做了少许简化, 您可以自行阅读\verb|airss-0.9.1|中包含的\verb|README|文件安装此软件.
+\textbf{附录}中以 \verb|airss-0.9.0| 版本为例, 简要记录了AIRSS的安装过程. 最新的 \verb|airss-0.9.1| 在安装过程上做了少许简化, 您可以自行阅读其内包含的 \verb|README| 文件, 安装此软件.
 
 AIRSS主运行脚本使用perl语言书写, 仅能安装在\verb|*nix|系统中, 且只支持在命令行(Command Line)使用. 安装此软件前, 您最好已经了解 \href{https://www.gnu.org/software/make/manual/}{GNU make} 的使用方法.
 
 \subsection{初次运行AIRSS}
-初次接触AIRSS, 您可以在终端输入\verb|airss.pl|指令查看软件欢迎界面.
+初次接触AIRSS, 您可以在终端输入 \verb|airss.pl| 指令查看软件欢迎界面.
 
 \begin{lstlisting}[language={bash}]
 user@machine_name$ airss.pl
@@ -137,7 +137,7 @@ Usage: airss.pl [-pressure] [-build] [-pp0] [-pp3] [-gulp] [-lammps]
 user@machine_name$
 \end{lstlisting}
 
-\verb|airss.pl|是使用AIRSS执行结构搜索的主要指令. 欢迎界面中已经系统且简要地说明了该指令的用法. 用法解释中的表格有三列. 第一列是传入参数的调用名称; 第二列是传入参数的数据类型, \verb|f|代表浮点数, \verb|n|代表整数, \verb|s|代表字符串, ``空''代表逻辑\verb!true||false!. 第三列是对此参数的详细解释.
+\verb|airss.pl| 是使用AIRSS执行结构搜索的主要指令. 欢迎界面中已经系统且简要地说明了该指令的用法. 用法解释中的表格有三列. 第一列是传入参数的调用名称; 第二列是传入参数的数据类型, \verb|f|代表浮点数, \verb|n|代表整数, \verb|s|代表字符串, ``空''代表逻辑字符串 \verb!true,false!. 第三列是对此参数的详细解释.
 
 \newpage
 \section{随机结构的生成}
@@ -145,39 +145,41 @@ user@machine_name$
 
 官方推荐AIRSS结合CASTEP使用, 且构建了 AIRSS 和 CASTEP 较为完善的接口. 使用AIRSS联合CASTEP计算时需要准备两种输入文件: \verb|*.cell| 文件与 \verb|*.param| (与VASP中的INCAR类似)文件. 前者用于确定材料结构(包括实空间与倒空间), 后者用于设置CASTEP计算过程中需要使用的配置参数(截断能, 交换关联函等).
 
-AIRSS 的核心组件名为 \verb|buildcell|, 顾名思义这个组件的作用就是依据用户给出的 \verb|*.cell| 文件生成一系列结构的随机但符合给定物理条件约束的结构. 如此一来学习 AIRSS 的根本, 就落在了学习如何书写高度自定义化的 \verb|*.cell| 上.
+AIRSS 的核心组件名为 \verb|buildcell|. 顾名思义, 这个组件的作用就是依据用户给出的 \verb|*.cell| 文件, 生成一系列结构的随机但符合给定物理条件约束的初始原子结构. 如此一来学习 AIRSS 的根本, 就落在了学习如何书写高度自定义化的 \verb|*.cell| 文件上.
 
 \verb|buildcell|区块的执行大致分为以下几步:
 \begin{enumerate}[-i-]
   \item 通过 \verb|cell.f90| 模块读取 \verb|*.cell| 文件中的配置信息.
   \item 通过 \verb|build.f90| 模块生成满足要求的结构.
-  \item 首先根据给定的原子极其半径确定合理的晶格常数, 若存在晶格标签 \verb|#FIX| 则忽略此步骤.
+  \item 首先根据给定的原子及其半径确定合理的晶格常数, 若存在晶格标签\footnote{如果您感觉对这一部分的概念并不熟悉, 可以先跳过本段, 更详细的介绍会在后文中展现.} \verb|#FIX| 则忽略此步骤.
   \item 依次按要求生成随机的原子新位置.
   \item 根据约束选择接收这一位置, 拒绝这一位置, 或者\textbf{PUSH}当前原子. \textbf{PUSH}是指: 当两原子位置过近时, 强行将两原子在其连线方向反向移开相同距离的操作. 当原子标签中有 \verb|FIX| 或 \verb|NOMOVE| 时, 忽略这一操作.
-  \item 依次作用新的原子，直至更新完整个结构.
-  \item 视用户设置, 用维象的对势(pp3)对结构进行简单弛豫.
+  \item 遍历体系中的全部原子, 直至更新完整个结构.
+  \item 视用户设置, 用唯象的对势(pp3)对结构进行简单弛豫.
   \item 通过 \verb|buildcell.f90| 模块输出上述满足要求的随机结构.
   \end{enumerate}
 
-下面详细介绍一下\verb|*.cell|文件的设置. 
 
 \subsection{*.cell文件结构概括}
+下面大体概括一下\verb|*.cell|文件的基本结构. 
+
 \verb|*.cell|文件相当于结构搜索的种子文件, 您可以在此文件中设置搜索约束条件.
 
-\verb|*.cell|文件的内容主要有以下特点:
+该文件有以下特点:
 \begin{enumerate}[(1)]
 \item 由于AIRSS就是部分参与CASTEP研发的人员编写的程序,因此该程序对CASTEP极其友好, 这里的\verb|*.cell|文件与CASTEP中的\verb|*.cell|文件完全兼容.
 \item \verb|*.cell|文件设置参数时, 需要使用一定的 keywords 标明所设参数的含义.
 \item AIRSS完全复用了CASTEP中进行结构声明的 keywords, 如 \verb|LATTICE_CART| 等.
-\item AIRSS的核心部分是\verb|buildcell|模块, 可以魔改AIRSS同时保留此模块, 使其与其他程序，如VASP, 适配.
-\item 对于那些 CASTEP 中未曾定义只对 AIRSS 有效的 keywords，需要在其之前附加\verb|#|，\verb|#POSAMP=|，以使得 AIRSS 的 \verb|*.cell| 文件与 CASTEP 完全兼容.
+\item AIRSS的核心部分是\verb|buildcell|模块, 可以单独拿出此模块, 使其与其他程序, 如VASP, 适配.
+\item AIRSS 识别的 keywords 一般以\verb|#|开头, 如\verb|#RASH|. (以使得 AIRSS 的 \verb|*.cell| 文件与 CASTEP 完全兼容)
 \item \verb|*.cell|文件主要由两部分组成: ``结构数据''和``全局参数''. 相应的, \verb|*.cell|中的keywords也可以分为上述两类.
 \item ``结构数据'' 和``全局参数'' 没有书写顺序上的限制.
-\item \verb|*.cell|中设定的所有的keywords和数据均不区分大小写. 同时, 任何标点符号(除了标明注释内容的符号),多余的空格和任何空行都将被自动忽略.
-\item 文件的一行中只能出现一个keywords及其对应参数.
+\item 该文件使用双井号(\verb|##|)标明注释内容.
+\item \verb|*.cell|中设定的所有的keywords需要采用\textbf{大写字母}书写, 并注意书写 keyword 时在等号和参数数值之间\textbf{不能添加空格}. 同时, 任何空行都将被自动忽略.
+\item 文件的同一行中最好只书写一个 keywords.
 \end{enumerate}
 
-以下是预测金属铝结构所用到的\verb|Al.cell|文件:
+以下是预测金属铝结构所用到的 \verb|Al.cell| 文件:
 \begin{lstlisting}[language={bash},numbers=left,firstnumber=0]
 user@machine_name$ cat Al.cell
 %BLOCK LATTICE_CART
@@ -196,10 +198,10 @@ user@machine_name$
 
 上述\verb|*.cell|文件的结构可做如下概括:
 \begin{itemize}
-  \item 前9行是由\verb|%BLOCK [keywords]|格式定义的数据读取区块. 这种格式在CASTEP中是十分常见的.  
-  \item 1至5行数据的\verb|[keywords]|是\verb|LATTICE_CART|. 声明使用笛卡尔坐标系定义的单胞基矢. 
-  \item 7至9行使用的\verb|[keywords]|是\verb|POSITIONS_FRAC|. 这在CASTEP中的意义是``以分数坐标定义的原子位置''. 而在AIRSS中, 该数据模块不仅可以锁定原子位置, 还可以定义搜寻过程中对单种原子的约束条件. 具体细节将在之后给出. 
-  \item 文件第11行的\verb|#MINSEP|是只在AIRSS结构搜索种子文件中有效的\textbf{全局参数}.
+  \item 前9行是由 \verb|%BLOCK [keywords]| 格式定义的数据读取区块, 这种格式在CASTEP中是十分常见的. 这些区块定义了晶体基本的\textbf{结构数据}.   
+  \item 1至5行数据的 \verb|[keywords]| 是 \verb|LATTICE_CART|, 声明使用笛卡尔绝对坐标系定义的单胞基矢. 
+  \item 7至9行使用的\verb|[keywords]|是 \verb|POSITIONS_FRAC|. 这在CASTEP中的意义是``以分数坐标定义的原子位置''. 而在AIRSS中, 该数据模块不仅可以锁定原子位置, 还可以定义搜寻过程中对单种原子的约束条件. 具体细节将在之后给出. 
+  \item 第11行的 \verb|#MINSEP| 是只在AIRSS结构搜索种子文件中有效的\textbf{全局参数}.
   \verb|#MINSEP=|\(1.5\)表明了两原子间距不得低于\(1.5\) \r{A}.
 \end{itemize}
 
@@ -208,8 +210,9 @@ user@machine_name$
 
 \subsection{*.cell文件参数细节}
 \subsubsection{结构数据}
-该部分沿用了CASTEP的结构文件中定义数据的模式. 结构数据由两部分构成: 晶格参数数据块, 原子位置数据块.
-结构数据的具体模式如下所示:
+该部分沿用了CASTEP的结构文件中定义数据的模式. 结构数据由两部分构成: 晶格参数数据区块, 原子位置数据区块. 
+
+数据区块的具体模式如下所示:
 \begin{lstlisting}[language={bash}]
 %BLOCK [keywords]
 [...]
@@ -218,7 +221,7 @@ user@machine_name$
 %BLOCKEND [keywords]
 \end{lstlisting}
 
-可以在AIRSS中使用的结构声明关键字(\verb|[keywords]|)已在 Table \ref{BLOCKkeywords} 中列出.
+可以在AIRSS中使用的数据区块关键字(\verb|[keywords]|)已在 \textbf{Table \ref{BLOCKkeywords}} 中列出.
 \begin{center}
 \begin{longtable}{m{13em}<{\centering} | m{19em}<{\centering}}
 \caption{AIRSS Cheat Sheet -- Data BOLCK}
@@ -237,9 +240,9 @@ user@machine_name$
 \midrule \multicolumn{2}{r}{\textit{Continued on next page...}} \\
 \endfoot
 \endlastfoot 
-\verb|LATTICE_CART|  & 使用笛卡尔坐标系, 以一个\(3\times3\)的矩阵定义\textbf{单胞}基矢. 通过在该区块中附加以下标签: \verb|#FIX,|\verb|#CFIX,|\verb|#ABFIX|, 可分别实现: 固定整个晶格形状，固定晶格常数c，固定晶格常数ab. 另外, 再次强调, 如果要确保晶格参数不变, 除了在晶格参数结构数据加入\verb|#FIX|, 以保证在猜测晶格结构时保持其为常值外, 还需要在DFT弛豫软件中做相应的设置, 以保证其在结构弛豫时也不变.\\
+\verb|LATTICE_CART|  & 使用笛卡尔坐标系, 以一个\(3\times3\)的矩阵定义\textbf{单胞}基矢. 通过在该区块中附加以下标签: \verb|#FIX,|\verb|#CFIX,|\verb|#ABFIX|, 可分别实现: 固定整个晶格形状, 固定晶格常数c, 固定晶格常数ab. 另外, 再次强调, 如果要确保晶格参数不变, 除了在晶格参数结构数据加入\verb|#FIX|, 以保证在猜测晶格结构时保持其为常值外, 还需要在DFT弛豫软件中做相应的设置, 以保证其在结构弛豫时也不变.\\
 \midrule
-\verb|LATTICE_ABC| & 以一个\(2\times3\)的矩阵定义单胞的晶格参数.矩阵第一行是参数abc, 第二行是三个夹角. 在同一个\verb|.cell|中, 与\verb|LATTICE_CART|二选一即可. 通过在该区块中附加以下标签: \verb|#FIX,|\verb|#CFIX,|\verb|#ABFIX|, 可分别实现: 固定整个晶格形状，固定晶格常数c，固定晶格常数ab.\\
+\verb|LATTICE_ABC| & 以一个\(2\times3\)的矩阵定义单胞的晶格参数.矩阵第一行是参数abc, 第二行是三个夹角. 在同一个\verb|.cell|中, 与\verb|LATTICE_CART|二选一即可. 通过在该区块中附加以下标签: \verb|#FIX,|\verb|#CFIX,|\verb|#ABFIX|, 可分别实现: 固定整个晶格形状, 固定晶格常数c, 固定晶格常数ab.\\
 \midrule
 \verb|POSITIONS_FRAC| & 以晶格基矢坐标系下的分数坐标定义原子位置.\\
 \midrule
@@ -250,7 +253,7 @@ user@machine_name$
 \end{longtable}
 \end{center}
 
-一般进行结构搜索时, 只需要在 AIRSS 的 \verb|*.cell| 文件中给出\textbf{晶格参数}和\textbf{原子位置}的数据即可.
+下面简单介绍, \textbf{晶格参数}数据区块和\textbf{原子位置}数据区块的详细书写方法.
 
 \paragraph{晶格参数} 首先介绍晶格参数的设定, 以\verb|LATTICE_CART|为例.\\
 \emph{例1.}
@@ -263,9 +266,9 @@ user@machine_name$
 %BLOCKEND LATTICE_CART
 \end{lstlisting}
 
-上述字段构建了一个\(20\times20\times20\) \r{A}\(^3\)的正方体作为晶体的单胞. \verb|#FIX|称为晶格标签(Lattice Tags). 
+上述字段构建了一个\(20\times20\times20\) \r{A}\(^3\)的正方体作为晶体的单胞. 这里的 \verb|#FIX| 被称为\textbf{晶格标签}(Lattice Tags). 
 
-它声明了晶格常数在搜寻过程(生成初始随机结构)中是不能改变的. 如果您想保证体系晶格常数在使用CASTEP或airss-pp3进行结构粗略优化时也不变, 则需要在相应计算软件的输入文件中设置.
+它声明了晶格常数在搜寻(生成初始随机结构)过程中是不能改变的. 如果您想保证体系晶格常数在进行DFT弛豫时也不变, 则需要在相应计算软件的输入文件中设置.
 
 \paragraph{原子位置} 下面再介绍原子位置的设置方法, 以\verb|POSITIONS_FRAC|为例.\\
 \emph{例2.}
@@ -282,7 +285,7 @@ H   0.0 0.0 0.0 # H-set % ANGAMP=0 POSAMP=0
 %BLOCKEND POSITIONS_FRAC
 \end{lstlisting}
 
-通过这个例子, 我们看到, 原子位置结构数据的基本格式是:
+通过这个例子可以看出, 原子位置结构数据的基本格式是:
 \begin{lstlisting}[language={bash}]
 [element] [x] [y] [z] # [atoms_set_name] % [tag1] [tag2] [tag3]
 \end{lstlisting}
@@ -291,11 +294,11 @@ H   0.0 0.0 0.0 # H-set % ANGAMP=0 POSAMP=0
 \begin{itemize}
   \item 第一项是元素名称, 如果将元素名称设置为Z, 则表示此原子是个空位, 空位与真实原子一样具有体积和PUSH属性, 但不会在最终结果中输出.
   \item 二三四项是原子位置坐标.
-  \item 井号(\verb|#|)后的第一项是原子所在原子集的名称, 原子集名称可以被设置成任意字符. 原子集可以由多个原子构成, 他们是结构搜索中的一个基本单元. \textbf{原子集名称相同的原子被标定为同一个原子集, 同一个原子集中的原子做相同的随机移动，且不受PUSH影响}. 如无特殊需求, 为了实现自由度相对的最大化, 一般需要为每个原子都单独设置原子集(每个原子集只含有一个原子).
-  \item 百分号(\verb|%|)之后的内容都是原子标签(Atom Tags).
+  \item 井号(\verb|#|)后的第一项是原子所在原子集的名称, 原子集名称可以被设置成任意字符. 原子集可以由多个原子构成, 他们是结构搜索中的一个基本单元. \textbf{原子集名称相同的原子组成一个原子集, 同一个原子集中的原子做相同的随机移动, 且不受PUSH影响}. 如无特殊需求, 为了实现自由度相对最大化, 一般不推荐将不同原子放入同一原子集中.
+  \item 百分号(\verb|%|)之后的内容都是\textbf{原子标签}(Atom Tags), 他们指定了该原子应该满足的若干约束条件.
 \end{itemize}
 
-\textbf{Table \ref{AIRSS_Atom_Tag}} 是各个原子标签的具体说明.
+\textbf{Table \ref{AIRSS_Atom_Tag}} 是AIRSS中全部可用的原子标签的具体说明.
 
 \begin{center}
 \begin{longtable}{m{9em}|m{4em}<{\centering}|m{3em}<{\centering}|m{15em}}
@@ -317,31 +320,31 @@ H   0.0 0.0 0.0 # H-set % ANGAMP=0 POSAMP=0
 \endlastfoot
 \verb|NUM=|\(n\),\hspace{4em} \verb|NUM=|\(n_{min}-n_{max}\) & \verb|int| & 1 & 定义该行原子实际代表的原子个数. 使用 \verb|NUM| 定义的重复原子会被逐个单独分配到不同的\textbf{原子集}中.\\
 \midrule
-\verb|POSAMP=|\(d\)& \verb|float| & -1.0 & 定义该行原子结构搜索过程中, 能偏离初始位置的最大距离. 若为负值则无限制.\\
+\verb|POSAMP=|\(d\)& \verb|float| & -1.0 & 定义该行原子在结构搜索过程中, 能偏离初始位置的最大距离. 若为负值则无限制.\\
 \midrule
-\verb|MINAMP=|\(d\)& \verb|float| & 0.0 & 定义该行原子结构搜索过程中, 偏离初始位置的最小距离.\\
+\verb|MINAMP=|\(d\)& \verb|float| & 0.0 & 定义该行原子在结构搜索过程中, 偏离初始位置的最小距离.\\
 \midrule
-\verb|XAMP=|\(d\)& \verb|float| & -1.0 & 定义该行原子结构搜索过程中, 在X轴方向上移动的最大距离. 若为负值则无限制. 设置该项会令POSAMP和MINAMP失效\\
+\verb|XAMP=|\(d\)& \verb|float| & -1.0 & 定义该行原子在结构搜索过程中, 在X轴方向上移动的最大距离. 若为负值则无限制. 设置该项会令POSAMP和MINAMP失效\\
 \midrule
-\verb|YAMP=|\(d\)& \verb|float| & -1.0 & 定义该行原子结构搜索过程中, 在Y轴方向上移动的最大距离. 若为负值则无限制. 设置该项会令POSAMP和MINAMP失效.\\
+\verb|YAMP=|\(d\)& \verb|float| & -1.0 & 定义该行原子在结构搜索过程中, 在Y轴方向上移动的最大距离. 若为负值则无限制. 设置该项会令POSAMP和MINAMP失效.\\
 \midrule
-\verb|ZAMP=|\(d\)& \verb|float| & -1.0 & 定义该行原子结构搜索过程中, 在Z轴方向上移动的最大距离. 若为负值则无限制. 设置该项会令POSAMP和MINAMP失效.\\
+\verb|ZAMP=|\(d\)& \verb|float| & -1.0 & 定义该行原子在结构搜索过程中, 在Z轴方向上移动的最大距离. 若为负值则无限制. 设置该项会令POSAMP和MINAMP失效.\\
 \midrule
-\verb|ANGAMP=|\(\theta\)  & \verb|float| \([0,360]\) & -1.0 & 原子绕自身所在\textbf{原子集}中心旋转角度的最大值(与 \verb|POSAMP| 互相独立, 分开作用). 存在晶格标签 \verb|#FIX| 时, \verb|ANGAMP=0|, \verb|POSAMP=0| 与 \verb|NOMOVE(\FIX)| 共用, 可保证原子在原始位置不动. 如果cell文件中所有原子集都只有1个原子, 则该参数失效, \verb|ANGAMP| 强制设为0. 若为负值则无限制..\\
+\verb|ANGAMP=|\(\theta\)  & \verb|float| \([0,360]\) & -1.0 & 原子绕自身所在\textbf{原子集}中心旋转角度的最大值(与 \verb|POSAMP| 互相独立, 分开作用). 存在晶格标签 \verb|#FIX| 时, \verb|ANGAMP=0|, \verb|POSAMP=0| 与 \verb|NOMOVE(\FIX)| 共用, 可保证原子在原始位置不动. 如果cell文件中所有原子集都只有1个原子, 则该参数失效, \verb|ANGAMP| 强制设为0. 若为负值则无限制.\\
 \midrule
-\verb|RAD=|\(d\) & \verb|float| & 0.0 & 设置原子的半径, 用于判断两个原子间的最小距离, MINSEP. 其优先级低于直接设置全局参数 \verb|MINSEP|.\\
+\verb|RAD=|\(d\) & \verb|float| & 0.0 & 设置原子的半径, 用于判断两个原子间的最小距离, MINSEP. 其优先级低于直接设置全局参数 \verb|#MINSEP=|.\\
 \midrule
-\verb|FIX| & \verb|void| & off & 该原子在产生结构时不受PUSH影响, 同时向cell文件中写入指令使其在CASTEP弛豫时也不动. 任何接近该原子的可移动原子都会以2倍的PUSH步长被PUSH回去. 这一指令仅在晶格被 \verb|#FIX| 时有效. 原子标签中的\verb|#FIX| 与晶格标签中的 \verb|#FIX|, \verb|#CFIX|, \verb|#ABFIX|作用不同. \\
+\verb|FIX| & \verb|void| & off & 该原子在产生结构时不受PUSH影响. 任何接近该原子的可移动原子都会以2倍的PUSH步长被PUSH回去. 同时向cell文件中写入指令使其在CASTEP弛豫时也不动. 这一指令仅在晶格被 \verb|#FIX| 时有效. 原子标签中的 \verb|FIX| 与晶格标签中的 \verb|#FIX|, \verb|#CFIX|, \verb|#ABFIX|名称相似, 但作用不同. \\
 \midrule
 \verb|NOMOVE| & \verb|void| & off & 该原子在产生结构时不受PUSH影响, 任何接近该原子的可移动原子都会以2倍的PUSH步长被PUSH回去. 这一指令仅在晶格被 \verb|#FIX| 时有效.\\
 \midrule
-\verb|COORD=|\(n\),\hspace{5em} \verb|COORD=|\(n_{min}-n_{max}\) & \verb|int| & -1 & 约束改行原子的配位数(最近邻原子数). 若为负值则无限制.\\
+\verb|COORD=|\(n\),\hspace{5em} \verb|COORD=|\(n_{min}-n_{max}\) & \verb|int| & -1 & 约束该行原子的配位数(最近邻原子数). 若为负值则无限制.\\
 \midrule
 \verb|NN=|\(\pm{}elm\)  & \verb|string| & null & 规定原子最近邻元素种类, `\(+\)'代表必须近邻该元素, `\(-\)'代表不能近邻该元素. 一个原子只能指定一种元素近邻或不近邻(NN参数仅会被读入一次). 若为空, 则表示无限制\\
 \midrule
-\verb|OCC=|\(p\) & \verb|float| \([0,1]\) & 1.0 & 该点位占据原子的几率, 同种元素在不同位置的占据几率之和必须为大于0的整数. 接收分数形式的输入, 如 OCC=1/3. 若该值设为小于0的数, 则强行将该原子的OCC设置为1, 同时不再输出该原子可能因对称性衍生的其他原子位置. 若原子同时有 \verb|FIX| 或 \verb|NOMOVE| 标签, 则\verb|OCC| 强制设为1. 若该原子OCC大于1, 则将其设置为空位(与将元素名称设为Z的效果相同).\\
+\verb|OCC=|\(p\) & \verb|float| \([0,1]\) & 1.0 & 该点位占据原子的几率, 同种元素在不同位置的占据几率之和必须为大于0的整数. 接收分数形式的输入, 如 OCC=1/3. 若该值设为小于0的数, 则强行将该原子的OCC设置为1, 同时不再输出该原子可能因对称性衍生的其他原子位置. 若原子同时有 \verb|FIX| 或 \verb|NOMOVE| 标签, 则 \verb|OCC| 强制设为1. 若该原子OCC大于1, 则将其设置为空位(与将元素名称设为Z的效果相同). 系统存在对称性时, 使用更小的\verb|OCC|可强制某一原子位于对称性更高的点位上. 但更为自然的用法是使用 \verb|MULT| 代替 \verb|OCC| 设置. 若设置了全局参数\verb|#NFORM=n|(n大于0): 在没有对称性条件下, \verb|OCC| 参数失效; 在有对称性条件下, 请参考 \verb|MULT| 中的说明. \\
 \midrule
-\verb|MULT=|\(p\) & \verb|float| & -1.0 & 设置该原子点位的 multiplicities. 这一数值为正时, 强制覆盖 \verb|OCC| 参数的设置, 将其设置为 MULT/SYMM\_NUM. 其中 SYMM\_NUM 为晶格对称操作的个数. 若该值为负数, 则直接将 \verb|MULT| 的值赋给 \verb|OCC|. 关于格点 multiplicities 与对称性的关系可参见 \href{https://www.cryst.ehu.es/cryst/get_set.html}{BCS: Wyckoff Position}\\
+\verb|MULT=|\(m\) & \verb|float| & -1.0 & 设置该原子点位的 multiplicities. 这一数值为正时, 强制将 \verb|OCC| 参数的值覆盖为 MULT/SYMM\_NUM. 其中 SYMM\_NUM 为晶格对称操作的个数. 若设置了全局参数\verb|#NFORM=n|(n大于0), 则等效于将所有原子的 \verb|MULT| 的值设为\(n\), 同时不设置\verb|#NFORM=|. 若该行原子同时有标签\verb|FIX/NOMOVE|, 则强制将该原子的MULT设为-1. 使用这一参数, 可以限制某一行原子由晶体对称性实际生成原子的个数. 关于格点 multiplicities 与对称性的关系可参见 \href{https://www.cryst.ehu.es/cryst/get_set.html}{BCS: Wyckoff Position}.\\
 \midrule
 \verb|PERM| & \verb|void| & off & 在完成原子位置选定后, 重排(按一定概率互相交换)指定原子位置间的元素种类. 需要配合全局参数 \verb|#PERMUTE| 使用, 否则该参数将被关闭.\\
 \midrule
@@ -378,7 +381,7 @@ H   0.0 0.0 0.0 # H-set % ANGAMP=0 POSAMP=0
 \endlastfoot
 \verb|#CELLCON=|\(a\;b\;c\;\alpha\;\beta\;\gamma\) & \verb|int| & off &定义晶胞应满足的条件, \(a,b,c\)是晶格常数, \(\alpha,\beta,\gamma\)是三个晶角. 晶格常数可选填的值有\(\{0,-1\}\), 晶角可选填的值有\(\{0,-1, \theta\}\). \(0\)表示无约束, \(-1\)表示相等. 如 \verb|#CELLCON=-1-1 -1 90 90 90| 表示立方晶系.\\
 \midrule
-\verb|#SYSTEM=|\(crs\) & \verb|string| & off & 设置结构所在的晶系, 可选的输入有 [Tric, Mono, Hexa, Rhom(/Trig), Orth, Tetr, Cubi]. 该参数实际为\verb|#CELLCON=|参数的若干特殊组合.\\
+\verb|#SYSTEM=|\(crs\) & \verb|string| & off & 设置结构所在的晶系, 可选的输入有 [Tric, Mono, Hexa, Rhom(/Trig), Orth, Tetr, Cubi]. 该参数实际为 \verb|'#CELLCON='| 参数的若干特殊组合.\\
 \midrule
 \verb|#CONS=|\(p\) & \verb|float| \((0,1]\) & 0.4 & 约束单胞边长. 接近0表示完全没有约束, 等于1表示尽一切可能约束晶胞abc三边等长.\\
 \midrule
@@ -446,17 +449,17 @@ H   0.0 0.0 0.0 # H-set % ANGAMP=0 POSAMP=0
 \midrule
 \verb|#TIGHT|& \verb|void| & off & 使得生成的结构更加紧密.\\
 \midrule
+\verb|#SYMMOPS=|\(n\),\hspace{6em}\verb|#SYMMOPS=|\(\sim{}n\;\;\;\;\;\;\;\;\;\;\;\)\hspace{6em}\verb|#SYMMOPS=|\(n_{min}-n_{max}\) & \verb|int| &  off & 声明生成的结构中必须含有\(n\)种对称操作. 若体系是周期性晶体结构, 推荐从下述整数中选取: 1,2,3,4,5,6,8,12,16,24,48. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量\footnote{这里的``数量''是指, 满足对称操作所需的最少同类原子数量, 也即该点位的 multiplicities. }更少的 special position 不予考虑.\footnote{源代码中这样描述: Symmetry is only be approximately applied (filling general positions only)} 另外需要注意的是, AIRSS中实现锁定对称性的方法是: 接将原子按对称性复制n份. 例如原子有\(C_4\)对称性, 则最终输出的总原子数将是设定的4倍. 但如果结合原子标签 \verb|OCC, MULT| 等的使用, 可实现在更高对称的点位安放更少原子的操作. 在含有波浪号(\(\sim\))的模式下不推荐使用\verb|MULT|等参数限制原子对称复制的个数.\\
+\midrule
+\verb|#SYMM=|\(spg\),\hspace{6em} \verb|#SYMM=|\(\sim{}spg\)& \verb|string| & off & 生成的结构必须在\(spg\)空间群中, \(spg\)是空间群的名称. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量更少的 special position 不予考虑, 在此模式下不推荐使用\verb|MULT|等参数限制原子对称复制的个数.\\
+\midrule
+\verb|#SYMMNO=|\(n\),\hspace{6em} \verb|#SYMMNO=|\(\sim{}n\) & \verb|int| & off & 生成的结构必须在第\(n\)号空间群中, \(n\)是空间群的序号. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量更少的 special position 不予考虑, 在此模式下不推荐使用\verb|MULT|等参数限制原子对称复制的个数.\\
+\midrule
 \verb|#SYMMORPHIC| & \verb|void| & off & 只检查体系是否存在点式对称操作.\\
-\midrule
-\verb|#SYMMOPS=|\(n\),\hspace{6em}\verb|#SYMMOPS=|\(\sim{}n\;\;\;\;\;\;\;\;\;\;\;\)\hspace{6em}\verb|#SYMMOPS=|\(n_{min}-n_{max}\) & \verb|int| &  off & 声明生成的结构中必须含有\(n\)种对称操作. 若体系是周期性晶体结构, 推荐从下述整数中选取: 1,2,3,4,5,6,8,12,16,24,48. 若输入中含有波浪号\(\sim\)则表明, 体系大致满足该对称性即可, 只检查体系general positions的对称性.\footnote{源代码中这样描述: Symmetry is only be approximately applied (filling general positions only)}\\
-\midrule
-\verb|#SYMM=|\(spg\),\hspace{6em} \verb|#SYMM=|\(\sim{}spg\)& \verb|string| & off & 生成的结构必须在\(spg\)空间群中, \(spg\)是空间群的名称.若输入中含有波浪号\(\sim\)则表明, 体系大致满足该对称性即可, 只检查体系general positions的对称性.\\
-\midrule
-\verb|#SYMMNO=|\(n\),\hspace{6em} \verb|#SYMMNO=|\(\sim{}n\) & \verb|int| & off & 生成的结构必须在第\(n\)号空间群中, \(n\)是空间群的序号.若输入中含有波浪号\(\sim\)则表明, 体系大致满足该对称性即可, 只检查体系general positions的对称性.\\
 \midrule
 \verb|#SGRANK=|\(n\) & \verb|int| & 230 & 设置空间群寻找/锁定的序号上限\(n\). 此值设为230时, 接受任何空间群的对称性锁定.\\
 \midrule
-\verb|#ADJGEN=|\(n\),\hspace{4em}\verb|#ADJGEN=|\(n_{min}-n_{max}\)  & \verb|int|  & 0 & 调整晶胞中使用 general positions(GP) 的个数. 该值为0时, 会强制最大程度地使用与对称相关的GP. 增大该值则将允许更多地使用 Special positions(SP) 而降低对GP的要求. 如果尝试后发现难以生成符合条件结构，则程序将动态增加该值. 关于 SP/GP 与晶体空间群的关系请参考: \href{https://en.wikipedia.org/wiki/Wyckoff_positions}{Wiki: Wyckoff Position}\\
+\verb|#ADJGEN=|\(n\),\hspace{4em}\verb|#ADJGEN=|\(n_{min}-n_{max}\)  & \verb|int|  & 0 & 调整晶胞中使用 general positions(GP) 的个数. 该值为0时, 会最大程度地使用GP点位. 增大该值则将逐渐更多地使用 Special positions(SP)点位. 如果尝试后发现难以生成符合条件结构, 则程序将动态增加该值. 关于 SP/GP 与晶体空间群的关系请参考: \href{https://en.wikipedia.org/wiki/Wyckoff_positions}{Wiki: Wyckoff Position}.\\
 \midrule
 \verb|#BREAKAMP=|\(d\) & \verb|float| & 0.0 & 在晶格矢量a方向随机移动原子破坏原有对称性, 原子分数坐标移动距离: \(d^{(frac)}_a=(random(0,1)\times{}d)^{1/3}\)\\
 \midrule
