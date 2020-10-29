@@ -6,38 +6,54 @@
 %
 
 \documentclass[a4paper, 10pt]{article}
-\usepackage{xeCJK}                        %支持中文
-\usepackage[colorlinks=true]{hyperref}    %支持超链接
+%===================== Common Set ======================
+\usepackage{xeCJK}
+\usepackage[colorlinks=true]{hyperref}
 \usepackage{amsmath}
-\usepackage{indentfirst}                  %支持首行缩进
-\setlength{\parindent}{2em}               %缩进距离
-\usepackage{float}                        %支持浮动体
-\usepackage{booktabs}                     %支持三段式表格
-\usepackage{enumerate}
+\usepackage{indentfirst}
+\setlength{\parindent}{2em}
+%===================== Table Env. ======================
+\usepackage{float}
+\usepackage{booktabs}
 \usepackage{longtable}
 \usepackage{array}
-%=================== Lstlisting代码区块支持 ====================
-\usepackage{listings}                     %支持lstlisting环境
-\usepackage{fontspec}                     %定制代码字段字体
-\usepackage{xcolor}                       %定制代码字段颜色
+%===================== List Env. =======================
+\usepackage[T1]{fontenc}
+\usepackage[charter]{mathdesign}
+\usepackage{eulervm}
+\usepackage{mathtools,enumitem,lipsum}
+\newlist{maineu}{enumerate}{1}
+\setlist[maineu]{label=\arabic*.,align=right,leftmargin=2em,itemsep=2pt}
+\newlist{subeu}{enumerate}{2}
+\setlist[subeu]{label=(\alph*),align=right,widest=i,labelsep=3pt,itemsep=0pt}
+%=============== Lstlisting Code Supp. =================
+\usepackage{listings}
+\usepackage{fontspec}
+\usepackage{xcolor}
 \definecolor{mygreen}{rgb}{0,0.6,0}
-\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mygray}{rgb}{0.93,0.93,0.93}
 \definecolor{mymauve}{rgb}{0.58,0,0.82}
-\lstset{% 
-backgroundcolor=\color{white},            %背景颜色
-basicstyle=\footnotesize\ttfamily,        %代码区段字体大小
+\definecolor{myblue}{rgb}{0.76,0.8,1}
+\lstset{%
+frame=shadowbox,
+backgroundcolor=\color{mygray},
+basicstyle=\footnotesize\ttfamily,
 columns=fixed,
-tabsize=2,                                %tab缩进空格数
-breaklines=ture,                          %自动换行
-captionpos=b,                             %sets the caption-position to bottom
-commentstyle=\color{blue},                %注释格式
-escapeinside={\%*}{*)},                   %代码内返回latex普通字体
-keywordstyle=\color{mygreen},             %关键字颜色
-otherkeywords={mkdir,rm,grep,wget,unzip},
-stringstyle=\color{mymauve}\ttfamily,     %string literal style
-frame=single,
-rulesepcolor=\color{red!20!green!20!blue!20}}
-%==============================================================
+tabsize=2,
+breaklines=ture,
+captionpos=b,
+commentstyle=\color{blue},
+escapeinside={\%*}{*)},
+keywordstyle=\color{mygreen}\bfseries,
+stringstyle=\color{mymauve}\ttfamily,
+rulesepcolor=\color{myblue},
+otherkeywords={user@machine_name\$,root@machine_name\#}
+}
+\lstdefinelanguage{bash}{%
+morekeywords={user@machine_name\$,root@machine_name\#},
+morecomment=[l]{\#},
+}
+%========================================================
 
 \title{\textbf{AIRSS说明手册}}
 \author{Yang Li\\ \href{mailto:lyang.1915@gmail.com}{lyang.1915@gmail.com}}
@@ -49,22 +65,21 @@ rulesepcolor=\color{red!20!green!20!blue!20}}
 
 \newpage
 \section{关于AIRSS}
-AIRSS(\textbf{A}b \textbf{I}nitio \textbf{R}andom \textbf{S}tructure \textbf{S}earching)是一款由英国剑桥大学 \href{https://www.mtg.msm.cam.ac.uk/People/CJP}{Chris Pickard} 教授\footnote{Chris 教授同时还参与研发过 DFT 计算软件 CASTEP.}等人开发的材料结构搜索软件. 该软件是受\href{https://en.wikipedia.org/wiki/GNU_General_Public_License}{\textbf{GPL2许可证}}保护的开源软件. 访问其官方网站, \url{https://www.mtg.msm.cam.ac.uk/Codes/AIRSS}, 便可获取 AIRSS 安装源码. 
+AIRSS(\textbf{A}b \textbf{I}nitio \textbf{R}andom \textbf{S}tructure \textbf{S}earching)是一款由英国剑桥大学 \href{https://www.mtg.msm.cam.ac.uk/People/CJP}{Chris Pickard} 教授\footnote{Chris 教授同时还参与研发过 DFT 计算软件 CASTEP.}等人开发的第一性原理结构搜索软件. 该软件是开源的, 受\href{https://en.wikipedia.org/wiki/GNU_General_Public_License}{\textbf{ GPL2 许可证}}保护. 访问其官方网站, \url{https://www.mtg.msm.cam.ac.uk/Codes/AIRSS}, 可获取安装源码. 
   
-所谓结构搜索是指, 对于一晶格结构未知的体系, 在一定的物理条件(如原子间距, 分布密度, 元素构成, 元素配比等)限制下, 广泛地猜测其结构, 而后对所得结构进行弛豫, 计算稳定构型能量, 最终得到DFT计算上全局最稳定晶格结构的过程. 显然人工手动猜测或是计算机盲目地遍历式搜寻是极为笨拙、耗时、甚至是难以实现的. 因此, 就需要使用一套成熟的结构搜索软件, 系统且巧妙地捕捉体系构型.
+所谓结构搜索是指: 对于一原子结构未知的体系, 在一定物理条件(如原子间距, 分布密度, 元素构成, 元素配比等)的限制下, 广泛地猜测其构型, 进行结构弛豫并计算其能量, 最终得到(DFT计算上的)全局最稳定原子结构的过程. 显然人工手动猜测或是计算机盲目地遍历式搜寻是极为笨拙、耗时、甚至难以实现的. 因此, 就需要使用一套成熟的结构搜索软件, 系统且巧妙地捕捉体系的稳定构型.
     
-AIRSS 正是这样一款软件. Chris 教授本人关于此软件的介绍可参见\href{https://www.youtube.com/watch?v=xW6pOYEIKVs&t=1061s}{有关视频}. 另外两个较为常用的结构搜索软件分别是: \href{http://uspex.stonybrook.edu/uspex.html}{USPEX} 和 \href{http://www.calypso.cn}{CALYPSO}.
+AIRSS 正是这样一款软件. Chris 教授本人关于此软件的介绍可参考\href{https://www.youtube.com/watch?v=xW6pOYEIKVs&t=1061s}{有关视频}. 另外还有两个较为常用的结构搜索软件: \href{http://uspex.stonybrook.edu/uspex.html}{USPEX} 和 \href{http://www.calypso.cn}{CALYPSO}.
 
-与 USPEX 或 CALYPSO 中使用的\href{https://en.wikipedia.org/wiki/Genetic_algorithm}{遗传算法}不同, AIRSS 基于完全随机的结构搜索策略. 也即, AIRSS 不同结构的产生是完全随机且独立的, 我们可以用 AIRSS 随机产生1000个结构, 而后独立弛豫. 这种随机方法的有效性在 Chris 教授关于 AIRSS 文章中有所证明\footnote{ [1] PRL 97, 045504 (2006); [2] JPCM 23, 053201 (2011)}. AIRSS 最强大之处还是在于其众多灵活的可调参数, 这可以说是AIRSS这个项目最出众的特点. 这十分类似于傻瓜相机和专业单反相机的区别. 前者简单实用, 可以一键提交任务并获得不错的结果. 后者按键众多参数可调, 但可获得各种专业且自定义极高的结果. AIRSS 可以高度自定义自己所要研究的对象, 使用 AIRSS 我们甚至可以验证结构的稳定性, 以及进行晶格表面势能的计算.
+与 USPEX 或 CALYPSO 中使用的\href{https://en.wikipedia.org/wiki/Genetic_algorithm}{遗传算法}不同, AIRSS 基于完全随机的结构搜索策略, 其产生的不同结构是完全随机且独立的, 这样的算法非常有利于搜索任务的并行实现.\footnote{比如, 我们可以用 AIRSS 随机产生1000个结构, 而后独立弛豫} 而这种随机方法的有效性在 Chris 教授关于 AIRSS 文章中也有所证明.\footnote{ [1] PRL 97, 045504 (2006); [2] JPCM 23, 053201 (2011)} AIRSS 最强大之处在于其众多灵活的可调参数, 这可以说是此项目最出众的特点. AIRSS的用户体验给人一种``傻瓜相机 vs 专业单反相机''的感觉. 前者简单实用, 可以一键提交各种不同类型的任务并获得不错的结果. 后者按键众多参数可调, 能自定义产生各种更加专业精细的结果. 前者是牺牲灵活性换取操作简易; 后者则相反. AIRSS 可以根据用户需求高度自定义研究对象的特征. 例如, 我们甚至可以使用此软件验证某个原子结构的稳定性, 或是进行晶格表面势能的计算.
 
-令人遗憾的是, AIRSS作为一个功能强大的结构搜索软件, 其官方手册相对简陋, 未能覆盖其全部用法. 再加上网络上相关说明文档或教程十分匮乏, 所以大部分人对 AIRSS 这样一个材料设计领域异常优秀的程序并不熟悉. 
+令人遗憾的是, AIRSS作为一个功能强大的结构搜索软件, 其\href{https://airss-docs.github.io/technical-reference/buildcell-manual/}{官方手册}却相对简陋, 未能覆盖全部用法. 再加上网络上相关说明文档或教程十分匮乏, 所以大部分人对 AIRSS 这样一个材料设计领域异常优秀的程序并不熟悉. 
 
-以下内容算不上指南或教程, 仅仅是学习 AIRSS 的一些记录. 本文除了一小部分内容是了借鉴软件包自带的\verb|examples|中的说明外, 其他大部分结论是自行分析源码、尝试摸索所得. 受各种因素限制, 理解和解释上的错误或不可避免. 如有问题, 还望您不吝指正.
-
+为了弥补这一缺憾, 笔者决定编写此文. 以下内容算不上指南或教程, 仅仅是学习 AIRSS 的一些记录. 本文绝大部分结论是自行分析源码、实际运行程序、尝试摸索所得.\footnote{官方虽然没有给出完整的用户手册, 但是提供了大量的使用范例, 位于程序的 example 目录中, 供使用者参考学习.} \textbf{受各种因素限制, 理解和解释上的错误或不可避免. 如有问题, 还望您不吝指正.}
 \newpage
-\section{计算前的准备}
+\section{准备工作}
 \subsection{Linux系统} 
-阅读本记录前, 需要您对Linux操作系统有一定的了解. 例如, 能理解以下指令的含义:
+阅读本记录前, 您需要对Linux操作系统有一定的了解. 例如, 能理解以下指令的含义:
 \begin{lstlisting}[language={bash}]
 user@machine_name$ ls | grep '.cell'
 \end{lstlisting}
@@ -73,15 +88,17 @@ user@machine_name$ ls | grep '.cell'
 \begin{lstlisting}[language={bash}]
 root@machine_name# rm -rf / home/user_name/trash_directory
 \end{lstlisting}
-    
-\subsection{AIRSS的安装与卸载}
-\textbf{附录}中以 \verb|airss-0.9.0| 版本为例, 简要记录了AIRSS的安装过程. 最新的 \verb|airss-0.9.1| 在安装过程上做了少许简化, 您可以自行阅读其内包含的 \verb|README| 文件, 安装此软件.
 
-AIRSS主运行脚本使用perl语言书写, 仅能安装在\verb|*nix|系统中, 且只支持在命令行(Command Line)使用. 安装此软件前, 您最好已经了解 \href{https://www.gnu.org/software/make/manual/}{GNU make} 的使用方法.
+另外需要特别提醒的是, 由于PDF文档编译时会将某些字符转化为命令行不能识别的符号(如ls \(-\)1 中的减号, 虽然他们看起来与命令号输入的减号并无不同), 所以\textbf{在直接复制粘贴本文档中的命令或字符使用时, 请加以小心}.
+
+\subsection{程序的安装与卸载}
+\hyperref[sec:airss-install]{附录A} 中以 \verb|airss-0.9.0| 版本为例, 简要记录了AIRSS的安装过程. 最新的 \verb|airss-0.9.1| 在安装过程上做了大量简化, 您可以自行阅读其内包含的 \verb|README| 文件, 安装此版本.
+
+AIRSS主运行脚本使用perl语言写成, 仅能安装在 \verb|*nix| 系统中, 且只支持在命令行(Command Line)使用. 安装此软件前, 您最好已经了解 \href{https://www.gnu.org/software/make/manual/}{GNU make} 的使用方法.
 
 \subsection{初次运行AIRSS}
 初次接触AIRSS, 您可以在终端输入 \verb|airss.pl| 指令查看软件欢迎界面.
-
+\newpage
 \begin{lstlisting}[language={bash}]
 user@machine_name$ airss.pl
 
@@ -102,13 +119,13 @@ Please cite the following:
 [1] C.J. Pickard and R.J. Needs, PRL 97, 045504 (2006)     
 [2] C.J. Pickard and R.J. Needs, JPCM 23, 053201 (2011)    
 
-Usage: airss.pl [-pressure] [-build] [-pp0] [-pp3] [-gulp] [-lammps] 
-                [-gap] [-psi4] [-cluster] [-slab] [-dos] [-workdir] 
-                [-max] [-num] [-amp] [-mode] [-minmode] [-sim] [-symm]
-                [-nosymm] [-mpinp] [-steps] [-best] [-track] [-keep] 
-                [-seed]
+Usage: airss.pl [-pressure] [-build] [-pp0] [-pp3] [-gulp] 
+                [-lammps] [-gap] [-psi4] [-cluster] [-slab] 
+                [-dos] [-workdir] [-max] [-num] [-amp] [-mode] 
+                [-minmode] [-sim] [-symm] [-nosymm] [-mpinp] 
+                [-steps] [-best] [-track] [-keep] [-seed]
   -pressure f  Pressure (0.0)
-  -build       Build structures only (false)
+  -build       Build str. only (false)
   -pp0         Use pair potentials rather than Castep (0D) (false)
   -pp3         Use pair potentials rather than Castep (3D) (false)
   -gulp        Use gulp rather than Castep (false)
@@ -120,7 +137,7 @@ Usage: airss.pl [-pressure] [-build] [-pp0] [-pp3] [-gulp] [-lammps]
   -slab        Use slab settings (false)
   -dos         Calculate DOS at Ef (false)
   -workdir  s  Work directory ('.')
-  -max      n  Maximum number of structures (1000000)
+  -max      n  Maximum number of str. (1000000)
   -num      n  Number of trials (0)
   -amp      f  Amplitude of move (-1.5)
   -mode        Choose moves based on low lying vmodes (false)
@@ -137,48 +154,46 @@ Usage: airss.pl [-pressure] [-build] [-pp0] [-pp3] [-gulp] [-lammps]
 user@machine_name$
 \end{lstlisting}
 
-\verb|airss.pl| 是使用AIRSS执行结构搜索的主要指令. 欢迎界面中已经系统且简要地说明了该指令的用法. 用法解释中的表格有三列. 第一列是传入参数的调用名称; 第二列是传入参数的数据类型, \verb|f|代表浮点数, \verb|n|代表整数, \verb|s|代表字符串, ``空''代表逻辑字符串 \verb!true,false!. 第三列是对此参数的详细解释.
+\verb|airss.pl| 是使用AIRSS执行结构搜索的主要指令. 欢迎界面中已经系统且简要地说明了该指令的用法. 用法解释中的表格有三列. 第一列是传入参数的名称; 第二列是传入参数的数据类型, \verb|f|代表浮点数, \verb|n|代表整数, \verb|s|代表字符串, ``空''代表逻辑字符串 \verb!true! 或 \verb!false!. 第三列是对相应参数的简单描述.
 
 \newpage
-\section{随机结构的生成}
-在使用AIRSS预测结构时, 一般需要准备一个 \verb|*.cell| 的文件. 如果要使用 AIRSS 自带的 \verb|pp3| 计算模块还需要准备一个名为 \verb|*.pp| 文件.
+\section{自定义随机结构}
+AIRSS 的核心组件名为 \textbf{buildcell}. 这个组件的作用就是依据用户给出的 *.cell 文件, 生成一系列结构的随机但符合给定物理条件约束的初始原子构型. 另外, 我们也可以单独拿出此模块, 使其与其他程序(如 VASP 等)适配. 学会书写出高度自定义化的 *.cell 文件是学习 AIRSS 的根本.\\
 
-官方推荐AIRSS结合CASTEP使用, 且构建了 AIRSS 和 CASTEP 较为完善的接口. 使用AIRSS联合CASTEP计算时需要准备两种输入文件: \verb|*.cell| 文件与 \verb|*.param| (与VASP中的INCAR类似)文件. 前者用于确定材料结构(包括实空间与倒空间), 后者用于设置CASTEP计算过程中需要使用的配置参数(截断能, 交换关联函等).
 
-AIRSS 的核心组件名为 \verb|buildcell|. 顾名思义, 这个组件的作用就是依据用户给出的 \verb|*.cell| 文件, 生成一系列结构的随机但符合给定物理条件约束的初始原子结构. 如此一来学习 AIRSS 的根本, 就落在了学习如何书写高度自定义化的 \verb|*.cell| 文件上.
-
-\verb|buildcell|区块的执行大致分为以下几步:
-\begin{enumerate}[-i-]
-  \item 通过 \verb|cell.f90| 模块读取 \verb|*.cell| 文件中的配置信息.
-  \item 通过 \verb|build.f90| 模块生成满足要求的结构.
-  \item 首先根据给定的原子及其半径确定合理的晶格常数, 若存在晶格标签\footnote{如果您感觉对这一部分的概念并不熟悉, 可以先跳过本段, 更详细的介绍会在后文中展现.} \verb|#FIX| 则忽略此步骤.
-  \item 依次按要求生成随机的原子新位置.
-  \item 根据约束选择接收这一位置, 拒绝这一位置, 或者\textbf{PUSH}当前原子. \textbf{PUSH}是指: 当两原子位置过近时, 强行将两原子在其连线方向反向移开相同距离的操作. 当原子标签中有 \verb|FIX| 或 \verb|NOMOVE| 时, 忽略这一操作.
-  \item 遍历体系中的全部原子, 直至更新完整个结构.
-  \item 视用户设置, 用唯象的对势(pp3)对结构进行简单弛豫.
-  \item 通过 \verb|buildcell.f90| 模块输出上述满足要求的随机结构.
-  \end{enumerate}
-
+\noindent\fcolorbox{mygray}[HTML]{EEEEFF}{\parbox{\textwidth}{%
+\noindent \textbf{buildcell 区块的执行大致分为以下几步:}
+\begin{maineu}
+\item 通过 cell.f90 模块读取 *.cell 文件中的配置信息.
+\item 通过 build.f90, opt.f90 等模块生成满足要求的结构. 
+  \begin{subeu}
+    \item 首先根据给定的原子及其半径确定合理的晶格常数, 若存在晶格标签\footnote{如果您感觉对这一部分的概念并不熟悉, 可以先跳过本段, 更详细的介绍会在后文中展现.} \#FIX 则忽略此步骤.
+    \item 按要求在随机位置生成某个原子.
+    \item 根据约束选择: 接受这一位置, 拒绝这一位置, 或者\textbf{PUSH}当前原子. \textbf{PUSH}是指: 将原子位置过近的两原子在其连线方向上, 反向移开相同距离. 当原子标签中有 FIX 或 NOMOVE 时, 忽略这一操作.
+    \item 遍历体系中的全部原子, 直至更新完整个结构.
+    \item 视用户设置, 用唯象的对势(pp3)对结构进行简单弛豫.
+  \end{subeu}
+\item 通过 buildcell.f90 模块输出上述满足要求的随机结构.
+\end{maineu}}}
 
 \subsection{*.cell文件结构概括}
-下面大体概括一下\verb|*.cell|文件的基本结构. 
+*.cell文件是结构搜索的``种子文件'', 您可以在此文件中设置搜索约束条件. 文件名称前的星号(*)代表是Linux系统下的通配符, 也即它代表任意字符. 在AIRSS文件系统中, 我们把后缀名前的部分称为 ``seed name''. Seed name 可用于区分不同计算的同类文件. 文中后续见到所有通配符, 如果不特殊指明, 均代指 seed name.
 
-\verb|*.cell|文件相当于结构搜索的种子文件, 您可以在此文件中设置搜索约束条件.
+\noindent\fcolorbox{mygray}[HTML]{EEEEFF}{\parbox{\textwidth}{%
+\noindent \textbf{*.cell 文件有以下特点:}
+\begin{maineu}
+\item 由于 AIRSS 是由部分参与 CASTEP 研发的人员编写, 因此该程序对 CASTEP 极其友好, 这里的 *.cell 文件与 CASTEP 中的 *.cell 文件完全兼容.
+\item *.cell 文件设置参数时, 需要使用一定的 keywords 标明所设参数的含义.
+\item AIRSS完全复用了CASTEP中进行结构声明的 keywords, 如 LATTICE\_CART 等.
+\item AIRSS 内置的 keywords 一般以\#开头, 如\#RASH. (以使得 AIRSS 的 *.cell 文件与 CASTEP 完全兼容)
+\item *.cell 文件主要由两部分组成: ``结构数据''和``全局参数''. 相应的, 文件中的 keywords 也可以分为上述两类.
+\item 任何 keyword 之间没有书写顺序上的限制.
+\item *.cell 中设定的所有的keywords需要采用\textbf{大写字母}书写, 并注意在keywords、等号和参数数值之间\textbf{不能添加空格}. 同时, 任何空行都将被自动忽略.
+\item 该文件中使用双井号(\#\#)标明注释内容.
+\item 虽然程序允许单行中出现多个 keywords, 但出于对所写文件的规范性和易读性考虑, 最好一行只写一个 keyword.
+\end{maineu}}}\\
 
-该文件有以下特点:
-\begin{enumerate}[(1)]
-\item 由于AIRSS就是部分参与CASTEP研发的人员编写的程序,因此该程序对CASTEP极其友好, 这里的\verb|*.cell|文件与CASTEP中的\verb|*.cell|文件完全兼容.
-\item \verb|*.cell|文件设置参数时, 需要使用一定的 keywords 标明所设参数的含义.
-\item AIRSS完全复用了CASTEP中进行结构声明的 keywords, 如 \verb|LATTICE_CART| 等.
-\item AIRSS的核心部分是\verb|buildcell|模块, 可以单独拿出此模块, 使其与其他程序, 如VASP, 适配.
-\item AIRSS 识别的 keywords 一般以\verb|#|开头, 如\verb|#RASH|. (以使得 AIRSS 的 \verb|*.cell| 文件与 CASTEP 完全兼容)
-\item \verb|*.cell|文件主要由两部分组成: ``结构数据''和``全局参数''. 相应的, \verb|*.cell|中的keywords也可以分为上述两类.
-\item ``结构数据'' 和``全局参数'' 没有书写顺序上的限制.
-\item 该文件使用双井号(\verb|##|)标明注释内容.
-\item \verb|*.cell|中设定的所有的keywords需要采用\textbf{大写字母}书写, 并注意书写 keyword 时在等号和参数数值之间\textbf{不能添加空格}. 同时, 任何空行都将被自动忽略.
-\item 文件的同一行中最好只书写一个 keywords.
-\end{enumerate}
-
+\vspace{4em}
 以下是预测金属铝结构所用到的 \verb|Al.cell| 文件:
 \begin{lstlisting}[language={bash},numbers=left,firstnumber=0]
 user@machine_name$ cat Al.cell
@@ -196,17 +211,19 @@ Al 0.0 0.0 0.0 # Al1 % NUM=8
 user@machine_name$
 \end{lstlisting}
 
-上述\verb|*.cell|文件的结构可做如下概括:
-\begin{itemize}
-  \item 前9行是由 \verb|%BLOCK [keywords]| 格式定义的数据读取区块, 这种格式在CASTEP中是十分常见的. 这些区块定义了晶体基本的\textbf{结构数据}.   
-  \item 1至5行数据的 \verb|[keywords]| 是 \verb|LATTICE_CART|, 声明使用笛卡尔绝对坐标系定义的单胞基矢. 
-  \item 7至9行使用的\verb|[keywords]|是 \verb|POSITIONS_FRAC|. 这在CASTEP中的意义是``以分数坐标定义的原子位置''. 而在AIRSS中, 该数据模块不仅可以锁定原子位置, 还可以定义搜寻过程中对单种原子的约束条件. 具体细节将在之后给出. 
-  \item 第11行的 \verb|#MINSEP| 是只在AIRSS结构搜索种子文件中有效的\textbf{全局参数}.
-  \verb|#MINSEP=|\(1.5\)表明了两原子间距不得低于\(1.5\) \r{A}.
-\end{itemize}
+
+\noindent\fcolorbox{mygray}[HTML]{EEEEFF}{\parbox{\textwidth}{%
+\noindent \textbf{上述 *.cell 文件的结构可做如下概括:}
+\begin{maineu}
+  \item 前9行是由 \%BLOCK [keywords] 格式定义的数据读取区块, 这种格式在CASTEP中是十分常见的. 这些区块定义了晶体基本的\textbf{结构数据}.   
+  \item 1至5行数据的 [keywords] 是 LATTICE\_CART, 声明使用笛卡尔绝对坐标系定义的单胞基矢. 
+  \item 7至9行使用的[keywords]是 POSITIONS\_FRAC. 这在CASTEP中的意义是``以分数坐标定义的原子位置''. 而在AIRSS中, 该数据模块不仅可以指明原子初始位置, 还可以定义搜寻过程中对单种原子的约束条件. 若初始不知道原子的具体位置, 可将其设为任意值, 如(0, 0, 0), 程序将自行找到符合要求的原子位置. 原子位置设置的更具体细节将在之后给出. 
+  \item 第11行的 \#MINSEP 是 AIRSS 中的\textbf{全局参数}.
+  \#MINSEP=\(1.5\)表明了任意两原子的间距不得低于\(1.5\) \r{A}.
+\end{maineu}}}\\
 
 
-可以看到, \verb|*.cell|文件的结构大致分为两大部分:\textbf{结构数据}和\textbf{全局参数}.
+可以看到, *.cell文件的结构大致分为两大部分:\textbf{结构数据}和\textbf{全局参数}.
 
 \subsection{*.cell文件参数细节}
 \subsubsection{结构数据}
@@ -240,7 +257,7 @@ user@machine_name$
 \midrule \multicolumn{2}{r}{\textit{Continued on next page...}} \\
 \endfoot
 \endlastfoot 
-\verb|LATTICE_CART|  & 使用笛卡尔坐标系, 以一个\(3\times3\)的矩阵定义\textbf{单胞}基矢. 通过在该区块中附加以下标签: \verb|#FIX,|\verb|#CFIX,|\verb|#ABFIX|, 可分别实现: 固定整个晶格形状, 固定晶格常数c, 固定晶格常数ab. 另外, 再次强调, 如果要确保晶格参数不变, 除了在晶格参数结构数据加入\verb|#FIX|, 以保证在猜测晶格结构时保持其为常值外, 还需要在DFT弛豫软件中做相应的设置, 以保证其在结构弛豫时也不变.\\
+\verb|LATTICE_CART|  & 使用笛卡尔坐标系, 以一个\(3\times3\)的矩阵定义\textbf{单胞}基矢. 通过在该区块中附加以下标签: \verb|#FIX,|\verb|#CFIX,|\verb|#ABFIX|, 可分别实现: 固定整个晶格形状, 固定晶格常数c, 固定晶格常数ab. 另外, 需要强调的是, 如果要确保晶格参数不变, 除了在晶格参数数据区块中加入\verb|#FIX|, 以保证在猜测晶格结构时保持其为常值外, 还需要在DFT弛豫软件中做相应的设置, 以保证其在结构弛豫时也不变.\\
 \midrule
 \verb|LATTICE_ABC| & 以一个\(2\times3\)的矩阵定义单胞的晶格参数.矩阵第一行是参数abc, 第二行是三个夹角. 在同一个\verb|.cell|中, 与\verb|LATTICE_CART|二选一即可. 通过在该区块中附加以下标签: \verb|#FIX,|\verb|#CFIX,|\verb|#ABFIX|, 可分别实现: 固定整个晶格形状, 固定晶格常数c, 固定晶格常数ab.\\
 \midrule
@@ -270,7 +287,7 @@ user@machine_name$
 
 它声明了晶格常数在搜寻(生成初始随机结构)过程中是不能改变的. 如果您想保证体系晶格常数在进行DFT弛豫时也不变, 则需要在相应计算软件的输入文件中设置.
 
-\paragraph{原子位置} 下面再介绍原子位置的设置方法, 以\verb|POSITIONS_FRAC|为例.\\
+\paragraph{原子位置} 再介绍原子位置的设置方法, 以\verb|POSITIONS_FRAC|为例.\\
 \emph{例2.}
 \hypertarget{Aotic Package}{\ }
 \begin{lstlisting}[language={bash},numbers=left]
@@ -290,18 +307,19 @@ H   0.0 0.0 0.0 # H-set % ANGAMP=0 POSAMP=0
 [element] [x] [y] [z] # [atoms_set_name] % [tag1] [tag2] [tag3]
 \end{lstlisting}
 
-每一行内部的元素含义如下: 
-\begin{itemize}
-  \item 第一项是元素名称, 如果将元素名称设置为Z, 则表示此原子是个空位, 空位与真实原子一样具有体积和PUSH属性, 但不会在最终结果中输出.
+\noindent\fcolorbox{mygray}[HTML]{EEEEFF}{\parbox{\textwidth}{%
+\noindent \textbf{每一行内部的元素含义如下: }
+\begin{maineu}
+  \item 第一项是元素名称, 如果\textbf{将元素名称设置为Z}, 则表示此原子是个空位, 空位与真实原子一样具有体积和PUSH属性, 但不会在最终结果中输出.
   \item 二三四项是原子位置坐标.
-  \item 井号(\verb|#|)后的第一项是原子所在原子集的名称, 原子集名称可以被设置成任意字符. 原子集可以由多个原子构成, 他们是结构搜索中的一个基本单元. \textbf{原子集名称相同的原子组成一个原子集, 同一个原子集中的原子做相同的随机移动, 且不受PUSH影响}. 如无特殊需求, 为了实现自由度相对最大化, 一般不推荐将不同原子放入同一原子集中.
-  \item 百分号(\verb|%|)之后的内容都是\textbf{原子标签}(Atom Tags), 他们指定了该原子应该满足的若干约束条件.
-\end{itemize}
+  \item 井号(\#)后的第一项是原子所在原子集的名称, 原子集名称可以被设置成任意字符. \textbf{原子集名称相同的原子组成一个原子集, 原子集是由一个或多个原子构成的基本结构单元, 同一个原子集中的原子做相同的随机移动, 且不受PUSH影响}. 如无特殊需求, 为了实现自由度相对最大化, 一般不推荐将不同原子放入同一原子集中.
+  \item 百分号(\%)之后的内容都是\textbf{原子标签}(Atom Tags). 同一行原子可以指定多个原子标签, 中间用空格隔开, 他们共同指定了该原子应该满足的若干约束条件.
+\end{maineu}}}\\
 
 \textbf{Table \ref{AIRSS_Atom_Tag}} 是AIRSS中全部可用的原子标签的具体说明.
 
 \begin{center}
-\begin{longtable}{m{9em}|m{4em}<{\centering}|m{3em}<{\centering}|m{15em}}
+\begin{longtable}{m{10em}|m{4em}<{\centering}|m{3em}<{\centering}|m{15em}}
 \caption{AIRSS Cheat Sheet -- Atom Tags (distance in \r{A})}
 \label{AIRSS_Atom_Tag}\\
 \toprule
@@ -318,7 +336,7 @@ H   0.0 0.0 0.0 # H-set % ANGAMP=0 POSAMP=0
 \midrule \multicolumn{4}{r}{\textit{Continued on next page...}} \\
 \endfoot
 \endlastfoot
-\verb|NUM=|\(n\),\hspace{4em} \verb|NUM=|\(n_{min}-n_{max}\) & \verb|int| & 1 & 定义该行原子实际代表的原子个数. 使用 \verb|NUM| 定义的重复原子会被逐个单独分配到不同的\textbf{原子集}中.\\
+\verb|NUM=|\(n\)\hspace{4em} \verb|NUM=|\(n_{min}-n_{max}\) & \verb|int| & 1 & 定义该行原子实际代表的原子个数. 使用 \verb|NUM| 定义的重复原子会被逐个单独分配到不同的\textbf{原子集}中.\\
 \midrule
 \verb|POSAMP=|\(d\)& \verb|float| & -1.0 & 定义该行原子在结构搜索过程中, 能偏离初始位置的最大距离. 若为负值则无限制.\\
 \midrule
@@ -342,9 +360,9 @@ H   0.0 0.0 0.0 # H-set % ANGAMP=0 POSAMP=0
 \midrule
 \verb|NN=|\(\pm{}elm\)  & \verb|string| & null & 规定原子最近邻元素种类, `\(+\)'代表必须近邻该元素, `\(-\)'代表不能近邻该元素. 一个原子只能指定一种元素近邻或不近邻(NN参数仅会被读入一次). 若为空, 则表示无限制\\
 \midrule
-\verb|OCC=|\(p\) & \verb|float| \([0,1]\) & 1.0 & 该点位占据原子的几率, 同种元素在不同位置的占据几率之和必须为大于0的整数. 接收分数形式的输入, 如 OCC=1/3. 若该值设为小于0的数, 则强行将该原子的OCC设置为1, 同时不再输出该原子可能因对称性衍生的其他原子位置. 若原子同时有 \verb|FIX| 或 \verb|NOMOVE| 标签, 则 \verb|OCC| 强制设为1. 若该原子OCC大于1, 则将其设置为空位(与将元素名称设为Z的效果相同). 系统存在对称性时, 使用更小的\verb|OCC|可强制某一原子位于对称性更高的点位上. 但更为自然的用法是使用 \verb|MULT| 代替 \verb|OCC| 设置. 若设置了全局参数\verb|#NFORM=n|(n大于0): 在没有对称性条件下, \verb|OCC| 参数失效; 在有对称性条件下, 请参考 \verb|MULT| 中的说明. \\
+\verb|OCC=|\(p\) & \verb|float| \([0,1]\) & 1.0 & 该点位占据原子的几率, 同种元素在不同位置的占据几率之和必须为大于0的整数. 接收分数形式的输入, 如 \verb|OCC=1/3|. 若该值设为小于0的数, 则强行将该原子的OCC设置为1, 同时不再输出该原子可能因对称性衍生的其他原子位置. 若原子同时有 \verb|FIX| 或 \verb|NOMOVE| 标签, 则 \verb|OCC| 强制设为1. 若该原子OCC大于1, 则将其设置为空位(与将元素名称设为Z的效果相同). 系统存在对称性时, 使用更小的 OCC 可强制某一原子位于对称性更高的点位上. 但更为自然的用法是使用 \verb|MULT| 代替 \verb|OCC| 设置. 若设置了全局参数\verb|#NFORM=n|(n大于0): 在没有对称性条件下, \verb|OCC| 参数失效; 在有对称性条件下, 请参考 \verb|MULT| 中的说明. \\
 \midrule
-\verb|MULT=|\(m\) & \verb|float| & -1.0 & 设置该原子点位的 multiplicities. 这一数值为正时, 强制将 \verb|OCC| 参数的值覆盖为 MULT/SYMM\_NUM. 其中 SYMM\_NUM 为晶格对称操作的个数. 若设置了全局参数\verb|#NFORM=n|(n大于0), 则等效于将所有原子的 \verb|MULT| 的值设为\(n\), 同时不设置\verb|#NFORM=|. 若该行原子同时有标签\verb|FIX/NOMOVE|, 则强制将该原子的MULT设为-1. 使用这一参数, 可以限制某一行原子由晶体对称性实际生成原子的个数. 关于格点 multiplicities 与对称性的关系可参见 \href{https://www.cryst.ehu.es/cryst/get_set.html}{BCS: Wyckoff Position}.\\
+\verb|MULT=|\(m\) & \verb|float| & -1.0 & 设置该原子点位的 multiplicities. 这一数值为正时, 强制将 \verb|OCC| 参数的值覆盖为 MULT/SYMM\_NUM. 其中 SYMM\_NUM 为晶格对称群元的个数. 若设置了全局参数\verb|#NFORM=n|(n大于0), 则等效于将所有原子的 \verb|MULT| 的值设为\(n\), 同时不设置\verb|#NFORM=|. 若该行原子有标签 \verb|FIX| 或 \verb|NOMOVE|, 则强制将该原子的MULT设为-1. 使用这一参数, 可以限制某一行原子由晶体对称性实际生成原子的个数, 以及所处位置对称性的高低. 关于格点 multiplicities 与对称性的关系可参考 \href{https://www.cryst.ehu.es/cryst/get_set.html}{BCS: Wyckoff Position}.\\
 \midrule
 \verb|PERM| & \verb|void| & off & 在完成原子位置选定后, 重排(按一定概率互相交换)指定原子位置间的元素种类. 需要配合全局参数 \verb|#PERMUTE| 使用, 否则该参数将被关闭.\\
 \midrule
@@ -357,12 +375,24 @@ H   0.0 0.0 0.0 # H-set % ANGAMP=0 POSAMP=0
 
 \subsubsection{全局参数}
 
-全局参数是 \verb|*.cell| 文件中指明结构搜索过程中应遵守的条件的语句.  AIRSS中的全局参数均以\verb|#|开头, 对体系中晶格以及全部的原子作用. 另外, 有些全局参数有和原子标签有相同的作用, 此时, 原子标签设置的优先级要高于全局参数.
+结构搜索过程中整个体系应遵守的条件由全局参数指定.  AIRSS中的全局参数均以井号（\verb|#|）开头, 对体系中晶格以及全部的原子作用. 另外, 有些全局参数和原子标签有相同的作用, 此时, 原子标签设置的优先级要高于全局参数.\\
 
-全部可用的全局参数的详细使用方法和功能如\textbf{Table \ref{AIRSS_Cheat_Sheet_Pragma}} 所示.
+\noindent\fcolorbox{mygray}[HTML]{EEEEFF}{\parbox{\textwidth}{%
+\noindent \textbf{全局参数目前覆盖的功能大致可以分为以下几类:}
+\begin{maineu}
+  \item \textbf{对晶胞参数的约束.} 比如固定初始晶胞, 约束晶胞体系, 约束晶胞变化程度, 约束晶胞所在晶系, 为晶胞添加真空层等.
+  \item \textbf{对体系化学式的要求.} 比如体系是几元的, 电子是否能配平(是否有悬挂键)等.
+  \item \textbf{对原子位置的约束.} 如两原子之间的最短距离, 某个原子偏离初始位置的最大/最小距离, 某原子的配位数等. 
+  \item \textbf{对体系对称性的约束.} 如体系有几个对称操作, 在什么空间群, 对称性寻找的精细程度, 是否引入破坏对称性扰动等.
+  \item \textbf{对程序本身搜索算法的调整.} 如, 接受搜索失败次数上限, 是否引入PSUH, 是否引入TPSD, 是否引入RASH等.
+  \item (不太常用的) 在晶体中加入一个覆盖整个晶胞的力场. 如, 加入一个球形力场, 椭球力场, 长条状力场, 平面力场等.
+\end{maineu}}}\\
+
+
+AIRSS中全部可用的全局参数的功能和详细使用方法如\textbf{Table \ref{AIRSS_Cheat_Sheet_Pragma}} 所示.
 
 \begin{center}
-\begin{longtable}{m{10em}|m{4em}<{\centering}|m{3em}<{\centering}|m{15em}}
+\begin{longtable}{m{11em}|m{4em}<{\centering}|m{3em}<{\centering}|m{15em}}
 \caption{AIRSS Cheat Sheet -- Global Pragma (distance in \r{A})}
 \label{AIRSS_Cheat_Sheet_Pragma} \\ 
 \toprule
@@ -379,9 +409,9 @@ H   0.0 0.0 0.0 # H-set % ANGAMP=0 POSAMP=0
 \midrule \multicolumn{4}{r}{\textit{Continued on next page...}} \\
 \endfoot
 \endlastfoot
-\verb|#CELLCON=|\(a\;b\;c\;\alpha\;\beta\;\gamma\) & \verb|int| & off &定义晶胞应满足的条件, \(a,b,c\)是晶格常数, \(\alpha,\beta,\gamma\)是三个晶角. 晶格常数可选填的值有\(\{0,-1\}\), 晶角可选填的值有\(\{0,-1, \theta\}\). \(0\)表示无约束, \(-1\)表示相等. 如 \verb|#CELLCON=-1-1 -1 90 90 90| 表示立方晶系.\\
+\verb|#CELLCON=|\(a\;b\;c\;\alpha\;\beta\;\gamma\) & \verb|int| & off &定义晶胞应满足的条件: \(a,b,c\)是晶格常数; \(\alpha,\beta,\gamma\)是三个晶角. 晶格常数可选填的值有\(\{0,-1\}\), 晶角可选填的值有\(\{0,-1, \theta\}\). \(0\)表示无约束, \(-1\)表示相等. 如 \verb|#CELLCON=-1-1 -1 90 90 90| 表示立方晶系.\\
 \midrule
-\verb|#SYSTEM=|\(crs\) & \verb|string| & off & 设置结构所在的晶系, 可选的输入有 [Tric, Mono, Hexa, Rhom(/Trig), Orth, Tetr, Cubi]. 该参数实际为 \verb|'#CELLCON='| 参数的若干特殊组合.\\
+\verb|#SYSTEM=|\(sys\) & \verb|string| & off & 设置结构所在的晶系, 可选的输入有 [Tric, Mono, Hexa, Rhom(/Trig), Orth, Tetr, Cubi]. 该参数实际为 \verb|'#CELLCON='| 参数的若干特殊组合.\\
 \midrule
 \verb|#CONS=|\(p\) & \verb|float| \((0,1]\) & 0.4 & 约束单胞边长. 接近0表示完全没有约束, 等于1表示尽一切可能约束晶胞abc三边等长.\\
 \midrule
@@ -393,7 +423,7 @@ H   0.0 0.0 0.0 # H-set % ANGAMP=0 POSAMP=0
 \midrule
 \verb|#NFORM=|\(n\) & \verb|int| & -1 & 声明单胞中实际存在的原子个数是的 \verb|%BLOCK POSITIONS_*| 或 \verb|#SPECIES| 中定义的\(n\)倍. 该选项不可与 \verb|#NATOM| 联用. 若为负值则此参数被关闭.\\
 \midrule
-\verb|#SUPERCELL=|\(n\), \verb|#SUPERCELL=|\(n_a\;n_b\;n_c,\;\;\;\;\;\;\) \hspace{2em}\verb|#SUPERCELL=|\(a_x\; a_y\;a_z\;b_x\)\hspace{2em} \(b_y\;b_z\;c_x\;c_y\;c_z\) & \verb|int| & off & 定义超胞的尺寸. 可以使用超胞中单胞的的个数\(n\), 超胞晶格基矢在三个方向的数值\(n_a\;n_b\;n_c\), 或是超胞与单胞晶格基矢之间的变换矩阵\(a_x\;a_y\;a_z\;b_x\;b_y\;b_z\;c_x\;c_y\;c_z\)定义新的超胞. 超胞的构建策略是: 首先用单胞构建符合条件的原子构型, 而后根据复制粘贴得到超胞.\\
+\verb|#SUPERCELL=|\(n\) \verb|#SUPERCELL=|\(n_a\;n_b\;n_c\;\;\;\;\;\;\) \hspace{2em}\verb|#SUPERCELL=|\(a_x\; a_y\;a_z\;\)\hspace{2em} \(b_x\;b_y\;b_z\;c_x\;c_y\;c_z\) & \verb|int| & off & 定义超胞的尺寸. 可以使用超胞中单胞的的个数\(n\), 超胞晶格基矢在三个方向的数值\(n_a\;n_b\;n_c\), 或是超胞与单胞晶格基矢之间的变换矩阵\([[a_x,a_y,a_z],[b_x,b_y,b_z],[c_x,c_y,c_z]]\)定义新的超胞. 超胞的构建策略是: 首先用单胞构建符合条件的原子构型, 而后根据扩胞参数复制粘贴得到超胞后直接输出.\\
 \midrule
 \verb|#SLAB| & \verb|void| & off & 声明该结构是一个二维平面结构, 取超胞时将不再向c方向扩胞, 同时检查结构对称性时也将忽略c方向.\\
 \midrule
@@ -405,7 +435,7 @@ H   0.0 0.0 0.0 # H-set % ANGAMP=0 POSAMP=0
 \midrule
 \verb|#FOCUS=|\(n\) & \verb|int| & 0 & 约束最终结构必须是\(n\)组分的(由\(n\)种不同的元素构成). 该参数一般用于变组分分析. 小于等于0表示无约束.\\
 \midrule
-\verb|#OCTET|& \verb|void| & off & 检查化学配比是否电子配平(全部电子数是否可以被8整除). 默认关闭.\\
+\verb|#OCTET|& \verb|void| & off & 检查化学配比是否电子配平(全部电子数是否可以被8整除).\\
 \midrule
 \verb|#POSAMP=|\(d\) & \verb|float|  & -1.0 & 与原子标签中的定义相同, 结构搜索中原子偏离初始点的最大位置. 负值为无限制.\\
 \midrule
@@ -423,19 +453,19 @@ H   0.0 0.0 0.0 # H-set % ANGAMP=0 POSAMP=0
 \midrule
 \verb|#MAXBANGLE=|\(\theta\) & \verb|float| \((0,360]\) & 180.0 &设置搜索结构中, 原子键角的最大值.\\
 \midrule
-\verb|#MINSEP=|\(d\) \verb|#MINSEP=|\(d\;\)\verb|X-X=|\(d_{X−X}\;\)\ \ \  \ \verb|X-Y=|\(d_{X−Y}\;...\) & \verb|float| & 0.0 & 两原子间最小距离, 也可以用来定义两原子距离固定是多少. 比如 \verb|#MINSEP=2.0 Li-Li=2.6 Ge-Ge=2.51|\\
+\verb|#MINSEP=|\(d\) \verb|#MINSEP=|\(d\;\)\verb|X-X=|\(d_{X−X}\;\)\ \ \  \ \verb|X-Y=|\(d_{X−Y}\;...\) & \verb|float| & 0.0 & 两原子间最小距离, 也可以用来定义两原子距离固定是多少. 比如 \verb|#MINSEP=| \verb|2.0 Li-Li=2.6 Ge-Ge=2.51|\\
 \midrule
 \verb|#RAD=|\(d\)& \verb|float|  & 0.0 & 与原子标签中的定义相同, 定义原子的半径大小.\\
 \midrule
 \verb|#COORD=|\(n\)& \verb|int| & -1 & 与原子标签中的定义相同, 设置原子的配位数限制. 负值为无限制.\\
 \midrule
-\verb|#SPIN=|\(S_{total}\;S_{abs},\;\;\;\;\;\;\) \verb|#SPIN=|\(S_{total}\;S_{abs}\) \verb|"|elm\(_1\) elm\(_2\)... \verb|"| & \verb|float|,  \verb|string|& off & 随机设置体系每个原子上共线自旋的取值. 并要求, 指定原子自旋值的和/原子数 = \(S_{total}\), 指定原子自旋值绝对值的和/原子数 = \(S_{abs}\), 未被指定的原子自旋保持为0. 可以用被双引号包裹的带空格的元素符号指明哪些是指定原子. 若未指定任何原子, 则默认所有原子都是指定原子. 例如 \verb|#SPIN=0 5 "Fe Co "| 或者 \verb|#SPIN=1 4| \\
+\verb|#SPIN=|\(S_{real}\;S_{mod}\;\;\;\;\;\;\) \verb|#SPIN=|\(S_{real}\;S_{mod}\;\;\;\;\;\) \verb|"|elm\(_1\) elm\(_2\)... \verb|"| & \verb|float|,  \verb|string|& off & 随机设置体系每个原子上共线自旋的取值. 并要求 \(S_{t,real}\)/\(N_{ions}\) = \(S_{real}\), \(S_{t,mod}\)/\(N_{ions}\) = \(S_{mod}\), 其中\(S_{t,real}\)是全部指定原子自旋的和, \(S_{t,mod}\)是全部指定原子自旋绝对值的和. 未被指定的原子自旋保持为0. 可以用被双引号包裹的带空格的元素符号指明哪些是指定原子. 若未指定任何原子, 则默认所有原子都是指定原子. 例如 \verb|#SPIN=0 5 "Fe Co "| 或者 \verb|#SPIN=1 4| \\
 \midrule
-\verb|#SPECIES=|\(elm_1\%tags_1,\) \(elm_2\%tags_2,...\;\;\;\;\;\;\) \verb|#SPECIES=|\(elm_1,elm_2...\) & \verb|string|  & off & 使用简化记号定义体系原子组分. 例如, \verb|#SPECIES=Si|\verb|%NUM=1| \verb|COORD=2, |\verb|O%NUM=2|. 该参数不能与\verb|BLOCK POSITIIONS_*|同时出现.\\
+\verb|#SPECIES=|\(elm_1\%tags_1,\) \(elm_2\%tags_2,...\;\;\;\;\;\;\) \verb|#SPECIES=|\(elm_1,elm_2...\) & \verb|string|  & off & 使用简化记号定义体系原子组分. 例如, \verb|#SPECIES=Si|\verb|%NUM=1| \verb|COORD=2,|\verb|O%NUM=2|. 该参数不能与\verb|BLOCK POSITIIONS_*|同时出现.\\
 \midrule
-\verb|#NATOM=|\(n\), \hspace{6em}\verb|#NATOM=|\(n_{min}-n_{max}\)  & 0 & \verb|int| & 与 \verb|#SPECIES| 联用, 定义单胞中总原子数, 一般用于变组分分析(变胞预测). 且使用此全局参数会使 \verb|#SPECIES| 指令包含的\verb|%|后的原子标签全部失效. \footnote{详细原因请参见源码``airss-0.9.1/src/buildcell/src/cell.f90''第493行与514行区别.} 若 \verb|#SPECIES| 中含有多中元素, 则每种元素随机数目, 保持总和为NATOM. 该参数设为0时自动失效.\\
+\verb|#NATOM=|\(n\) \hspace{6em}\verb|#NATOM=|\(n_{min}-n_{max}\)  & 0 & \verb|int| & 与 \verb|#SPECIES| 联用, 定义单胞中总原子数, 一般用于变组分分析(变胞预测). 且使用此全局参数会使 \verb|#SPECIES| 指令包含的\verb|%|后的原子标签全部失效. \footnote{详细原因请参见源码``airss-0.9.1/src/buildcell/src/cell.f90''第493行与514行区别.} 若 \verb|#SPECIES| 中含有多中元素, 则每种元素随机数目, 保持总和为NATOM. 该参数设为0时自动失效.\\
 \midrule
-\verb|#TARGVOL=|\(V\), \verb|#TARGVOL=|\(V_{min}-V_{max}\) & \verb|float| & init. cell vol. & 固定晶格体积为\(V\), 或\(V_{min}\)到\(V_{max}\)之间的随机数值. 存在晶格标签 \verb|#FIX| 时该参数失效. 默认为初始给定原胞的体积. 该参数常在不引入 \verb|BLOCK POSITION_*| 区块时使用.\\
+\verb|#TARGVOL=|\(V\) \verb|#TARGVOL=|\(V_{min}-V_{max}\) & \verb|float| & init. cell vol. & 固定晶格体积为\(V\), 或\(V_{min}\)到\(V_{max}\)之间的随机数值. 存在晶格标签 \verb|#FIX| 时该参数失效. 默认为初始给定原胞的体积. 该参数常在不引入 \verb|BLOCK POSITION_*| 区块时使用.\\
 \midrule
 \verb|#VARVOL=|\(V\)& \verb|float| & init. cell vol. & 与 \verb|#TARGVOL=| 作用相同, 该参数会覆盖 \verb|#TARGVOL=| 的设置. 默认为初始给定原胞的体积.\\
 \midrule
@@ -449,17 +479,17 @@ H   0.0 0.0 0.0 # H-set % ANGAMP=0 POSAMP=0
 \midrule
 \verb|#TIGHT|& \verb|void| & off & 使得生成的结构更加紧密.\\
 \midrule
-\verb|#SYMMOPS=|\(n\),\hspace{6em}\verb|#SYMMOPS=|\(\sim{}n\;\;\;\;\;\;\;\;\;\;\;\)\hspace{6em}\verb|#SYMMOPS=|\(n_{min}-n_{max}\) & \verb|int| &  off & 声明生成的结构中必须含有\(n\)种对称操作. 若体系是周期性晶体结构, 推荐从下述整数中选取: 1,2,3,4,5,6,8,12,16,24,48. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量\footnote{这里的``数量''是指, 满足对称操作所需的最少同类原子数量, 也即该点位的 multiplicities. }更少的 special position 不予考虑.\footnote{源代码中这样描述: Symmetry is only be approximately applied (filling general positions only)} 另外需要注意的是, AIRSS中实现锁定对称性的方法是: 接将原子按对称性复制n份. 例如原子有\(C_4\)对称性, 则最终输出的总原子数将是设定的4倍. 但如果结合原子标签 \verb|OCC, MULT| 等的使用, 可实现在更高对称的点位安放更少原子的操作. 在含有波浪号(\(\sim\))的模式下不推荐使用\verb|MULT|等参数限制原子对称复制的个数.\\
+\verb|#SYMMOPS=|\(n\)\hspace{6em}\verb|#SYMMOPS=~|\(n\;\;\;\;\;\;\;\;\;\;\;\)\hspace{6em}\verb|#SYMMOPS=|\(n_{min}-n_{max}\) & \verb|int| &  off & 声明生成的结构中必须含有\(n\)种对称操作. 若体系是周期性晶体结构, 推荐从下述整数中选取: 1,2,3,4,5,6,8,12,16,24,48. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量\footnote{这里的``数量''是指, 满足对称操作所需的最少同类原子数量, 也即该点位的 multiplicities. }更少的 special position 不予考虑.\footnote{源代码中这样描述: Symmetry is only be approximately applied (filling general positions only)} 另外需要注意的是, AIRSS中实现锁定对称性的方法是: 接将原子按对称性复制n份. 例如原子有\(C_4\)对称性, 则最终输出的总原子数将是设定的4倍. 但如果结合原子标签 \verb|OCC, MULT| 等的使用, 可实现在更高对称的点位安放更少原子的操作. 在含有波浪号(\(\sim\))的模式下不推荐使用\verb|MULT|等参数限制原子对称复制的个数.\\
 \midrule
-\verb|#SYMM=|\(spg\),\hspace{6em} \verb|#SYMM=|\(\sim{}spg\)& \verb|string| & off & 生成的结构必须在\(spg\)空间群中, \(spg\)是空间群的名称. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量更少的 special position 不予考虑, 在此模式下不推荐使用\verb|MULT|等参数限制原子对称复制的个数.\\
+\verb|#SYMM=|\(spg\)\hspace{6em} \verb|#SYMM=~|\(spg\)& \verb|string| & off & 生成的结构必须在\(spg\)空间群中, \(spg\)是空间群的名称. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量更少的 special position 不予考虑, 在此模式下不推荐使用\verb|MULT|等参数限制原子对称复制的个数.\\
 \midrule
-\verb|#SYMMNO=|\(n\),\hspace{6em} \verb|#SYMMNO=|\(\sim{}n\) & \verb|int| & off & 生成的结构必须在第\(n\)号空间群中, \(n\)是空间群的序号. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量更少的 special position 不予考虑, 在此模式下不推荐使用\verb|MULT|等参数限制原子对称复制的个数.\\
+\verb|#SYMMNO=|\(n\)\hspace{6em} \verb|#SYMMNO=~|\(n\) & \verb|int| & off & 生成的结构必须在第\(n\)号空间群中, \(n\)是空间群的序号. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量更少的 special position 不予考虑, 在此模式下不推荐使用\verb|MULT|等参数限制原子对称复制的个数.\\
 \midrule
 \verb|#SYMMORPHIC| & \verb|void| & off & 只检查体系是否存在点式对称操作.\\
 \midrule
 \verb|#SGRANK=|\(n\) & \verb|int| & 230 & 设置空间群寻找/锁定的序号上限\(n\). 此值设为230时, 接受任何空间群的对称性锁定.\\
 \midrule
-\verb|#ADJGEN=|\(n\),\hspace{4em}\verb|#ADJGEN=|\(n_{min}-n_{max}\)  & \verb|int|  & 0 & 调整晶胞中使用 general positions(GP) 的个数. 该值为0时, 会最大程度地使用GP点位. 增大该值则将逐渐更多地使用 Special positions(SP)点位. 如果尝试后发现难以生成符合条件结构, 则程序将动态增加该值. 关于 SP/GP 与晶体空间群的关系请参考: \href{https://en.wikipedia.org/wiki/Wyckoff_positions}{Wiki: Wyckoff Position}.\\
+\verb|#ADJGEN=|\(n\)\hspace{4em}\verb|#ADJGEN=|\(n_{min}-n_{max}\)  & \verb|int|  & 0 & 调整晶胞中使用 general positions(GP) 的个数. 该值为0时, 会最大程度地使用GP点位. 增大该值则将逐渐更多地使用 Special positions(SP)点位. 如果尝试后发现难以生成符合条件结构, 则程序将动态增加该值. 关于 SP/GP 与晶体空间群的关系请参考: \href{https://en.wikipedia.org/wiki/Wyckoff_positions}{Wiki: Wyckoff Position}.\\
 \midrule
 \verb|#BREAKAMP=|\(d\) & \verb|float| & 0.0 & 在晶格矢量a方向随机移动原子破坏原有对称性, 原子分数坐标移动距离: \(d^{(frac)}_a=(random(0,1)\times{}d)^{1/3}\)\\
 \midrule
@@ -518,6 +548,7 @@ H   0.0 0.0 0.0 # H-set % ANGAMP=0 POSAMP=0
 \end{longtable}
 \end{center}
 
+\newpage
 现在您应该可以轻松读懂下述内容了:
 
 \begin{lstlisting}[language={bash},numbers=left]
@@ -541,7 +572,7 @@ Al 0.0 0.0 0.0 # Al1 % NUM=7-13 COORD=4
 #MAXBANGLE=120
 \end{lstlisting}
 
-对于只存在全局参数的结构文件, 只要您对晶体结构(如晶体原子构成, 晶格大概的体积大小等)声明得足够清楚, AIRSS也是可以接受的.  下面是两则合法且十分简洁的AIRSS结构种子文件.\\
+另外, *.cell 文件中还可以完全不出现结构数据对应的数据区块. 比如您只对晶体大概的结构有一些模糊的认识(比如, 只知道其晶体原子构成, 晶格大概的体积大小等), 仍然可以使用AIRSS进行结构搜索. 下面就是这样两则符合规范且十分简洁的AIRSS结构种子文件.\\
 \emph{例4.1}
 \begin{lstlisting}[language={bash},numbers=left]
 #VARVOL=15
@@ -557,13 +588,15 @@ Al 0.0 0.0 0.0 # Al1 % NUM=7-13 COORD=4
 #MINSEP=1.5        
 \end{lstlisting}
 
-可见, \verb|SPECIES=[element1]%NUM=[n1],[element2]%NUM=[n2]|相当于一个简化的\verb|BLOCK POSITIONS_FRAC|原子位置结构数据.
+这里用 \verb|#VARVOL| 代替了晶格参数数据区块 \verb|BLOCK LATTICE_CART|, 用 \verb|#SPECIES| 代替了原子位置数据区块 \verb|BLOCK POSITIONS_FRAC|.
 
 \newpage
 \section{结构弛豫与能量计算}
 
 \subsection{联合airss-pp3模块弛豫}
-\verb|airss-pp3|是AIRSS自带的pp3对势(pair potential)计算模块. 其功能是使用化学上经典的分子势场(如6-12势能)弛豫原子结构并输出体系能量. 由于这一模块使用的是维象的晶体能量模型, 不涉及任何第一性原理的复杂运算, 因此其实现简单、效果稳定、计算速度快, 适用于简单组分的小体系. 更具体的, AIRSS中计算对势采用了如下公式:
+使用 AIRSS 联合 \verb|airss-pp3| 计算模块预测结构时, 除了要准备一个 *.cell 的文件外, 还需要准备一个名为 *.pp 文件. 
+
+\verb|airss-pp3|是AIRSS自带的pp3对势(pair potential)计算模块. 其功能是使用化学上经典的分子势场(如6-12势)弛豫原子结构并输出体系能量. 由于这一模块使用的是维象的晶体能量模型, 不涉及任何第一性原理的复杂运算, 因此其实现简单、效果稳定、计算速度极快, 适用于简单组分的小体系. 更具体的, \verb|airss-pp3| 采用了如下势能计算原子的受力和体系总能:
 \begin{subequations}
   \label{eq:pp3}
   \begin{align}
@@ -573,7 +606,7 @@ Al 0.0 0.0 0.0 # Al1 % NUM=7-13 COORD=4
 \end{subequations}
 其中 \(i,j\)标定了不同原子位置, 当元素种类不同时, \(\varepsilon_{ij},\sigma_{ij}\)等变量对应不同的值.
 
-使用该模块时, 需要首先配置名为\verb|*.pp|的参数文件. 这个文件中存储了对势的相关参数, 其内部书写形式如下: 
+使用该模块时, 需要首先配置名为*.pp的参数文件. 这个文件中存储了对势的相关参数, 其内部书写形式如下: 
 \begin{lstlisting}[language={bash},numbers=left]
 n_spec m n range
 specs
@@ -591,9 +624,10 @@ beta_22 ...
 ...
 \end{lstlisting}
 
-上述参数中, 
-\begin{itemize}
-  \item 第1行各项分别是: 元素个数; 对势中指数\(m,n\)的数值; 对势中能量极小值(力为0处)处距离原子中心距离\(d_{min}\)与\(\sigma\)的比值, 也即 \(d_{min}^{(ij)} = \sigma_{ij}*d_{range}\). 
+\noindent\fcolorbox{mygray}[HTML]{EEEEFF}{\parbox{\textwidth}{%
+\noindent \textbf{上述参数中, }
+\begin{maineu}
+  \item 第1行各项分别是: 元素个数; 对势中指数\(m,n\)的数值; 对势中能量极小值(力为0处)处距离原子中心的距离\(d_{min}\)与\(\sigma\)的比值, 也即 \(d_{min}^{(ij)} = \sigma_{ij}*d_{range}\). 
   \item 第2行指明了体系中的元素种类, 不同元素间用空格隔开. 
   \item 第3行是注释行, 在程序中无意义, 但必须存在. 
   \item 第4至(\(n_{spec}+3\))行声明了元素之间的\(varepsilon\)值对应的矩阵.
@@ -601,7 +635,8 @@ beta_22 ...
   \item 第(\(n_{spec}+5\))至(\(2n_{spec}+4\))行声明了元素之间的\(sigma\)值对应的矩阵.
   \item 第(\(2n_{spec}+5\))行必须为书写含有``Beta"字符的注释. 若此字符未出现, 则系统将强制把全部\(beta\)值设为1.
   \item 第(\(2n_{spec}+6\))至(\(3n_{spec}+5\))行声明了元素之间的\(beta\)值对应的矩阵.
-\end{itemize}
+\end{maineu}}}\\
+
 例如,
 \begin{lstlisting}[language={bash},numbers=left]
 2 12 6 5
@@ -614,7 +649,7 @@ A B
 1.76
 \end{lstlisting}
 
-下面通过一个例子来演示AIRSS联合\verb|pp3|的使用过程.
+下面通过一个例子来演示AIRSS联合 \verb|pp3| 的计算过程.
 \begin{lstlisting}[language={bash}]
 user@machine_name$ ls 
 Al.cell Al.pp
@@ -651,19 +686,22 @@ user@machine_name$
 \end{lstlisting}
 
 \subsection{联合CASTEP弛豫}
+官方推荐AIRSS结合CASTEP使用, 且构建了 AIRSS 和 CASTEP 间十分完善的接口. 
+
 要使用 CASTEP 联合 AIRSS 计算, 首先需要将成功安装的 CASTEP 可执行文件 \verb|castep.serial| 或 \verb|castep.mpi| 复制到 AIRSS 的 \verb|bin| 目录中, 并重命名为 \verb|castep|.
 
-使用CASTEP 联合AIRSS计算时, 除了\verb|*.cell|外需要准备\verb|*.param|文件. \verb|*.param|是CASTEP的配置文件, 您可以在其中定义CASTEP计算过程中的必要配置参数, 包括, 计算的类型(结构优化, 自洽, 光学性质计算, 能带计算 等), 电荷, 自旋取向, 截断能, 收敛标准等. 该文件通常由若干行组成, 每一行包含一个 \verb|keyword| 及其相应的赋值.
+使用 CASTEP 联合 AIRSS 计算时, 除了*.cell外, 还需要准备 *.param 文件. *.param 是CASTEP的配置文件, 您可以在其中定义CASTEP计算过程中的必要配置参数, 包括, 计算的类型(结构优化, 自洽, 光学性质计算, 能带计算 等), 电荷, 自旋取向, 截断能, 收敛标准等. 该文件通常由若干行组成, 每一行包含一个 \verb|keyword| 及其相应的赋值.
 
-\verb|*.param|文件的内容主要有以下特点:
-\begin{enumerate}[(1)]
+\noindent\fcolorbox{mygray}[HTML]{EEEEFF}{\parbox{\textwidth}{%
+\noindent \textbf{*.param 文件主要有以下特点:}
+\begin{maineu}
 \item 任何两个 keywords 之间没有书写顺序上的限制.
-\item 您可以使用 \verb|#| 或 \verb|;| 或 \verb|!| 又或者单词 \verb|COMMENT| 来添加注释.
-\item \verb|*.param|中设定的所有的 keywords 和数据均不区分大小写, 同时, 任何标点符号(除了标明注释内容的符号),多余的空格和任何空行都将被自动忽略.
+\item 您可以使用 \# 或 ; 或 ! 又或者单词 COMMENT 来添加注释.
+\item *.param 中设定的所有的 keywords 和数据均不区分大小写, 同时, 任何标点符号(除了标明注释内容的符号),多余的空格和任何空行都将被自动忽略.
 \item 文件的任何一行中最多只能出现一个 keywords 及其对应参数.
-\end{enumerate}
+\end{maineu}}}\\
 
-\verb|*.param|文件每一行的基本格式均为:
+*.param 文件每一行的基本格式均为:
 \begin{lstlisting}
 [keywords] : [value]
 \end{lstlisting}
@@ -671,31 +709,28 @@ user@machine_name$
 
 CASTEP中\verb|[keywords]|的定义和使用方法, 可参考: \href{http://www.tcm.phy.cam.ac.uk/castep/documentation/WebHelp/content/modules/castep/keywords/k_main_structure.htm}{CASTEP cell keywords and data blocks}.
 
-AIRSS默认联合CASTEP计算, 因此运行下述命令即可开始结构搜索.
+AIRSS默认联合CASTEP计算, 因此运行下述命令即可启动结构搜索.
 \begin{lstlisting}[language={bash},numbers=left]
 user@machine_name$ airss.pl -max 3 -seed Al
 \end{lstlisting}
 
 \subsection{联合VASP弛豫}
-AIRSS自带了 \verb|airss.pl -vasp| 选项用于联合VASP弛豫计算. 但官方自带的接口在并行计算上还有待开发. 基于AIRSS, 笔者用一套bash命令集重新编写了AIRSS至VASP的接口, 将其命名为airss4vasp(a4v). 后虽考虑过将此命令集使用python重新书写, 但AIRSS本身无法在Windows上运行, 而复写工程又过于庞大且收效甚微, 因此a4v目前仍然主要基于bash实现.
+AIRSS自带了 \verb|airss.pl -vasp| 选项用于联合VASP弛豫计算. 但官方自带的接口在并行计算方面还有待完善. 基于AIRSS, 笔者用一套bash命令集重新编写了AIRSS至VASP的接口, 将其命名为airss4vasp(a4v). 后虽考虑过将此命令集使用python重新编写, 但AIRSS本身无法在Windows上运行, 而复写工程又过于庞大且收效甚微, 因此a4v目前仍然主要基于bash实现.
 
-a4v可以看做是AIRSS的改版, 无需安装原生AIRSS便可独立运行. 其主要基于AIRSS原生的\verb|buildcell|模块, 同时内嵌了PBS, NSCC, Slurm等作业提交系统指令, 真正做到了一键提交AIRSS+VASP任务的功能. 其具体用法可参见项目内部的 \verb|README.md| 文件. \footnote{事实上, 该说明手册也在此项目中.(笑} 
+a4v可以看做是AIRSS的改版, 无需安装原生AIRSS便可独立运行. 其主要基于AIRSS原生的 \verb|buildcell| 模块, 同时内嵌了PBS, NSCC, Slurm等作业提交系统指令, 真正做到了一键提交 AIRSS+VASP 任务的功能, 同时对计算的并行也有较好的支持. 其具体用法可参见项目内部的 \verb|README.md| 文件. \footnote{事实上, 该说明手册也在此项目中.(笑} 
 
-a4v增加了对应原子位置弛豫固定的\verb|SD-XYZ|, \verb|SD-XY|, \verb|SD-X|等原子标签, 同时删减了原先buildcell中设置共线自旋数值的全局参数关键字\verb|SPIN=|.
+在 *.cell 文件设置方面: a4v增加了对应原子位置弛豫固定的\verb|SD-XYZ|, \verb|SD-XY|, \verb|SD-X|等原子标签; 同时删减了原先buildcell中设置共线自旋数值的全局参数, \verb|#SPIN=|.
 
 \newpage
-\section{输出结果的后处理}
-\subsection{*.res文件的结构}
-AIRSS的计算结果全部储存在了\verb|.res|文件中. 这种 \verb|.res| 结构文件最早在 \href{https://strucbio.biologie.uni-konstanz.de/ccp4wiki/index.php/SHELXL}{SHELX} 中使用. 由于一些历史原因被 CASTEP 和 AIRSS 复用. 由于 SHELX 本身是对Windows友好程序, 因此其书写格式也沿袭了部分Windows文档的特点, 如 \verb|REM| 代表注释行, 文件使用 \verb|END| 结尾等.
+\section{数据后处理}
+\subsection{*.res文件结构}
+AIRSS的计算结果全部储存在了 *.res 文件中. 这种 *.res 结构文件最早在 \href{https://strucbio.biologie.uni-konstanz.de/ccp4wiki/index.php/SHELXL}{SHELX} 中使用. 由于一些历史原因被 CASTEP 和 AIRSS 复用. 由于 SHELX 本身是对 Windows 友好的程序, 因此其输入输出文件的书写格式也沿袭了部分Windows文档的特点, 如 倾向使用大写字母, \verb|REM| 代表注释行, 文件使用 \verb|END| 结尾等.
 
 \begin{lstlisting}[language={bash}]
 user@machine_name$ cat Al-43867-3302-1.res
 TITL Al-43867-3302-2 0.0000000004 60.4852769773 -53.2712053113 0 0 8 (P63/mmc) n - 1
 REM
 REM in /Users/alex/Documents/ProgramCode/MaterialCalculateProgram/AIRSS/airss-0.9/examples/1.1
-REM
-REM
-REM
 REM
 CELL 1.54180 2.2 5.2 5.2  86.6 90.0 90.0
 LATT -1
@@ -709,36 +744,35 @@ Al     1  0.7544637023180  0.1816224159838  0.9157635306900 1.0
 Al     1  0.7544637024482  0.6816224143044  0.4157635299253 1.0
 Al     1  0.2544637030384  0.4316224167828  0.1657635292340 1.0
 END
-
 user@machine_name$
 \end{lstlisting}
 
-AIRSS输出的\verb|.res|文件各行的含义如下:
-\begin{itemize}
-\item 第一行\verb|TITL|中的第一项是软件分配给该结构的名称标签, 第二项是系统外加静水压(GPa), 第三项是单胞体积, 第五项是每个单胞总的焓(能量), 第六项是原子自旋值的平均值, 第七项是原子自旋绝对值的平均值, 第八项是体系所在空间群名称, 最后一项是固定字符 \verb|n - 1|.
-\item 之后若干以\verb|REM|开头的行为注释行, 记录了文件生成的基本信息, 删除后不会有任何影响.
-\item 紧接着以\verb|CELL|开头的行记录了基本的晶胞信息. 其中, 第一项是一个无意义的小数, 这个小数在原来的SHELX程序中是用来记录得到相关结构所用XRD的波长, 在AIRSS中锁定为了一个无意义的小数. 第二至四项是晶格常数\(a\;b\;c\), 接下来五至七项是晶角\(\alpha\;\beta\;\gamma\).
-\item 下面一行是\verb|LATT -1|. 这一行在SHELX中用于标定晶格的对称性, 在AIRSS中锁定为固定值-1.
-\item 接下来以\verb|SFAC|开头的行记录了体系中全部的元素种类, 不同的元素用一个空格隔开.
-\item 最后若干行标定了单胞中原子的位置. 原子位置信息行的第一项是元素符号, 第二项指明了该元素在\verb|SFAC| 行中是第几个出现的元素, 第三到五项是该行对应原子的分数坐标, 最后一项是该点位的占据数, 一般设为1.
-\item 文件最终以\verb|END|行结尾.
-\end{itemize}
+\noindent\fcolorbox{mygray}[HTML]{EEEEFF}{\parbox{\textwidth}{%
+\noindent \textbf{AIRSS输出的 *.res 文件各行的含义如下:}
+\begin{maineu}
+\item 第一行TITL中的第一项是软件分配给该结构的名称标签, 第二项是系统外加静水压(GPa), 第三项是单胞体积, 第四项是每个单胞总的焓(能量), 第五项是原子自旋值的平均值, 第六项是原子自旋绝对值的平均值, 第七项是体系的总原子数, 第八项是体系所在空间群名称, 最后一项是固定字符 n - 1.
+\item 之后若干以REM开头的行是注释行, 记录了文件生成的基本信息, 删除后不会有任何影响.
+\item 紧接着以CELL开头的行记录了基本的晶胞信息. 其中, 第一项是一个无意义的小数, 这个小数在原来的SHELX程序中是用来记录得到相关结构所用衍射谱的波长, 在AIRSS中锁定为了一个无意义的小数. 第二至四项是晶格常数\(a\;b\;c\), 接下来五至七项是晶角\(\alpha\;\beta\;\gamma\).
+\item 下面一行是LATT -1. 这一行在SHELX中用于标定晶格的对称性, 在AIRSS中锁定为固定值-1.
+\item 接下来以 SFAC 开头的一行记录了构成体系的全部元素名称, 不同的元素用一个空格隔开.
+\item 最后若干行标定了单胞中原子的位置. 这些行中的第一列是元素符号, 第二列指明了该元素在SFAC 行中出现的次序, 第三到五列是该行储存了原子的分数坐标, 最后一列是原子的占据数, 一般设为1.
+\item 文件最终以END行结尾.
+\end{maineu}}}\\
 
-\subsection{数据的批量化处理}
-有了计算数据\verb|.res|文件后, 就可以使用\verb|ca|指令进行数据处理了. \verb|ca| 是对AIRSS中基本分析套件 \verb|cryan| 的封装. 
+\subsection{数据批量化处理}
+有了计算数据*.res文件后, 就可以使用\verb|ca|指令进行数据处理了. \verb|ca| 是对AIRSS中基本分析套件 \verb|cryan| 的封装. 
 \begin{lstlisting}[language={bash}]
 user@machine_name$ ca
 ca [-R(recurcsive)] [command line arguments for cryan]
 user@machine_name$
 \end{lstlisting}
 
-\verb|cryan|的使用方法如下:
+\verb|cryan|的使用方法如下:\footnote{为了行文简洁, 对参数的说明做了少许简化, 请自行运行上述指令查看更详细的信息.}
 \begin{lstlisting}[language={bash}]
 user@machine_name$ cryan
 
 Usage: cryan [OPTIONS]
-
-The structures are read from STDIN, for example:
+The str. are read from STDIN, for example:
 
      cat *.res | cryan -s
      gunzip -c lots.res.gz | cryan -f H2O
@@ -746,41 +780,40 @@ The structures are read from STDIN, for example:
 
 cryan options (note - the order matters):
 
- -r,  --rank                          Rank all structures, of any composition
- -s,  --summary                       Summary, most stable from each composition
- -e,  --enthalpy <length_scale>       Plot enthalpy vs. pressure, interpolate with <length_scale>
- -f,  --formula <formula>             Select structures of a given composition
- -fc,  --formula_convert <formula>    Attempt to convert structure to this composition
- -t,  --top [num]                     Output top few results (default 10)
- -u,  --unite <thresh>                Unite similar structures
- -dr, --distance <rmax>               Distance threshold for structure comparison (default 20)
- -de, --delta_e <energy>              Ignore structures above energy (per atom)
- -sd, --struc_dos <smear>             Plot a structural density of states, smeared
- -p,  --pressure <pressure>           Additional pressure (default 0 GPa)
- -m,  --maxwell                       Extract the stable compositions
- -ph, --pressure_hull                 Extract the stable structures with pressure
+ -r,  --rank                          Rank all str.
+ -s,  --summary                       Summary
+ -e,  --enthalpy <length_scale>       Plot enthalpy vs. pressure
+ -f,  --formula <formula>             Select str. of a given com.
+ -fc,  --formula_convert <formula>    Attempt to convert.
+ -t,  --top [num]                     Output top few results
+ -u,  --unite <thresh>                Unite similar str.
+ -dr, --distance <rmax>               Distance threshold
+ -de, --delta_e <energy>              Ignore str. above energy
+ -sd, --struc_dos <smear>             Plot a structural DOS
+ -p,  --pressure <pressure>           Additional pressure
+ -m,  --maxwell                       Extract the stable com.
+ -ph, --pressure_hull                 Ext. the stable str. with P
  -<n>                                 Component <n>
  -xg, --xmgrace                       Plot output with xmgrace
- -c,  --compare <thresh> <structure>  Compare structure to all others
-      --delete                        Delete unwanted structures
- -g,  --geometry [thresh]             Calculate the atomic geometry for the structures (default 0.1)
- -n,  --num_units                     Only report structures with n separate units (default -1)
- -d,  --dimensionality                Only report structures with dimensionality of d (default -1.0)
- -cl, --cluster                       No periodic boundary conditions
- -bl, --bondlength                    Maximum bond length (default 0.0, negative for modularity)
- -bs, --bondscale                     Bond length scaling (default 1.0, negative for modularity)
+ -c,  --compare <thresh> <structure>  Compare structures
+      --delete                        Delete unwanted str.
+ -g,  --geometry [thresh]             Calculate the atomic geometry
+ -n,  --num_units                     Report n separate str.
+ -d,  --dimensionality                Report dD str.
+ -cl, --cluster                       No periodic boundary
+ -bl, --bondlength                    Maximum bond length
+ -bs, --bondscale                     Bond length scaling
  -dm, --deltamodularity               Modularity bias parameter
- -wt, --weight                        Weight the adjacancy matrix toward short contacts
- -ns, --notsymm                       Do not calculate point group of clusters
- -sc, --struct_comm <thresh>          Determine the community structure
- -cm, --community                     Output the community structure
+ -wt, --weight                        Weight the adjacancy matrix
+ -ns, --notsymm                       Clusters  point group off
+ -sc, --struct_comm <thresh>          Determine the community str.
+ -cm, --community                     Output the community str.
  -am, --adjacancymatrix               Output the adjacancy matrix
  -x,  --xyz                           Output clusters in XYZ format
- -o,  --off                           Output polyhedra in OFF format
+ -o,  --off                           Output polyhedra in OFF
  -al, --alpha                         Construct alpha shapes
- -l,  --long                          Long names for structures
- -h,  --help, -?                      Print usage information and exit
-
+ -l,  --long                          Long names for str.
+ -h,  --help, -?                      Print usage information
 user@machine_name$
 \end{lstlisting}
 
@@ -794,8 +827,9 @@ Al-43867-3302-3   0.00  7.564   0.005   8 Al  Fm-3m    1
 user@machine_name$
 \end{lstlisting}
 
-上述输出结果中, 
-\begin{itemize}
+\noindent\fcolorbox{mygray}[HTML]{EEEEFF}{\parbox{\textwidth}{%
+\noindent \textbf{上述输出结果中,}
+\begin{maineu}
   \item 第一列是AIRSS软件分配给该结构的名称标签
   \item 第二列压力值(GPa)
   \item 第三列是每个化学式结构单元(fu)的体积
@@ -804,9 +838,9 @@ user@machine_name$
   \item 第六列是化学式结构单元(fu)的化学式
   \item 第七列是空间群名称
   \item 第八列是所有搜索结果中出现该结构的次数
-\end{itemize}
+\end{maineu}}}\\
 
-如果您认为所列结果过多, 可以使用\verb|-u|选项, 但是要注意, \verb|-u| 一定要排在\verb|-r|之前使用. \footnote{这可以算作是原程序的BUG, 已在airss4vasp中修正.}
+如果您认为所列结果过多, 可以使用\verb|-u|选项, 但是要注意, \verb|-u| 一定要排在\verb|-r|之前使用.\footnote{事实上, 所有排在 rank (-r) 任务之后的参数都会被自动忽略.} 如果您仔细看过 \verb|cryan| 的 help 信息就不难发现这样一个提醒: ``note - the order matters''.
 \begin{lstlisting}[language={bash}]
 user@machine_name$ ca -u 0.01 -r > analysis.data
 user@machine_name$ cat analysis.data
@@ -815,11 +849,12 @@ Al-43867-3302-3   0.00  7.564   0.005   8 Al  Fm-3m    1
 user@machine_name$
 \end{lstlisting}
 
-指令 \verb|ca -u| 后所跟的数字是一个无量纲的比例. 可以将这一参数简单的做如下理解:  他标定了晶格相似度阈值. 该数值越大, 容忍度越高, 最终展示出来的不同结构越少. 更详细的, 这一参数标定的距离, 是原子结构内部最接近的两个原子之间距离的小数倍. 例如, 现有两个结构十分相似, 晶格中最短键长为1.5 \r{A}, 则 \verb|ca -u 0.1| 就意味着, 比较全部的两结构对应原子的两两距离, 如果未能发现这些距离差存在大于0.15 \r{A} 的情况, 则标定这两个结构一致. \footnote{详细见源码``airss-0.9.1/src/cryan/src/cryan.f90''2133行} 该值可根据需求调整, 建议在0.1--0.01之间选择.
+指令 \verb|ca -u| 后所跟的数字是一个无量纲的比例. 可以将这一参数简单的做如下理解:  他标定了晶格相似度阈值. 该数值越大, 容忍度越高, 最终展示出来的不同结构越少. 更详细的, 这一参数标定的距离, 是原子结构内部最接近的两个原子之间距离的倍数. 例如, 现有两个结构十分相似, 晶格中最短键长为1.5 \r{A}, 则 \verb|ca -u 0.1| 就意味着, 依次比较两结构对应原子的两两距离, 如果未能发现这些距离差存在大于0.15 \r{A} 的情况, 则标定这两个结构一致. \footnote{这一段描述只是一个粗浅直观的解释, 实际使用的算法要更加复杂且稳定. 详细见源码``airss-0.9.1/src/cryan/src/cryan.f90''2133行.} 该值可根据需求调整, 建议在0.1--0.01之间选择.
 
 \newpage
 \appendix
 \section{AIRSS安装日志}
+\label{sec:airss-install} 
 \textbf{下面将以 airss-0.9.0 版本为例, 简要记录AIRSS的安装.}
 
 AIRSS只支持在命令行(Command Line)使用, 且仅能安装在*nix系统中. 安装此软件前, 您最好已经了解 \href{https://www.gnu.org/software/make/manual/}{GNU make} 的使用方法. 当然, 如果您实在对此不感兴趣, 这不是必须的. 前提是您能完全按照以下步骤操作.
@@ -827,7 +862,7 @@ AIRSS只支持在命令行(Command Line)使用, 且仅能安装在*nix系统中.
 \subsection{软件主体安装}
 具体的安装分为以下几步, 非必须步骤已使用\verb|*|标出:
 \begin{description}
-\item [*(I)建立安装包文件管理系统] 在开始一切安装之前, 建议作为非\verb|root|用户但是有\verb|sudo|权限的您: 在自己能进行任意操作的家目录\verb|~/|中建立一个安装包管理文件夹, 如\verb|~/install_package|; 同时在系统目录\verb|/usr/local|中建立一个存放airss和其他程序二进制可执行文件的目录, 如\verb|/usr/local/| \verb|airss-0.9/bin|. 
+\item [*(I) 建立安装包文件管理系统] 在开始一切安装之前, 建议作为非\verb|root|用户但是有\verb|sudo|权限的您: 在自己能进行任意操作的家目录\verb|~/|中建立一个安装包管理文件夹, 如\verb|~/install_package|; 同时在系统目录\verb|/usr/local|中建立一个存放airss和其他程序二进制可执行文件的目录, 如\verb|/usr/local/| \verb|airss-0.9/bin|. 
 
 之所以这样建议, 是为了减少您安装过程中在系统目录下需要进行的操作, 降低由此可能引发的事故的概率, 同时让安装过程更简洁(避免每个命令都要使用前缀\verb|sudo ...|, \verb|sudo sh -c "...>..."|). 
 
@@ -839,15 +874,14 @@ Password:
 user@machine_name$ cd airss-0.9
 user@machine_name$ ls -F 
 bin/
-user@machine_name$ cd ~
+user@machine_name$ cd
 user@machine_name$ mkdir -p  install_package/AIRSS
 user@machine_name$ cd install_package
 user@machine_name$ ls -F
 AIRSS/
 \end{lstlisting}
 
-\item [(II)AIRSS安装包下载]AIRSS软件包下载地址为:\url{https://www.mtg.msm.cam.ac.uk/files/airss-0.9.tgz}
-或者, 您可以访问前文所述\href{https://www.mtg.msm.cam.ac.uk/Codes/AIRSS}{官方网站}详细了解相关信息后下载.
+\item [(II) AIRSS安装包下载]您可以访问前文所述\href{https://www.mtg.msm.cam.ac.uk/Codes/AIRSS}{官方网站}下载 airss-0.9.0.
 
 您可以选择在浏览器上下载, 也可以使用\verb|wget|指令.
 
@@ -856,7 +890,7 @@ user@machine_name$ wget -P ~/Downloads https://www.mtg.msm.
 cam.ac.uk/files/airss-0.9.tgz
 \end{lstlisting}
 
-\item [(III)拷贝并解压安装包] 将您下载的\verb|airss-0.9-2.tag|拷贝到安装包管理文件夹中, 并使用\verb|tar|解压.
+\item [(III) 拷贝并解压安装包] 将您下载的\verb|airss-0.9-2.tag|拷贝到安装包管理文件夹中, 并使用\verb|tar|解压.
 \begin{lstlisting}[language={bash}]
 user@machine_name$ cd AIRSS
 user@machine_name$ cp ~/Downloads/airss-0.9-2.tgz .
@@ -870,7 +904,7 @@ x airss-0.9/VERSION
 ...
 \end{lstlisting}
 
-\item[(IV)使用 GNU make 指令安装 AIRSS] 使用\verb|make|等指令安装编译安装AIRSS.
+\item[(IV) 使用 GNU make 指令安装 AIRSS] 使用\verb|make|等指令安装编译安装AIRSS.
 \begin{lstlisting}[language={bash}]
 user@machine_name$ cd airss-0.9
 user@machine_name$ make
@@ -910,9 +944,9 @@ spawn        symm
 
 \end{lstlisting}
 
-\item[(VI)设置系统环境变量] 完成以上所有设置后, 您实际上就可以通过使用使用命令\verb|/usr/local/airss-0.9/bin/airss.pl -[option] [parameter] ...|来运行AIRSS了. 为了简便, 可以考虑在\verb|~/.bash_profile|文件中加入如下内容
+\item[(VI) 设置系统环境变量] 完成以上所有设置后, 您实际上就可以通过使用使用命令\verb|/usr/local/airss-0.9/bin/airss.pl -[option] [parameter] ...|来运行AIRSS了. 为了简便, 可以考虑在\verb|~/.bash_profile|文件中加入如下内容
 \begin{lstlisting}[language={bash}]
-###Setting PATH for AIRSS
+## Setting PATH for AIRSS
 export PATH="/usr/local/airss-0.9/bin:${PATH}"
 \end{lstlisting}
 
@@ -923,7 +957,7 @@ user@machine_name$ source ~/.bash_profile
 
 这样您就可以在系统中的任何路径上执行\verb|airss.pl|等AIRSS的指令了.
 
-\item[(VII)检查安装情况] 设置好环境变量后, 您可以在\verb|~/install_package/AIRSS/|
+\item[(VII) 检查安装情况] 设置好环境变量后, 您可以在\verb|~/install_package/AIRSS/|
 \\\verb|airss-0.9/|下输入\verb|make check|指令检查AIRSS安装情况. 
 \begin{lstlisting}[language={bash}]
 user@machine_name$ make check
@@ -1004,7 +1038,7 @@ Skipping example 2.1a (Castep)
 AIRSS支持的全部插件信息可查询\verb|~/install_package/AIRSS/airss-0.9/|
 \verb|README|文件.下面只演示最核心的\verb|cellsym|和\verb|symmol|插件的安装过程.
 \begin{description}
-\item[(I)下载插件安装包]
+\item[(I) 下载插件安装包]
 \verb|cellsym|的安装包官方网站是:
 
 \url{http://www.tcm.phy.cam.ac.uk/sw/check2xsf/cellsym.html}
@@ -1031,7 +1065,7 @@ www.tcm.phy.cam.ac.uk/sw/check2xsf/cellsym.tgz
 www.ccp14.ac.uk/ccp/web-mirrors/symmol/~pila/symmol.zip
 \end{lstlisting}
 
-\item[(II)拷贝并解压插件]将您下载的三个压缩包拷贝到安装包管理文件夹中, 并使用\verb|tar|和\verb|unzip|解压.
+\item[(II) 拷贝并解压插件]将您下载的三个压缩包拷贝到安装包管理文件夹中, 并使用\verb|tar|和\verb|unzip|解压.
 \begin{lstlisting}[language={bash}]
 user@machine_name$ cd ~/Downloads
 user@machine_name$ cp cellsym.tar spglib-1.9.4.tar 
@@ -1049,7 +1083,7 @@ cellsym.tar    spglib-1.9.4/     spglib-1.9.4.tar
 symmol/        symmol.zip
 \end{lstlisting}
 
-\item[(III)编译插件]将解压好的插件按如下顺序操作.
+\item[(III) 编译插件]将解压好的插件按如下顺序操作.
 
 首先安装库文件 \verb|spglib|.使用 GNU make 指令. 
 \begin{lstlisting}[language={bash}]
@@ -1132,7 +1166,7 @@ user@machine_name$
 
 至此, 我们完成了所有插件的编译. 生成了\verb|symmol|和\verb|cellsym|两个可执行文件.
 
-\item[(IV)将插件导入AIRSS]
+\item[(IV) 将插件导入AIRSS]
 这一步的操作十分简单, 将编译好的两个插件复制到系统目录下的\verb|bin/|文件夹即可. 为了以防万一, 可以在安装包管理文件夹保存一个\verb|bin/|的备份
 \begin{lstlisting}[language={bash}]
 user@machine_name$ pwd
@@ -1145,7 +1179,7 @@ user@machine_name$ cp cellsym ../airss-0.9/bin/
 user@machine_name$ sudo cp cellsym /usr/local/airss-0.9/bin
 \end{lstlisting}
 
-\item[(V)安装最终检查]
+\item[(V) 安装最终检查]
 回到\verb|airss-0.9|中执行\verb|make|的文件夹. 重新输入\verb|make check|检查安装情况.
 \begin{lstlisting}[language={bash}]
 user@machine_name$ cd ../airss-0.9
