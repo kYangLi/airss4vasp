@@ -6,9 +6,9 @@
 
 `Start Date` 2019.9.21
 
-`Last Update` 2020.10.24
+`Last Update` 2020.10.29
 
-`Version` 1.0.0
+`Version` 1.0.1
 
 ## Description
 
@@ -90,7 +90,7 @@ KEEP_CALC_DETAILS = F
 
 ### `<seedname>.cell`
 
-This is the key file for the whole structure searching task. Please first learn how to use `AIRSS` before using `a4v`.
+This is the key file for the whole structure searching task. Please first learn how to use `AIRSS` before using `a4v`. You could reference the AIRSS manual writen by me in ./doc/AIRSS-0.9.1_manual/main.pdf.
 
 There is one thing need to be explained more specifically.
 
