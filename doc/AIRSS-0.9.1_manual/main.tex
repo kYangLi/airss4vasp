@@ -161,7 +161,7 @@ user@machine_name$
 AIRSS 的核心组件名为 \textbf{buildcell}. 这个组件的作用就是依据用户给出的 *.cell 文件, 生成一系列结构的随机但符合给定物理条件约束的初始原子构型. 另外, 我们也可以单独拿出此模块, 使其与其他程序(如 VASP 等)适配. 学会书写出高度自定义化的 *.cell 文件是学习 AIRSS 的根本.\\
 
 
-\noindent\fcolorbox{mygray}[HTML]{EEEEFF}{\parbox{\textwidth}{%
+\noindent\fcolorbox{mygray}[HTML]{E7E7E7}{\parbox{\textwidth}{%
 \noindent \textbf{buildcell 区块的执行大致分为以下几步:}
 \begin{maineu}
 \item 通过 cell.f90 模块读取 *.cell 文件中的配置信息.
@@ -179,7 +179,7 @@ AIRSS 的核心组件名为 \textbf{buildcell}. 这个组件的作用就是依�
 \subsection{*.cell文件结构概括}
 *.cell文件是结构搜索的``种子文件'', 您可以在此文件中设置搜索约束条件. 文件名称前的星号(*)代表是Linux系统下的通配符, 也即它代表任意字符. 在AIRSS文件系统中, 我们把后缀名前的部分称为 ``seed name''. Seed name 可用于区分不同计算的同类文件. 文中后续见到所有通配符, 如果不特殊指明, 均代指 seed name.
 
-\noindent\fcolorbox{mygray}[HTML]{EEEEFF}{\parbox{\textwidth}{%
+\noindent\fcolorbox{mygray}[HTML]{E7E7E7}{\parbox{\textwidth}{%
 \noindent \textbf{*.cell 文件有以下特点:}
 \begin{maineu}
 \item 由于 AIRSS 是由部分参与 CASTEP 研发的人员编写, 因此该程序对 CASTEP 极其友好, 这里的 *.cell 文件与 CASTEP 中的 *.cell 文件完全兼容.
@@ -212,7 +212,7 @@ user@machine_name$
 \end{lstlisting}
 
 
-\noindent\fcolorbox{mygray}[HTML]{EEEEFF}{\parbox{\textwidth}{%
+\noindent\fcolorbox{mygray}[HTML]{E7E7E7}{\parbox{\textwidth}{%
 \noindent \textbf{上述 *.cell 文件的结构可做如下概括:}
 \begin{maineu}
   \item 前9行是由 \%BLOCK [keywords] 格式定义的数据读取区块, 这种格式在CASTEP中是十分常见的. 这些区块定义了晶体基本的\textbf{结构数据}.   
@@ -307,7 +307,7 @@ H   0.0 0.0 0.0 # H-set % ANGAMP=0 POSAMP=0
 [element] [x] [y] [z] # [atoms_set_name] % [tag1] [tag2] [tag3]
 \end{lstlisting}
 
-\noindent\fcolorbox{mygray}[HTML]{EEEEFF}{\parbox{\textwidth}{%
+\noindent\fcolorbox{mygray}[HTML]{E7E7E7}{\parbox{\textwidth}{%
 \noindent \textbf{每一行内部的元素含义如下: }
 \begin{maineu}
   \item 第一项是元素名称, 如果\textbf{将元素名称设置为Z}, 则表示此原子是个空位, 空位与真实原子一样具有体积和PUSH属性, 但不会在最终结果中输出.
@@ -377,7 +377,7 @@ H   0.0 0.0 0.0 # H-set % ANGAMP=0 POSAMP=0
 
 结构搜索过程中整个体系应遵守的条件由全局参数指定.  AIRSS中的全局参数均以井号（\verb|#|）开头, 对体系中晶格以及全部的原子作用. 另外, 有些全局参数和原子标签有相同的作用, 此时, 原子标签设置的优先级要高于全局参数.\\
 
-\noindent\fcolorbox{mygray}[HTML]{EEEEFF}{\parbox{\textwidth}{%
+\noindent\fcolorbox{mygray}[HTML]{E7E7E7}{\parbox{\textwidth}{%
 \noindent \textbf{全局参数目前覆盖的功能大致可以分为以下几类:}
 \begin{maineu}
   \item \textbf{对晶胞参数的约束.} 比如固定初始晶胞, 约束晶胞体系, 约束晶胞变化程度, 约束晶胞所在晶系, 为晶胞添加真空层等.
@@ -624,7 +624,7 @@ beta_22 ...
 ...
 \end{lstlisting}
 
-\noindent\fcolorbox{mygray}[HTML]{EEEEFF}{\parbox{\textwidth}{%
+\noindent\fcolorbox{mygray}[HTML]{E7E7E7}{\parbox{\textwidth}{%
 \noindent \textbf{上述参数中, }
 \begin{maineu}
   \item 第1行各项分别是: 元素个数; 对势中指数\(m,n\)的数值; 对势中能量极小值(力为0处)处距离原子中心的距离\(d_{min}\)与\(\sigma\)的比值, 也即 \(d_{min}^{(ij)} = \sigma_{ij}*d_{range}\). 
@@ -692,7 +692,7 @@ user@machine_name$
 
 使用 CASTEP 联合 AIRSS 计算时, 除了*.cell外, 还需要准备 *.param 文件. *.param 是CASTEP的配置文件, 您可以在其中定义CASTEP计算过程中的必要配置参数, 包括, 计算的类型(结构优化, 自洽, 光学性质计算, 能带计算 等), 电荷, 自旋取向, 截断能, 收敛标准等. 该文件通常由若干行组成, 每一行包含一个 \verb|keyword| 及其相应的赋值.
 
-\noindent\fcolorbox{mygray}[HTML]{EEEEFF}{\parbox{\textwidth}{%
+\noindent\fcolorbox{mygray}[HTML]{E7E7E7}{\parbox{\textwidth}{%
 \noindent \textbf{*.param 文件主要有以下特点:}
 \begin{maineu}
 \item 任何两个 keywords 之间没有书写顺序上的限制.
@@ -715,7 +715,7 @@ user@machine_name$ airss.pl -max 3 -seed Al
 \end{lstlisting}
 
 \subsection{联合VASP弛豫}
-AIRSS自带了 \verb|airss.pl -vasp| 选项用于联合VASP弛豫计算. 但官方自带的接口在并行计算方面还有待完善. 基于AIRSS, 笔者用一套bash命令集重新编写了AIRSS至VASP的接口, 将其命名为airss4vasp(a4v). 后虽考虑过将此命令集使用python重新编写, 但AIRSS本身无法在Windows上运行, 而复写工程又过于庞大且收效甚微, 因此a4v目前仍然主要基于bash实现.
+AIRSS自带了 \verb|airss.pl -vasp| 选项用于联合VASP弛豫计算. 但官方自带的接口在并行计算方面还有待完善. 基于AIRSS, 笔者用一套bash命令集重新编写了AIRSS至VASP的接口, 将其命名为\href{https://github.com/kYangLi/airss4vasp}{airss4vasp(a4v)}. 后虽考虑过将此命令集使用python重新编写, 但AIRSS本身无法在Windows上运行, 而复写工程又过于庞大且收效甚微, 因此a4v目前仍然主要基于bash实现.
 
 a4v可以看做是AIRSS的改版, 无需安装原生AIRSS便可独立运行. 其主要基于AIRSS原生的 \verb|buildcell| 模块, 同时内嵌了PBS, NSCC, Slurm等作业提交系统指令, 真正做到了一键提交 AIRSS+VASP 任务的功能, 同时对计算的并行也有较好的支持. 其具体用法可参见项目内部的 \verb|README.md| 文件. \footnote{事实上, 该说明手册也在此项目中.(笑} 
 
@@ -747,7 +747,7 @@ END
 user@machine_name$
 \end{lstlisting}
 
-\noindent\fcolorbox{mygray}[HTML]{EEEEFF}{\parbox{\textwidth}{%
+\noindent\fcolorbox{mygray}[HTML]{E7E7E7}{\parbox{\textwidth}{%
 \noindent \textbf{AIRSS输出的 *.res 文件各行的含义如下:}
 \begin{maineu}
 \item 第一行TITL中的第一项是软件分配给该结构的名称标签, 第二项是系统外加静水压(GPa), 第三项是单胞体积, 第四项是每个单胞总的焓(能量), 第五项是原子自旋值的平均值, 第六项是原子自旋绝对值的平均值, 第七项是体系的总原子数, 第八项是体系所在空间群名称, 最后一项是固定字符 n - 1.
@@ -827,7 +827,7 @@ Al-43867-3302-3   0.00  7.564   0.005   8 Al  Fm-3m    1
 user@machine_name$
 \end{lstlisting}
 
-\noindent\fcolorbox{mygray}[HTML]{EEEEFF}{\parbox{\textwidth}{%
+\noindent\fcolorbox{mygray}[HTML]{E7E7E7}{\parbox{\textwidth}{%
 \noindent \textbf{上述输出结果中,}
 \begin{maineu}
   \item 第一列是AIRSS软件分配给该结构的名称标签
