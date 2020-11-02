@@ -247,8 +247,7 @@ user@machine_name$
   \item 前9行是由 \%BLOCK [keywords] 格式定义的数据读取区块, 这种格式在CASTEP中是十分常见的. 这些区块定义了晶体基本的\textbf{结构数据}.   
   \item 1至5行数据的 [keywords] 是 LATTICE\_CART, 声明使用笛卡尔绝对坐标系定义的单胞基矢. 
   \item 7至9行使用的[keywords]是 POSITIONS\_FRAC. 这在CASTEP中的意义是``以分数坐标定义的原子位置''. 而在AIRSS中, 该数据模块不仅可以指明原子初始位置, 还可以定义搜寻过程中对单种原子的约束条件. 若初始不知道原子的具体位置, 可将其设为任意值, 如(0, 0, 0), 程序将自行找到符合要求的原子位置. 原子位置设置的更具体细节将在之后给出. 
-  \item 第11行的 \#MINSEP 是 AIRSS 中的\textbf{全局参数}.
-  \#MINSEP=\(1.5\)表明了任意两原子的间距不得低于\(1.5\) \r{A}.
+  \item 第11行的 \#MINSEP 是 AIRSS 中的\textbf{全局参数}. \#MINSEP=\(1.5\)表明了任意两原子的间距不得低于\(1.5\) \r{A}.
 \end{maineu}}}\\
 
 
@@ -318,7 +317,6 @@ user@machine_name$
 
 \paragraph{原子位置} 再介绍原子位置的设置方法, 以\verb|POSITIONS_FRAC|为例.\\
 \emph{例2.}
-\hypertarget{Aotic Package}{\ }
 \begin{lstlisting}[language={bash},numbers=left]
 %BLOCK POSITIONS_FRAC
 Al  0.0 0.0 0.0 # Al1 % NUM=2 

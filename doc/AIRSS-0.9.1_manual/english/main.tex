@@ -97,7 +97,7 @@ Another thing that needs special reminder is that certain characters will be con
 
 \hyperref[sec:airss-install]{Appendix A} takes \verb|airss-0.9.0| as an example to briefly record the installation process of AIRSS. The latest \verb|airss-0.9.1| has made a lot of simplifications in the installation process, you can read the included README file to install this version.
 
-AIRSS主运行脚本使用perl语言写成, 仅能安装在 \verb|*nix| 系统中, 且只支持在命令行(Command Line)使用. 安装此软件前, 您最好已经了解 \href{https://www.gnu.org/software/make/manual/}{GNU make} 的使用方法.
+The main running script of AIRSS is written in perl language, and can only be installed in the \verb|*nix| system, used in the command line (Command Line). Before installing this software, you'd better understand the usage of \href{https://www.gnu.org/software/make/manual/}{GNU make}.
 
 \subsection{Run AIRSS}
 For you first time using AIRSS, you can enter the command `\verb|airss.pl|' in terminal to view the software welcome interface.
@@ -182,50 +182,51 @@ In order to facilitate the subsequent description, we first briefly introduce th
 \item Output the above random structure that meets the requirements through the buildcell.f90 module.
 \end{maineu}}}
 
-\subsection{*.cell文件结构概括}
-*.cell文件是结构搜索的``种子文件'', 您可以在此文件中设置搜索约束条件. 文件名称前的星号(*)代表是Linux系统下的通配符, 也即它代表任意字符. 在AIRSS文件系统中, 我们把后缀名前的部分称为 ``seed name''. Seed name 可用于区分不同计算的同类文件. 文中后续见到所有通配符, 如果不特殊指明, 均代指 seed name.
+\subsection{File Structure of *.cell}
+
+The *.cell file is the ``seed file'' of the structure search. You can set search constraints in this file. The asterisk (*) before the file name represents a wildcard under the Linux system, that is, it represents any strings. In the AIRSS file system, we refer to the part before the suffix as the ``seed name''. Seed name can be used to distinguish the same kind of files of different calculations. All wildcards will be seen later in the text. Unless otherwise specified, they all refer to the seed name.
 
 \noindent\fcolorbox{mygray}[HTML]{E7E7E7}{\parbox{\textwidth}{%
-\noindent \textbf{*.cell 文件有以下特点:}
+\noindent \textbf{*.cell file has the following characteristics:}
 \begin{maineu}
-\item 由于 AIRSS 是由部分参与 CASTEP 研发的人员编写, 因此该程序对 CASTEP 极其友好, 这里的 *.cell 文件与 CASTEP 中的 *.cell 文件完全兼容.
-\item *.cell 文件设置参数时, 需要使用一定的 keywords 标明所设参数的含义.
-\item AIRSS完全复用了CASTEP中进行结构声明的 keywords, 如 LATTICE\_CART 等.
-\item AIRSS 内置的 keywords 一般以\#开头, 如\#RASH. (以使得 AIRSS 的 *.cell 文件与 CASTEP 完全兼容)
-\item *.cell 文件主要由两部分组成: ``结构数据''和``全局参数''. 相应的, 文件中的 keywords 也可以分为上述两类.
-\item 任何 keyword 之间没有书写顺序上的限制.
-\item *.cell 中设定的所有的keywords需要采用\textbf{大写字母}书写, 并注意在keywords、等号和参数数值之间\textbf{不能添加空格}. 同时, 任何空行都将被自动忽略.
-\item 该文件中使用双井号(\#\#)标明注释内容.
-\item 虽然程序允许单行中出现多个 keywords, 但出于对所写文件的规范性和易读性考虑, 最好一行只写一个 keyword.
+\item Since AIRSS was written by some people who participated in the development of CASTEP, the program is extremely friendly to CASTEP, and the *.cell file here is fully compatible with the *.cell file in CASTEP.
+\item When setting parameters in the *.cell file, you need to use certain keywords to indicate the meaning of the set parameters.
+\item AIRSS completely reuses the keywords of CASTEP for structural declaration, such as LATTICE\_CART, etc.
+\item The built-in keywords of AIRSS usually start with \#, such as \#RASH. (To make the *.cell file of AIRSS fully compatible with CASTEP)
+\item *.cell file is mainly composed of two parts: ``structure data'' and ``global parameters''. Correspondingly, keywords in the file can also be divided into the above two categories.
+\item There is no restriction on the order of writing between any keywords.
+\item All keywords set in *.cell need to be written in \textbf{capital letters}, and be careful \textbf{not to add spaces} between keywords, equal signs and parameter values. At the same time, any blank lines will be automatically ignored.
+\item This file uses double pound signs (\#\#) to indicate the content of the comments.
+\item Although the program allows multiple keywords to appear in a single line, it is best to write only one keyword per line for the purpose of standardization and readability of the written file.
 \end{maineu}}}\\
 
-接下来我们会介绍*.cell文件的具体书写方式, 能否独立高效使用AIRSS就在于能否掌握下面几页的内容. 比起那些``关于AIRSS''之类的``没人细看''的前言章节, 此处可以说是该文章核心位置, 因此笔者想借用这个``黄金段位''讨论一些 AIRSS 程序设计合理性的问题, 这对于更好的使用该软件是相当有益的.
+Next, we will introduce the specific writing method of *.cell file. Whether you can use AIRSS independently and efficiently depends on whether you can master the content of the following pages. Compared with those ``about AIRSS'', ​​``no one will read it carefully'' 'Foreword chapter, here can be said to be the core position of the article, so I want to use this ``golden rank'' to discuss some issues of the rationality of the AIRSS program design, which is quite beneficial for the better use of the software.
 
-结构搜索想解决的问题其实是相当好定义的. 我们设想一个\(N\)维相空间, 空间的不同维度代表结构的不同可变参数(如原子配比, 晶格基矢, 原子位置等), 空间中的每个点代表不同的原子构型, 每个构型对应一个能量值. 于是我们的系统中就会存在一个\(N+1\)维的能量曲面(比如我们的相空间是二维的, 那么就会存在一个关于能量的三维曲面). 结构搜索要做的事情, 就是找到这个能量曲面的部分/全部的能量极小值点, 进而确定对应能量全局最小值的结构(也就是我们所说的最稳定构型).
+The problem that the structure search wants to solve is actually quite well-defined. We imagine a \(N\)-dimensional phase space, where different dimensions of the space represent different variable parameters of the structure (such as atomic ratio, lattice basis vector, atomic position, etc.) ), each point in the space represents a different atomic configuration, and each configuration corresponds to an energy value. So there will be a \(N+1\)-dimensional energy surface in our system (such as our phase space If it is two-dimensional, then there will be a three-dimensional surface about energy). What the structure search does is to find some/all energy minimum points of this energy surface, and then determine the structure corresponding to the global minimum energy ( That is what we call the most stable configuration).
 
-解决的这个问题的一种思路, 是用一些十分巧妙的算法(比如遗传算法或者机器学习), 使得体系基于不同的亚稳态构型``进化'', 找到全局最稳定构型. 这种算法的实现步骤如下: 初始产生一系列随机构型; 而后用第一性原理计算软件弛豫这些构型, 从弛豫的结果中继承/学习低能结构的特点; 接着利用从上一代学习的信息产生下一代结构; 如此迭代, 最终期望找到一个全局的最稳态. 这种算法的优点是, 可以在一个很大的相空间中迅速定位能量极小值点, 这在不借助任何先验信息, 只是纯理论的预测某个结构时是十分有效的. 但同时, 由于产生的上一代和下一代结构之间有因果关系, 因此不同代的结构只能序列(串行)地计算. 另外使用这一类算法还会面临一个很大的挑战, 也就是所谓的``相空间坍缩''(也即由于初始选取随机构型的局限性, 后续产生的新结构全部局域在某几个亚稳态附近). 为了解决这个问题, 我们不得不引入一个可调参数: ``变异概率''(也即认为结构在继承父代结构基础上, 还有一定概率在某些位置发生异变). 但在某些情况下(比如设置变异概率过高或过低), 这个参数并不如我们所想的有效. 
+One way to solve this problem is to use some very clever algorithms (such as genetic algorithms or machine learning) to make the system ``evolve'' based on different metastable configurations, and find the most stable configuration globally. The implementation steps of the algorithm are as follows: Initially generate a series of random mechanism types; then use first-principle calculation software to relax these configurations, inherit/learn the characteristics of low-energy structures from the relaxation results; then use the information learned from the previous generation Generate a next-generation structure; iterate in this way, and finally expect to find a global most stable state. The advantage of this algorithm is that it can quickly locate the energy minimum point in a large phase space, which does not rely on any prior information , It is only a purely theoretical prediction of a certain structure is very effective. But at the same time, due to the causal relationship between the previous generation and the next generation structure, the structure of different generations can only be calculated in sequence (serial). In addition, use This type of algorithm will also face a big challenge, that is, the so-called ``phase space collapse'' (that is, due to the limitations of the initial selection with the organization type, the subsequent new structures are all localized in certain sub-regions. Near steady state). In order to solve this problem, we have to introduce an adjustable parameter: ``mutation probability'' (that is, it is believed that the structure inherits the parent structure, and there is a certain probability that it will change in certain positions). But in some Under circumstances (such as setting the mutation probability too high or too low), this parameter is not as effective as we thought.
 
-AIRSS 则是使用了另一种结构搜索的策略. 它的 *.cell 文件中提供了大量的可调参数, 每一个参数对应着若干约束条件, 可以实现 \textbf{对相空间的精准限制}. 系统在满足这些约束条件的相空间中\textbf{随机}设置初始构型, 而后经过第一性原理计算软件的弛豫找到初始构型附近的某个(亚)稳态, 这就算是完成了一次``结构搜索''. 通过大规模(比如几千次或上万次)``搜索'', 结合\textbf{结构查重算法}, 最终就能在约束的相空间中找到一个全局最稳态. 这样的稳态大概有两个特点: \textbf{能量较(最)低}, \textbf{重复出现次数较(最)多}.
+AIRSS uses another structure searching strategy. Its *.cell file provides a large number of adjustable parameters, and each parameter corresponds to a number of constraints, which can achieve \textbf{precise restrictions on the phase space}. The system is meeting these The initial configuration is \textbf{randomly} set in the phase space of the constraints, and then a (meta)stable state near the initial configuration is found through the relaxation of the first-principles calculation software, which is regarded as a ``structure search''. Through large-scale (such as thousands or tens of thousands of times) ``search'', combined with the \textbf{structural duplicate check algorithm}, we can finally find a global most stable state in the constrained phase space. Such a steady state probably has two characteristics: \textbf{the energy is lower (the lowest)}, and \textbf{the number of repetitions is more (the most)}.
 
-``随机选取''初始结构这种策略乍一听起来似乎是毫无道理且效率极低的, 但如果经过``精准约束''后得到的相空间不是非常大, 那么即使不使用十分复杂的遗传算法, 单单依靠简单的随机撒点, 也可以获得不错的结果. 同时, 随机设置初始结构在保证了\textbf{并行计算效率}的同时, 还能避免``相空间坍缩''的发生. 
+The strategy of ``random selection'' of the initial structure at first sounds unreasonable and extremely inefficient, but if the phase space obtained after ``precision constraints'' is not very large, then even if it is not used, it is very complicated The genetic algorithm, which relies solely on simple random dots, can also obtain good results. At the same time, the random setting of the initial structure ensures the \textbf{efficiency of parallel computing} while avoiding the occurrence of ``phase space collapse''.
 
-也许看到这, 你会说, 如果我们一开始在遗传算法中把第一代设置得和AIRSS中一样多, 比如10000个, 那最终的结果不是比AIRSS这种算法要好得多, 毕竟AIRSS只相当于遗传算法的第一步? 但事实是, 在一个小的相空间中, 我们用每代10000个构型迭代100代所得到的结果, 和直接用1000000个随机结构弛豫计算, 其实差别不大, 有时甚至是后者更精确一些. 而且光是说出``每代10000个构型迭代100代''这样的话就会感觉荒唐, 因为这种计算需要的算力是海量的. 一般来说, 我们会取每代构型数量在100这个量级. 所以我更倾向于认为这两种算法是互补的关系, 一个适用于串行地寻找一个超大相空间中的部分低能极值点, 另一个适用于并行地寻找某个被牢牢限制的小相空间内的全部极值点. 而且根据本人的经验, AIRSS在较大的相空间中的表现, 并不像我们想象的那么差. 因为对实际满足物理约束的相空间, 其内的极值点是少量的(不然这个结构在实验上可能会存在大量的亚稳态), 完全可以依赖第一性原理计算的弛豫过程, 由一个看起来随机但其实就在DFT弛豫能力范围内的初始点, 找到这些最终的极值点.
+Perhaps seeing this, you will argue that if we set the first generation in the genetic algorithm as many as in the AIRSS, such as 10,000, the final result is not much better than the AIRSS algorithm, after all, AIRSS only It is equivalent to the first step of the genetic algorithm? But the fact is that in a small phase space, we use 10,000 configurations per generation to iterate for 100 generations, and directly use 1,000,000 random structure relaxation calculations. The difference is actually Not big, and sometimes the latter is more accurate. And just saying ``10,000 configuration iterations for 100 generations per generation'' would feel ridiculous, because this kind of calculation requires massive computing power. Generally speaking. In other words, we will take the number of configurations in each generation on the order of 100. So I prefer to think that these two algorithms are complementary, and one is suitable for serially finding some low-energy extreme points in a super large phase space. , The other is suitable for finding all extreme points in a small phase space that is tightly restricted in parallel. And according to my experience, the performance of AIRSS in a larger phase space is not as bad as we thought Because for the phase space that actually meets the physical constraints, there are a small number of extreme points (otherwise the structure may have a large number of metastable states in the experiment), and it can completely rely on the relaxation process calculated by first principles. Find these final extreme points from an initial point that looks random but is actually within the range of DFT relaxation ability.
 
-使用 \textbf{精准限制相空间大小} 加 \textbf{随机搜索} 的策略搜索结构, 可以说是一种非常清奇且有效的思路. 因为大部分时候, 我们并非需要完全理论的预测某个结构, 而是和实验合作(比如实验上已经知道了元素配比和晶报形状, 有时甚至可以通过电镜知道其大概的原子位置), 共同研究某种材料的原子结构. 此时原子可变的相空间可能并不是很大, 因此``如何更精确地定义所研究的相空间''就变成了比``如何优化算法更快从而更快得到极小值点''更重要的问题. 当然相空间的大小也是相对的, 比如我们选取10个随机构型显然不能覆盖任何所谓的``小的相空间'', 只有当这个数字增大到比如10000的时候, 对某些体系, 我们才能勉强这么说. 但这里就引出了随机生成结构的另一个好处, 那就是天生适合并行计算. 我们知道, 结构搜索中几乎全部的时间都花在了结构弛豫上. 如果我们手上有8000个核, 使用8个核优化一个构型, 那么在同一时间我们就可以同时搜寻1000个结构, 如果有80000个核(当然这几乎是不可能的, 捂脸笑.jpg ), 那么同一时间就可以计算10000个结构. 这种简单粗暴的高效并行方式, 是其他算法所不能比拟. AIRSS同时集合了\textbf{精准限制相空间大小} 和 \textbf{随机产生结构} 两大特点, 在很多时候(尤其在与实验合作共同搜寻原子结构时), 是十分高效的.
+Using a strategy search structure that \textbf{accurately limits the size of the phase space} plus \textbf{random search} can be said to be a very strange but effective idea. Because most of the time, we do not need to predict a structure completely theoretically, but cooperate with experiments (such as Experiments have already known the element ratio and crystal shape, and sometimes even the approximate atomic position can be known through electron microscopy), and jointly study the atomic structure of a certain material. At this time, the variable phase space of atoms may not be very large, so ``How to define the phase space under study more precisely'' has become a more important issue than ``how to optimize the algorithm to get the minimum point faster''. Of course, the size of the phase space is also relative. For example, if we choose 10 random organization types, it is obviously not possible to cover any so-called ``small phase space''.Only when this number increases to, for example, 10,000, can we reluctantly say that for some systems. But here comes another benefit of randomly generating structures, that is, it is inherently suitable for parallel computing. We know that almost all the time in structure search is spent on structure relaxation. If we have 8000 cores in our hands, use 8 Each core optimizes a configuration, then at the same time we can search for 1000 structures at the same time. If there are 80,000 cores (of course, this is almost impossible, face smile.jpg), then 10,000 structures can be calculated at the same time This simple and rude and efficient parallel method is unmatched by other algorithms. AIRSS also combines the two characteristics of \textbf{precise limit phase space size} and \textbf{random structure generation}. In many cases (especially when working with experiments to search for atomic structures), It is very efficient.
 
 \noindent\fcolorbox{mygray}[HTML]{E7E7E7}{\parbox{\textwidth}{%
-\noindent \textbf{目前 *.cell 文件中可用参数的功能可分为以下几类:}
+\noindent \textbf{At present, the functions of the parameters available in the *.cell file can be divided into the following categories:}
 \begin{maineu}
-  \item \textbf{声明初始晶格结构.} 比如声明初始的晶胞基矢, 初始的原子位置等.
-  \item \textbf{对晶胞参数的约束.} 比如固定初始晶格基矢, 约束晶胞体系, 约束晶胞变化程度, 约束晶胞所在晶系, 为晶胞添加真空层, 是否扩胞等.
-  \item \textbf{对体系化学式的要求.} 比如体系是几元的, 电子是否能配平(是否有悬挂键)等.
-  \item \textbf{对原子位置的约束.} 如两原子之间的最短距离, 某个原子偏离初始位置的最大/最小距离, 某原子的配位数等. 
-  \item \textbf{对体系对称性的约束.} 如体系有几个对称操作, 在什么空间群, 对称性寻找的精细程度, 是否引入破坏对称性扰动等.
-  \item \textbf{对程序本身搜索算法的调整.} 如, 接受搜索失败次数上限, 是否引入PSUH, 是否引入TPSD, 是否引入RASH等.
-  \item (不太常用的) 在晶体中加入一个覆盖整个晶胞的力场. 如, 加入一个球形力场, 椭球力场, 长条状力场, 平面力场等.
+  \item \textbf{Declare the initial lattice structure.} For example, declare the initial unit cell basis vector, initial atomic position, etc.
+  \item \textbf{Constraints on unit cell parameters.} Such as fixing the initial lattice base vector, constraining the unit cell system, constraining the degree of change of the unit cell, constraining the crystal system of the unit cell, adding a vacuum layer to the unit cell, whether to expand the cell, etc.
+  \item \textbf{Requirements for the chemical formula of the system.} For example, how many yuan the system is, whether the electrons can be balanced (whether there are dangling bonds), etc.
+  \item\textbf{Restrictions on the position of atoms.} Such as the shortest distance between two atoms, the maximum/minimum distance of an atom from the initial position, the coordination number of an atom, etc.
+  \item \textbf{Restrictions on the symmetry of the system.} For example, the system has several symmetry operations, in what space group, the degree of fineness of symmetry search, whether to introduce symmetry breaking disturbances, etc.
+  \item \textbf{Adjustment to the search algorithm of the program itself.} For example, accept the upper limit of the number of search failures, whether to introduce PSUH, whether to introduce TPSD, whether to introduce RASH, etc.
+  \item (Less commonly used) Add a force field covering the entire unit cell in the crystal. For example, add a spherical force field, an ellipsoidal force field, a strip force field, a plane force field, etc.
 \end{maineu}}}\\
 
-以下是预测金属铝结构所用到的 \verb|Al.cell| 文件:
+The following is the \verb|Al.cell| file used to predict the structure of metal aluminum:
 \begin{lstlisting}[language={bash},numbers=left,firstnumber=0]
 user@machine_name$ cat Al.cell
 %BLOCK LATTICE_CART
@@ -244,23 +245,23 @@ user@machine_name$
 
 
 \noindent\fcolorbox{mygray}[HTML]{E7E7E7}{\parbox{\textwidth}{%
-\noindent \textbf{上述 *.cell 文件的结构可做如下概括:}
+\noindent \textbf{The structure of the above *.cell file can be summarized as follows:}
 \begin{maineu}
-  \item 前9行是由 \%BLOCK [keywords] 格式定义的数据读取区块, 这种格式在CASTEP中是十分常见的. 这些区块定义了晶体基本的\textbf{结构数据}.   
-  \item 1至5行数据的 [keywords] 是 LATTICE\_CART, 声明使用笛卡尔绝对坐标系定义的单胞基矢. 
-  \item 7至9行使用的[keywords]是 POSITIONS\_FRAC. 这在CASTEP中的意义是``以分数坐标定义的原子位置''. 而在AIRSS中, 该数据模块不仅可以指明原子初始位置, 还可以定义搜寻过程中对单种原子的约束条件. 若初始不知道原子的具体位置, 可将其设为任意值, 如(0, 0, 0), 程序将自行找到符合要求的原子位置. 原子位置设置的更具体细节将在之后给出. 
-  \item 第11行的 \#MINSEP 是 AIRSS 中的\textbf{全局参数}.
-  \#MINSEP=\(1.5\)表明了任意两原子的间距不得低于\(1.5\) \r{A}.
+  \item The first 9 lines are data reading blocks defined by the format \%BLOCK [keywords], this format is very common in CASTEP. These blocks define the basic \textbf{structure data} of the crystal. 
+  \item The [keywords] of the 1 to 5 rows of data is LATTICE\_CART, which declares the unit cell base vector defined by the Cartesian absolute coordinate system.
+  \item The [keywords] used in lines 7 to 9 is POSITIONS\_FRAC. The meaning of this in CASTEP is ``the position of the atom defined in fractional coordinates''. In AIRSS, the data module can not only specify the initial position of the atom, but also Define the constraint conditions for a single atom in the search process. If the specific position of the atom is not known initially, it can be set to any value, such as (0, 0, 0), and the program will find the atomic position that meets the requirements. Atom position More specific details of the settings will be given later.
+  \item \#MINSEP on line 11 is \textbf{global parameter} in AIRSS. \#MINSEP=\(1.5\) indicates that the distance between any two atoms must not be less than \(1.5\) \r(A).
 \end{maineu}}}\\
 
 
-可以看到, *.cell文件的结构大致分为两大部分:\textbf{结构数据}和\textbf{全局参数}.
+As we can see, the structure of the *.cell file is roughly divided into two parts: \textbf{structure data} and \textbf{global parameters}.
 
-\subsection{*.cell文件参数细节}
-\subsubsection{结构数据}
-该部分沿用了CASTEP的结构文件中定义数据的模式. 结构数据由两部分构成: 晶格参数数据区块, 原子位置数据区块. 
+\subsection{Parameter Details of *.cell File}
+\subsubsection{structure data}
+This part follows the data pattern defined in the CASTEP structure file. The structure data consists of two parts: the lattice parameter data block and the atomic position data block.
 
-数据区块的具体模式如下所示:
+
+The specific mode of the data block is as follows:
 \begin{lstlisting}[language={bash}]
 %BLOCK [keywords]
 [...]
@@ -269,42 +270,44 @@ user@machine_name$
 %BLOCKEND [keywords]
 \end{lstlisting}
 
-可以在AIRSS中使用的数据区块关键字(\verb|[keywords]|)已在 \textbf{Table \ref{BLOCKkeywords}} 中列出.
+
+The data block keywords that can be used in AIRSS are listed in \textbf{Table \ref{BLOCKkeywords}}.
+
 \begin{center}
 \begin{longtable}{m{13em}<{\centering} | m{19em}<{\centering}}
 \caption{AIRSS Cheat Sheet -- Data BOLCK}
 \label{BLOCKkeywords} \\
 \toprule
-\textbf{参数名称}  & \textbf{功能说明}  \\
+\textbf{Parameters}  & \textbf{Description}  \\
 \midrule
 \midrule
 \endfirsthead
 \multicolumn{2}{c}{\tablename\ \thetable\ -- \textit{Continued from previous page}} \\
 \toprule
-\textbf{参数名称}  & \textbf{功能说明}  \\
+\textbf{Parameters}  & \textbf{Description}  \\
 \midrule
 \midrule
 \endhead
 \midrule \multicolumn{2}{r}{\textit{Continued on next page...}} \\
 \endfoot
 \endlastfoot 
-\verb|LATTICE_CART|  & 使用笛卡尔坐标系, 以一个\(3\times3\)的矩阵定义\textbf{单胞}基矢. 通过在该区块中附加以下标签: \verb|#FIX,|\verb|#CFIX,|\verb|#ABFIX|, 可分别实现: 固定整个晶格形状, 固定晶格常数c, 固定晶格常数ab. 另外, 需要强调的是, 如果要确保晶格参数不变, 除了在晶格参数数据区块中加入\verb|#FIX|, 以保证在猜测晶格结构时保持其为常值外, 还需要在DFT弛豫软件中做相应的设置, 以保证其在结构弛豫时也不变.\\
+\verb|LATTICE_CART|  & Use the Cartesian coordinate system to define the base vector of \textbf{unit cell} with a matrix of \(3\times3\). By appending the following tags to the block: \verb|#FIX,|\verb|#CFIX, |\verb|#ABFIX|, can be implemented separately: fix the entire lattice shape, fix the lattice constant c, and fix the lattice constant ab. In addition, it should be emphasized that if you want to ensure that the lattice parameters are unchanged, except in the lattice Add \verb|#FIX| to the parameter data block to ensure that it is maintained as a constant value when guessing the lattice structure, and it is also necessary to make corresponding settings in the DFT relaxation software to ensure that it is also in the structure relaxation. constant.\\
 \midrule
-\verb|LATTICE_ABC| & 以一个\(2\times3\)的矩阵定义单胞的晶格参数.矩阵第一行是参数abc, 第二行是三个夹角. 在同一个\verb|.cell|中, 与\verb|LATTICE_CART|二选一即可. 通过在该区块中附加以下标签: \verb|#FIX,|\verb|#CFIX,|\verb|#ABFIX|, 可分别实现: 固定整个晶格形状, 固定晶格常数c, 固定晶格常数ab.\\
+\verb|LATTICE_ABC| & Use a \(2\times3\) matrix to define the lattice parameters of the unit cell. The first row of the matrix is ​​the parameter abc, and the second row is the three angles. In the same \verb|.cell|, it is the same as \verb |LATTICE_CART|Choose one of the two. By adding the following tags to the block: \verb|#FIX,|\verb|#CFIX,|\verb|#ABFIX|, can be achieved separately: fix the entire lattice shape, Fixed lattice constant c, fixed lattice constant ab.\\
 \midrule
-\verb|POSITIONS_FRAC| & 以晶格基矢坐标系下的分数坐标定义原子位置.\\
+\verb|POSITIONS_FRAC| & The atomic position is defined by the fractional coordinates in the lattice base vector coordinate system.\\
 \midrule
-\verb|POSITIONS_ABS| & 以笛卡尔坐标系下的绝对数值坐标定义原子位置. 与 \verb|POSITIONS_FRAC| 二者选一即可.\\
+\verb|POSITIONS_ABS| & Define the atomic position with absolute numerical coordinates in Cartesian coordinate system. Choose one from this or \verb|POSITIONS_FRAC|.\\
 \midrule
-\verb|SYMMETRY_OPS| & 定义生成的单胞所必须满足的对称操作, 四行一组, 前三行定义旋转操作, 第四行行定义平移操作. 具体用法可参考 \href{http://www.tcm.phy.cam.ac.uk/castep/documentation/WebHelp/content/modules/castep/keywords/k_symmetry_ops_castep.htm}{CASTEP:SYMMETRY OPS}.\\
+\verb|SYMMETRY_OPS| & Define the symmetry operations that the generated unit cell must meet, a group of four, the first three lines define rotation operations, and the fourth line defines translation operations. For specific usage, please refer to \href{http://www.tcm.phy.cam.ac.uk/castep/documentation/WebHelp/content/modules/castep/keywords/k_symmetry_ops_castep.htm}{CASTEP:SYMMETRY OPS}.\\
 \bottomrule
 \end{longtable}
 \end{center}
 
-下面简单介绍, \textbf{晶格参数}数据区块和\textbf{原子位置}数据区块的详细书写方法.
+The following briefly introduces the detailed writing method of \textbf{lattice parameter} data block and \textbf{atomic position} data block.
 
-\paragraph{晶格参数} 首先介绍晶格参数的设定, 以\verb|LATTICE_CART|为例.\\
-\emph{例1.}
+\paragraph{Lattice parameter} First introduce the setting of lattice parameters, \\take \verb|LATTICE_CART| as an example.\\
+\emph{Example 1.}
 \begin{lstlisting}[language={bash},numbers=left]
 %BLOCK LATTICE_CART
 20 0 0
@@ -314,13 +317,12 @@ user@machine_name$
 %BLOCKEND LATTICE_CART
 \end{lstlisting}
 
-上述字段构建了一个\(20\times20\times20\) \r{A}\(^3\)的正方体作为晶体的单胞. 这里的 \verb|#FIX| 被称为\textbf{晶格标签}(Lattice Tags). 
+The above fields construct a cube of \(20\times20\times20\) \r(A)\(^3\) as the unit cell of the crystal. Here \verb|#FIX| is called \textbf{lattice tag}.
 
-它声明了晶格常数在搜寻(生成初始随机结构)过程中是不能改变的. 如果您想保证体系晶格常数在进行DFT弛豫时也不变, 则需要在相应计算软件的输入文件中设置.
+It states that the lattice constant cannot be changed during the search (generating the initial random structure). If you want to ensure that the lattice constant of the system remains unchanged during DFT relaxation, you need to set it in the input file of the corresponding calculation software .
 
-\paragraph{原子位置} 再介绍原子位置的设置方法, 以\verb|POSITIONS_FRAC|为例.\\
-\emph{例2.}
-\hypertarget{Aotic Package}{\ }
+\paragraph{Atomic position} Then introduce the setting method of atomic position, \\take \verb|POSITIONS_FRAC| as an example.\\
+\emph{Example 2.}
 \begin{lstlisting}[language={bash},numbers=left]
 %BLOCK POSITIONS_FRAC
 Al  0.0 0.0 0.0 # Al1 % NUM=2 
@@ -333,7 +335,7 @@ H   0.0 0.0 0.0 # H-set % ANGAMP=0 POSAMP=0
 %BLOCKEND POSITIONS_FRAC
 \end{lstlisting}
 
-通过这个例子可以看出, 原子位置结构数据的基本格式是:
+As can be seen from this example, the basic format of atomic position structure data is:
 \begin{lstlisting}[language={bash}]
 [element] [x] [y] [z] # [atoms_set_name] % [tag1] [tag2] [tag3]
 \end{lstlisting}
