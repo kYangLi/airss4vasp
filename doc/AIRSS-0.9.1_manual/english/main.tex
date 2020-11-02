@@ -395,7 +395,7 @@ As can be seen from this example, the basic format of atomic position structure 
 \midrule
 \verb|OCC=|\(p\) & \verb|float| \([0,1]\) & 1.0 & 该点位占据原子的几率, 同种元素在不同位置的占据几率之和必须为大于0的整数. 接收分数形式的输入, 如 \verb|OCC=1/3|. 若该值设为小于0的数, 则强行将该原子的OCC设置为1, 同时不再输出该原子可能因对称性衍生的其他原子位置. 若原子同时有 \verb|FIX| 或 \verb|NOMOVE| 标签, 则 \verb|OCC| 强制设为1. 若该原子OCC大于1, 则将其设置为空位(与将元素名称设为Z的效果相同). 系统存在对称性时, 使用更小的 OCC 可强制某一原子位于对称性更高的点位上. 但更为自然的用法是使用 \verb|MULT| 代替 \verb|OCC| 设置. 若设置了全局参数\verb|#NFORM=n|(n大于0): 在没有对称性条件下, \verb|OCC| 参数失效; 在有对称性条件下, 请参考 \verb|MULT| 中的说明. \\
 \midrule
-\verb|MULT=|\(m\) & \verb|float| & -1.0 & 设置该原子点位的 multiplicities. 这一数值为正时, 强制将 \verb|OCC| 参数的值覆盖为 MULT/SYMM\_NUM. 其中 SYMM\_NUM 为晶格对称群元的个数. 若设置了全局参数\verb|#NFORM=n|(n大于0), 则等效于将所有原子的 \verb|MULT| 的值设为\(n\), 同时不设置\verb|#NFORM=|. 若该行原子有标签 \verb|FIX| 或 \verb|NOMOVE|, 则强制将该原子的MULT设为-1. 使用这一参数, 可以限制某一行原子由晶体对称性实际生成原子的个数, 以及所处位置对称性的高低. 关于格点 multiplicities 与对称性的关系可参考 \href{https://www.cryst.ehu.es/cryst/get_set.html}{BCS: Wyckoff Position}.\\
+\verb|MULT=|\(m\) & \verb|float| & symm num & 设置该原子点位的 multiplicity.\footnote{这一数值为正时, 会强制将 OCC 参数的值覆盖为 MULT/SYMM\_NUM, 其中 SYMM\_NUM 为晶格对称群元的个数. 也即在AIRSS中, multiplicities 是通过设置分数OCC实现的, 因此不设置MULT而直接设置分数的OCC也可达到一样的效果.} 格点的 multiplicity 告诉我们, 如果我们在该位置上放置一个原子, 那么对称性将产生多少个原子. 使用这一参数, 可以限制某一行原子由晶体对称性实际生成原子的个数, 以及所处位置对称性的高低. 该参数默认大小为群操作个数, 也即默认只寻找 general position. 若该行原子有标签 \verb|FIX| 或 \verb|NOMOVE|, 则MULT失效, 同时将\verb|OCC|强制设为-1. 若设置了全局参数\verb|#NFORM=n|(n大于0), 则等效于将所有原子的 \verb|MULT| 的值设为\(n\), 同时不设置\verb|#NFORM=|. 关于格点 multiplicities 与对称性的更多信息可参考 \href{http://folk.ntnu.no/yingday/NilsYD/PhaseStructure/001Space_Groups.pdf}{PDF: Space Group and Multiplicities}.\\
 \midrule
 \verb|PERM| & \verb|void| & off & 在完成原子位置选定后, 重排(按一定概率互相交换)指定原子位置间的元素种类. 需要配合全局参数 \verb|#PERMUTE| 使用, 否则该参数将被关闭.\\
 \midrule
@@ -500,11 +500,11 @@ AIRSS中全部可用的全局参数的功能和详细使用方法如\textbf{Tabl
 \midrule
 \verb|#TIGHT|& \verb|void| & off & 使得生成的结构更加紧密.\\
 \midrule
-\verb|#SYMMOPS=|\(n\)\hspace{6em}\verb|#SYMMOPS=~|\(n\;\;\;\;\;\;\;\;\;\;\;\)\hspace{6em}\verb|#SYMMOPS=|\(n_{min}-n_{max}\) & \verb|int| &  off & 声明生成的结构中必须含有\(n\)种对称操作. 若体系是周期性晶体结构, 推荐从下述整数中选取: 1,2,3,4,5,6,8,12,16,24,48. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量\footnote{这里的``数量''是指, 满足对称操作所需的最少同类原子数量, 也即该点位的 multiplicities. }更少的 special position 不予考虑.\footnote{源代码中这样描述: Symmetry is only be approximately applied (filling general positions only)} 另外需要注意的是, AIRSS中实现锁定对称性的方法是: 接将原子按对称性复制n份. 例如原子有\(C_4\)对称性, 则最终输出的总原子数将是设定的4倍. 但如果结合原子标签 \verb|OCC, MULT| 等的使用, 可实现在更高对称的点位安放更少原子的操作. 在含有波浪号(\(\sim\))的模式下不推荐使用\verb|MULT|等参数限制原子对称复制的个数.\\
+\verb|#SYMMOPS=|\(n\)\hspace{6em}\verb|#SYMMOPS=~|\(n\;\;\;\;\;\;\;\;\;\;\;\)\hspace{6em}\verb|#SYMMOPS=|\(n_{min}-n_{max}\) & \verb|int| &  off & 声明生成的结构中必须含有\(n\)种对称操作. 若体系是周期性晶体结构, 推荐从下述整数中选取: 1,2,3,4,5,6,8,12,16,24,48. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量\footnote{这里的``数量''是指, 满足对称操作所需的最少同类原子数量, 也即该点位的 multiplicities. }更少的 special position 不予考虑. 若使用\verb|MULT|逐个原子指定 multiplicity, 则波浪号(\(\sim\))被忽略, 但若使用\verb|#NFORM=n|(\(n\)大于0), 则会与波浪号(\(\sim\))冲突. 另外需要注意的是, AIRSS中实现锁定对称性的方法是: 接将原子按对称性复制n份. 例如原子有\(C_4\)对称性, 则最终输出的总原子数将是设定的4倍. 但如果结合原子标签 \verb|OCC, MULT| 等的使用, 可实现在更高对称的点位安放更少原子的操作. 在含有波浪号(\(\sim\))的模式下不推荐使用\verb|#NFORM=n|限制原子对称复制的个数.\\
 \midrule
-\verb|#SYMM=|\(spg\)\hspace{6em} \verb|#SYMM=~|\(spg\)& \verb|string| & off & 生成的结构必须在\(spg\)空间群中, \(spg\)是空间群的名称. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量更少的 special position 不予考虑, 在此模式下不推荐使用\verb|MULT|等参数限制原子对称复制的个数.\\
+\verb|#SYMM=|\(spg\)\hspace{6em} \verb|#SYMM=~|\(spg\)& \verb|string| & off & 生成的结构必须在\(spg\)空间群中, \(spg\)是空间群的名称. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量更少的 special position 不予考虑, 在此模式下不推荐使用\verb|#NFORM=n|限制原子对称复制的个数.\\
 \midrule
-\verb|#SYMMNO=|\(n\)\hspace{6em} \verb|#SYMMNO=~|\(n\) & \verb|int| & off & 生成的结构必须在第\(n\)号空间群中, \(n\)是空间群的序号. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量更少的 special position 不予考虑, 在此模式下不推荐使用\verb|MULT|等参数限制原子对称复制的个数.\\
+\verb|#SYMMNO=|\(n\)\hspace{6em} \verb|#SYMMNO=~|\(n\) & \verb|int| & off & 生成的结构必须在第\(n\)号空间群中, \(n\)是空间群的序号. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量更少的 special position 不予考虑, 在此模式下不推荐使用\verb|#NFORM=n|限制原子对称复制的个数.\\
 \midrule
 \verb|#SYMMORPHIC| & \verb|void| & off & 只检查体系是否存在点式对称操作.\\
 \midrule
