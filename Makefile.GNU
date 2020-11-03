@@ -1,23 +1,24 @@
 FC=gfortran   # GCC family only
 FFLAGS=-O0 -g # Do not optimise
-#FFLAGS= -O0 -g -fimplicit-none -Wall -Wline-truncation -Wcharacter-truncation -Wsurprising -Waliasing -Wimplicit-interface -Wunused-parameter -fwhole-file -fcheck=all -std=f2008 -pedantic -fbacktrace -fall-intrinsics -ffpe-trap=invalid,zero,overflow -fbounds-check -Wuninitialized
+#FFLAGS=-O0 -g -fimplicit-none -Wall -Wline-truncation -Wcharacter-truncation -Wsurprising -Waliasing -Wimplicit-interface -Wunused-parameter -fwhole-file -fcheck=all -std=f2008 -pedantic -fbacktrace -fall-intrinsics -ffpe-trap=invalid,zero,overflow -fbounds-check -Wuninitialized
 
 CC=gcc # GCC family only
-CFLAGS=
+CFLAGS=-lm
 
 LD=$(FC)
 LDFLAGS=-llapack
 
-LDC=$(CC)
-LDCFLAGS=-lm
-
-PREFIX=$(PWD)
 
 GCC_VER_GTE46 := $(shell echo `$(FC) -dumpfullversion -dumpversion | \
                    cut -f1-2 -d.` \>= 4.6 | bc )
 ifeq ($(GCC_VER_GTE46),0)
 DFLAGS=-DCOMPAT
 endif
+
+LDC=$(CC)
+LDCFLAGS=$(CFLAGS)
+
+PREFIX=$(PWD)
 
 export
 

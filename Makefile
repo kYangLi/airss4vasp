@@ -1,22 +1,25 @@
+## Please Change the parameters below...
+# [tips] You may need to check: 
+# [tips]  https://software.intel.com/en-us/articles/intel-mkl-link-line-advisor 
+# [tips]  to confirm the FFLAGS, FLIBS, CFLAGS, CLIBS, if you are using intel
+# [tips]  compilers.
 FC=ifort
-FFLAGS=-O0 -g # Do not optimise
-#FFLAGS= -O0 -g -fimplicit-none -Wall -Wline-truncation -Wcharacter-truncation -Wsurprising -Waliasing -Wimplicit-interface -Wunused-parameter -fwhole-file -fcheck=all -std=f2008 -pedantic -fbacktrace -fall-intrinsics -ffpe-trap=invalid,zero,overflow -fbounds-check -Wuninitialized
+FLIBS=${MKLROOT}/lib/intel64/libmkl_lapack95_ilp64.a -Wl,--start-group ${MKLROOT}/lib/intel64/libmkl_intel_ilp64.a ${MKLROOT}/lib/intel64/libmkl_sequential.a ${MKLROOT}/lib/intel64/libmkl_core.a -Wl,--end-group -lpthread -lm -ldl
+FFLAGS=-i8 -I${MKLROOT}/include/intel64/ilp64 -I${MKLROOT}/include 
 
 CC=icc
-CFLAGS=
+CLIBS=${MKLROOT}/lib/intel64/libmkl_blas95_ilp64.a ${MKLROOT}/lib/intel64/libmkl_lapack95_ilp64.a -Wl,--start-group ${MKLROOT}/lib/intel64/libmkl_intel_ilp64.a ${MKLROOT}/lib/intel64/libmkl_sequential.a ${MKLROOT}/lib/intel64/libmkl_core.a -Wl,--end-group -lpthread -lm -ldl
+CFLAGS=-DMKL_ILP64 -I${MKLROOT}/include/intel64/ilp64 -I${MKLROOT}/include
+
+
+## DO NOT CHANGE BELOW ##
+DFLAGS=-DCOMPAT
 
 LD=$(FC)
-# [tips] You may need to check: 
-# [tips] https://software.intel.com/en-us/articles/intel-mkl-link-line-advisor 
-# [tips] to confirm the LDFLAGS, if you are using intel compilers.
-LDFLAGS=-Wl,--start-group ${MKLROOT}/lib/intel64/libmkl_gf_ilp64.a ${MKLROOT}/lib/intel64/libmkl_intel_thread.a ${MKLROOT}/lib/intel64/libmkl_core.a ${MKLROOT}/lib/intel64/libmkl_blacs_intelmpi_ilp64.a -Wl,--end-group -liomp5 -lpthread -lm -ldl
+LDFLAGS=$(FFLAGS) -L$(FLIBS)
 
 LDC=$(CC)
-LDCFLAGS=-lm
-
-# 'DFLAGS=-DCOMPAT' is necessary when it comes the error:
-#   [COMPILER_VERSION] and [COMPILER_OPTIONS] are invalid in cell.f90.
-DFLAGS=-DCOMPAT
+LDCFLAGS=$(CFLAGS) -L$(CLIBS)
 
 PREFIX=$(PWD)
 

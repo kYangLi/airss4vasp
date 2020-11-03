@@ -30,10 +30,10 @@ module rng
 
   implicit none
 
-!!$  interface ! Needed for ifort
-!!$     integer function getpid()
-!!$     end function getpid
-!!$  end interface
+  interface ! Needed for ifort
+    integer function getpid()
+    end function getpid
+  end interface
 
   private
 
@@ -54,8 +54,6 @@ contains
     integer                            :: i,j,iters,size
     real(kind=dp)                      :: rr
     character(len=*), optional         :: sstring
-    integer                            :: getpid  ! Adding definations due to 
-                                                  !   `implicit none`. 
 
     pid=getpid()
 
