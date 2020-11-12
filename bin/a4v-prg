@@ -38,21 +38,24 @@ seed_name=$(grep_input_file 'SEED_NAME')
 total_coach_num=$(echo ${coach_list} | wc -w)
 total_str_num=$(ls POSCAR-POOL/${seed_name}-*.cell 2>/dev/null | wc -w)
 untouched_str_num=$(ls POSCAR-POOL/${seed_name}-*.vasp 2>/dev/null | wc -w)
-finished_str_num=$(ls RES-POOL/*.res 2>/dev/null | wc -w)
+succeed_str_num=$(ls RES-POOL/*.res 2>/dev/null | wc -w)
 error_str_num=$(grep '\[error\]' VASP.log.temp | wc -l)
+finished_str_num=$((error_str_num+succeed_str_num))
 not_conv_str_num=$(grep '\[error\]' VASP.log.temp | 
                    grep 'Not reach the required accuracy' | wc -l)
 no_contcar_str_num=$(grep '\[error\]' VASP.log.temp | 
                      grep 'CONTCAR not found' | wc -l)
 bad_poscar_str_num=$(grep '\[error\]' VASP.log.temp | 
                      grep 'Bad initial structure' | wc -l)
-((processed_str_num=error_str_num+finished_str_num))
 calc_done=false
-if [ "${total_str_num}" == "${processed_str_num}" ]; then 
+color_red='\033[01;31m'
+color_green='\033[01;32m'
+color_none='\033[0m'
+if [ "${total_str_num}" == "${finished_str_num}" ]; then 
   calc_done=true
-  run_state='[done] Random searching done!'
+  run_state="${color_green}[done] Random searching done!${color_none}"
 else 
-  run_state='[info] Random searching in processing...'
+  run_state="${color_red}[doing] Random searching in processing...${color_none}"
 fi
 start_time=$(grep '\[start_time\]' VASP.log.temp | awk '{print $2}' | 
              sort -n | head -1)
@@ -93,19 +96,24 @@ fi
 
 # Process Summary Output
 echo "================== Process Check =================="
-echo "${run_state}"
+printf "${run_state}\n"
+echo "  Seed Name                  :  ${seed_name}"
 if ! ${calc_done}; then
-  echo "[info] Curr. Work Coach   :  ${current_coach_num}/${total_coach_num}"
+  echo "  Curr. Work Coach           :  ${current_coach_num}/${total_coach_num}"
 fi
-echo "[info] Seed Name          :  ${seed_name}"
-echo "[info] Succeed Str.       :  ${finished_str_num}/${total_str_num}"
-echo "[info] Error Str.         :  ${error_str_num}/${total_str_num}"
-echo "[info] Not Converged      :  ${not_conv_str_num}/${error_str_num}"
-echo "[info] Missing CONTCAR    :  ${no_contcar_str_num}/${error_str_num}"
-echo "[info] Bad Init. POSCAR   :  ${bad_poscar_str_num}/${error_str_num}"
-echo "[info] Ave. Time Per Str. :  ${average_time_spend_format}"
-echo "[info] Total Time Spend   :  ${total_time_spend_format}"
-echo "[info] Time Remain Estim. :  ${esti_remain_time_format}"
+echo "  -----------------------------------------------"
+echo "  Total Str.                 :  ${total_str_num}"
+echo "  |--Untouched Str.          :  ${untouched_str_num}/${total_str_num}"
+echo "  +--Finished Str.           :  ${finished_str_num}/${total_str_num}"
+echo "     |--Succeed Str.         :  ${succeed_str_num}/${finished_str_num}"
+echo "     +--Error Str.           :  ${error_str_num}/${finished_str_num}"
+echo "        |--Not Converged     :  ${not_conv_str_num}/${error_str_num}"
+echo "        |--Missing CONTCAR   :  ${no_contcar_str_num}/${error_str_num}"
+echo "        +--Bad Init. POSCAR  :  ${bad_poscar_str_num}/${error_str_num}"
+echo "  -----------------------------------------------"
+echo "  Running Time               :  ${total_time_spend_format}"
+echo "  Average Time Per Str.      :  ${average_time_spend_format}"
+echo "  Estimated Remaining Time   :  ${esti_remain_time_format}"
 echo "==================================================="
 
 # Useless file remove 

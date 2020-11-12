@@ -22,7 +22,7 @@ PREFIX=$(PWD)
 
 export
 
-all: internal external
+all: internal external install
 
 internal: cabal buildcell cryan
 
