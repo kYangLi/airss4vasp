@@ -40,7 +40,7 @@ total_str_num=$(ls POSCAR-POOL/${seed_name}-*.cell 2>/dev/null | wc -w)
 untouched_str_num=$(ls POSCAR-POOL/${seed_name}-*.vasp 2>/dev/null | wc -w)
 finished_str_num=$(ls RES-POOL/*.res 2>/dev/null | wc -w)
 error_str_num=$(grep '\[error\]' VASP.log.temp | wc -l)
-not_conv_str_num=$(grep '\[error\]' VASP.log | 
+not_conv_str_num=$(grep '\[error\]' VASP.log.temp | 
                    grep 'Not reach the required accuracy' | wc -l)
 no_contcar_str_num=$(grep '\[error\]' VASP.log.temp | 
                      grep 'CONTCAR not found' | wc -l)
