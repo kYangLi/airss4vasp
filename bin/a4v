@@ -15,6 +15,11 @@ if [ -z "${a4v_in_path}" ]; then
   exit 1
 fi
 
+if [ ! -e a4v.input ]; then
+  echo '[error] Not in a A4V calculation folder!!!'
+  exit -1
+fi
+
 #===================#
 #   Tools Defined   #
 #===================#
@@ -471,7 +476,7 @@ fi
 cd POSCAR-POOL
 cp ../${seed_name}.cell .
 genpos ${seed_name} ${str_num}
-gen_str_num=$(echo $(ls | wc -w) | awk '{print ($1-1)/2}')
+gen_str_num=$(ls -1 *.vasp | wc -l)
 echo "[info] There are ${gen_str_num} structures in the POSCAR-POOL, now."
 cd ..
 ## Make the Result directory

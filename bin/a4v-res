@@ -3,8 +3,8 @@
 # Descripution: ca
 #
 
-if [ -e 'TRAIN.record' ]; then 
-  cd RES-POOL 
+if [ -e 'TRAIN.record' ]; then
+  cd RES-POOL
 fi 
 
 # Tips for usage

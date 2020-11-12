@@ -41,6 +41,7 @@ untouched_str_num=$(ls POSCAR-POOL/${seed_name}-*.vasp 2>/dev/null | wc -w)
 succeed_str_num=$(ls RES-POOL/*.res 2>/dev/null | wc -w)
 error_str_num=$(grep '\[error\]' VASP.log.temp | wc -l)
 finished_str_num=$((error_str_num+succeed_str_num))
+process_str_num=$((total_str_num-finished_str_num-untouched_str_num))
 not_conv_str_num=$(grep '\[error\]' VASP.log.temp | 
                    grep 'Not reach the required accuracy' | wc -l)
 no_contcar_str_num=$(grep '\[error\]' VASP.log.temp | 
@@ -99,10 +100,11 @@ echo "================== Process Check =================="
 printf "${run_state}\n"
 echo "  Seed Name                  :  ${seed_name}"
 if ! ${calc_done}; then
-  echo "  Curr. Work Coach           :  ${current_coach_num}/${total_coach_num}"
+  echo "  Started Work Coach         :  ${current_coach_num}/${total_coach_num}"
 fi
 echo "  -----------------------------------------------"
 echo "  Total Str.                 :  ${total_str_num}"
+echo "  |--Processing Str.         :  ${process_str_num}/${current_coach_num}"
 echo "  |--Untouched Str.          :  ${untouched_str_num}/${total_str_num}"
 echo "  +--Finished Str.           :  ${finished_str_num}/${total_str_num}"
 echo "     |--Succeed Str.         :  ${succeed_str_num}/${finished_str_num}"
