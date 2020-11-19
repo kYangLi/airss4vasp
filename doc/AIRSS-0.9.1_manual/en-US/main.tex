@@ -709,7 +709,7 @@ user@machine_name$
 \subsection{Relaxed with CASTEP}
 It is officially recommended that AIRSS be used in combination with CASTEP, and a very complete interface between AIRSS and CASTEP is constructed.
 
-To use CASTEP combined with AISS calculation, first you need to copy the successfully installed CASTEP executable file \verb|castep.serial| or \verb|castep.mpi| to the \verb|bin| directory of AIRSS, and rename it to \verb|castep|.
+To use CASTEP combined with AIRSS calculation, first you need to copy the successfully installed CASTEP executable file \verb|castep.serial| or \verb|castep.mpi| to the \verb|bin| directory of AIRSS, and rename it to \verb|castep|.
 
 When using CASTEP combined with AIRSS calculation, in addition to *.cell, you also need to prepare *.param files. *.param is the configuration file of CASTEP, in which you can define the necessary configuration parameters during the calculation of CASTEP, including, the type of calculation (Structure optimization, self-consistency, calculation of optical properties, band calculation, etc.), charge, spin orientation, truncation energy, convergence criteria, etc. The file usually consists of several lines, each line contains a \verb|keyword| and its corresponding assignment.
 
@@ -736,11 +736,11 @@ user@machine_name$ airss.pl -max 3 -seed Al
 \end{lstlisting}
 
 \subsection{Relax with VASP}
-AIRSS comes with the \verb|airss.pl -vasp| option for joint VASP relaxation calculation. However, the official interface needs to be improved in terms of parallel computing. Based on AIRSS, the author rewritten AIRSS with a set of bash commands The interface to VASP is named \href{https://github.com/kYangLi/airss4vasp}{airss4vasp(a4v)}. Although I have considered this command set to be rewritten in python, but AISS itself cannot be used on Windows However, the replication project is too large and has little effect, so a4v is still mainly based on bash.
+AIRSS comes with the \verb|airss.pl -vasp| option for joint VASP relaxation calculation. However, the official interface needs to be improved in terms of parallel computing. Based on AIRSS, the author rewritten AIRSS with a set of bash commands The interface to VASP is named \href{https://github.com/kYangLi/airss4vasp}{airss4vasp(a4v)}. Although I have considered this command set to be rewritten in python, but AIRSS itself cannot be used on Windows However, the replication project is too large and has little effect, so a4v is still mainly based on bash.\footnote{If you compare C++ to classical Chinese, python is equivalent to modern vernacular, and shell languages such as bash are spoken. Therefore, it is generally recommended to use python to write large-scale scripts.}
 
-a4v can be regarded as a revised version of AIRSS. It can run independently without installing native AIRSS. It is mainly based on AIRSS's native \verb|buildcell| module, and it also embeds PBS, NSCC, Slurm and other job submission system commands, which truly achieves one Key to submit the function of AISS+VASP task, and it also has better support for parallel calculation. For specific usage, please refer to the file \verb|README.md| inside the project. \footnote{In fact, the instruction manual is also in this project In. (laughs}
+a4v can be regarded as a revised version of AIRSS. It can run independently without installing original AIRSS. It is mainly based on AIRSS's \verb|buildcell| module, and it also embeds PBS, NSCC, Slurm and other job submission system commands, which truly achieves one Key to submit the function of AIRSS+VASP task, and it also has better support for parallel calculation. For specific usage, please refer to the file \verb|README.md| inside the project. \footnote{In fact, the instruction manual is also in this project In. (laughs}
 
-In the *.cell file settings: a4v adds \verb|SD-XYZ|, \verb|SD-XY|, \verb|SD-X| and other atom labels that correspond to the fixed atomic position relaxation; at the same time deletes the original Set the global parameters of the collinear spin value in buildcell, \verb|#SPIN=|.
+In the *.cell file settings: a4v adds \verb|SD-XYZ|, \verb|SD-XY|, \verb|SD-X| and other atom labels that correspond to the fixed atomic position relaxation; at the same time deletes the original Set the global parameters of the collinear spin value in buildcell, \verb|#SPIN=|. In addition, because VASP itself is not very friendly to cluster calculations, a4v does not integrate cluster calculation components (such as symmetry judgment components, etc.).
 
 \newpage
 \section{Data post-processing}
@@ -853,11 +853,12 @@ user@machine_name$
 \noindent \textbf{In the above output result,}
 \begin{maineu}
   \item The first column is the name tag assigned by the AIRSS software to the structure.
-  \item Second column pressure value (GPa).
-  \item The third column is the volume of each chemical formula structural unit (fu).
-  \item The first row of the fourth column is the enthalpy value of the structural unit (fu) of a chemical formula, and the following rows are the enthalpy values of the first row under different structures.
-  \item The fifth column is the total number of chemical formula structural units (fu) in the unit cell.
-  \item The sixth column is the chemical formula of the structural unit (fu).
+  \item The second column is the hydrostatic pressure value of the system(GPa).
+  \item The third column is the volume of each chemical formula structural unit.
+  \item 
+  The first row of the fourth column is the total energy (enthalpy, eV/f.u.) of the corresponding structure, and the following rows are the energy difference relative to the first row under different structures.
+  \item The fifth column is the total number of chemical formula structural units in the unit cell.
+  \item The sixth column is the chemical formula of the structural unit.
   \item The seventh column is the space group name.
   \item The eighth column is the number of times the structure appears in all search results.
 \end{maineu}}}\\
