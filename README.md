@@ -1,4 +1,4 @@
-# AIRSS for VASP (a4v)
+# airss4vasp (a4v)
 
 ## Basic Info
 
@@ -12,7 +12,7 @@
 
 ## Description
 
-[`AIRSS`](https://www.mtg.msm.cam.ac.uk/Codes/AIRSS)(Ab Initio Random Structure Searching) is a fantastic, efficient, and easy to parallel structure searching package, but with pool supporting for `VASP`. `AIRSS4VASP`(a4v), based on `PBS` ,`Slurm`,or `NSCC(Tianhe)` job management system, is an interface program design for the better communication between AIRSS and VASP.
+[`AIRSS`](https://www.mtg.msm.cam.ac.uk/Codes/AIRSS)(Ab Initio Random Structure Searching) is a fantastic, efficient, and easy to parallel structure searching package, but with pool supporting for `VASP`. `airss4vasp`(a4v), based on `PBS` ,`Slurm`,or `NSCC(Tianhe)` job management system, is an interface program design for the better communication between AIRSS and VASP.
 
 ## Installtion
 
