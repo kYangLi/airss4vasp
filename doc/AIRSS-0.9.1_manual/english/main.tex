@@ -95,7 +95,7 @@ Another thing that needs special reminder is that certain characters will be con
 
 \subsection{Program Installation and Remove}
 
-\hyperref[sec:airss-install]{Appendix A} takes \verb|airss-0.9.0| as an example to briefly record the installation process of AIRSS. The latest \verb|airss-0.9.1| has made a lot of simplifications in the installation process, you can read the included README file to install this version.
+The latest \verb|airss-0.9.1| has made a lot of simplifications in the installation process, you can read the included README file to install this version.
 
 The main running script of AIRSS is written in perl language, and can only be installed in the \verb|*nix| system, used in the command line (Command Line). Before installing this software, you'd better understand the usage of \href{https://www.gnu.org/software/make/manual/}{GNU make}.
 
@@ -341,236 +341,236 @@ As can be seen from this example, the basic format of atomic position structure 
 \end{lstlisting}
 
 \noindent\fcolorbox{mygray}[HTML]{E7E7E7}{\parbox{\textwidth}{%
-\noindent \textbf{每一行内部的元素含义如下: }
+\noindent \textbf{The meaning of the elements inside each line is as follows: }
 \begin{maineu}
-  \item 第一项是元素名称, 如果\textbf{将元素名称设置为Z}, 则表示此原子是个空位, 空位与真实原子一样具有体积和PUSH属性, 但不会在最终结果中输出.
-  \item 二三四项是原子位置坐标.
-  \item 井号(\#)后的第一项是原子所在原子集的名称, 原子集名称可以被设置成任意字符. \textbf{原子集名称相同的原子组成一个原子集, 原子集是由一个或多个原子构成的基本结构单元, 同一个原子集中的原子做相同的随机移动, 且不受PUSH影响}. 如无特殊需求, 为了实现自由度相对最大化, 一般不推荐将不同原子放入同一原子集中.
-  \item 百分号(\%)之后的内容都是\textbf{原子标签}(Atom Tags). 同一行原子可以指定多个原子标签, 中间用空格隔开, 他们共同指定了该原子应该满足的若干约束条件.
+  \item The first item is the element name. If \textbf{the element name is set to Z}, it means that the atom is a void. The void has the same volume and PUSH properties as a real atom, but it will not be output in the final result.
+  \item The terms two, three, and four are the coordinates of the atomic position.
+  \item The first item after the pound sign (\#) is the name of the atom set where the atom is located. The name of the atom set can be set to any character. \textbf{Atoms with the same atom set name form an atom set, and an atom set consists of one or more A basic structural unit composed of two atoms. The atoms in the same atomic set move the same randomly and are not affected by PUSH}. If there is no special requirement, in order to achieve the relative maximum degree of freedom, it is generally not recommended to put different atoms into the same atom concentrated.
+  \item The content after the percent sign (\%) is \textbf{atomic tag}. The same line of atoms can specify multiple atom tags, separated by spaces, they jointly specify several constraints that the atom should satisfy condition.
 \end{maineu}}}\\
 
-\textbf{Table \ref{AIRSS_Atom_Tag}} 是AIRSS中全部可用的原子标签的具体说明.
+\textbf{Table \ref{AIRSS_Atom_Tag}} is the specific description of all atom tags available in AIRSS.
 
 \begin{center}
 \begin{longtable}{m{10em}|m{4em}<{\centering}|m{3em}<{\centering}|m{15em}}
 \caption{AIRSS Cheat Sheet -- Atom Tags (distance in \r{A})}
 \label{AIRSS_Atom_Tag}\\
 \toprule
-\textbf{参数名称} & \textbf{输入类型} & \textbf{默认值} & \textbf{功能说明}  \\
+\textbf{Parameters} & \textbf{Type} & \textbf{Defualt} & \textbf{Description}  \\
 \midrule
 \midrule
 \endfirsthead
 \multicolumn{4}{c}{\tablename\ \thetable\ -- \textit{Continued from previous page}} \\
 \toprule
-\textbf{参数名称} & \textbf{输入类型} & \textbf{默认值} & \textbf{功能说明}  \\
+\textbf{Parameters} & \textbf{Type} & \textbf{Defualt} & \textbf{Description}  \\
 \midrule
 \midrule
 \endhead
 \midrule \multicolumn{4}{r}{\textit{Continued on next page...}} \\
 \endfoot
 \endlastfoot
-\verb|NUM=|\(n\)\hspace{4em} \verb|NUM=|\(n_{min}-n_{max}\) & \verb|int| & 1 & 定义该行原子实际代表的原子个数. 使用 \verb|NUM| 定义的重复原子会被逐个单独分配到不同的\textbf{原子集}中.\\
+\verb|NUM=|\(n\)\hspace{4em} \verb|NUM=|\(n_{min}-n_{max}\) & \verb|int| & 1 & Define the number of atoms actually represented by the row of atoms. Repeated atoms defined with \verb|NUM| will be individually assigned to different \textbf{atom sets} one by one.\\
 \midrule
-\verb|POSAMP=|\(d\)& \verb|float| & -1.0 & 定义该行原子在结构搜索过程中, 能偏离初始位置的最大距离. 若为负值则无限制.\\
+\verb|POSAMP=|\(d\)& \verb|float| & -1.0 & Define the maximum distance that  the atom(s) can deviate from the initial position in the structure search process. If it is a negative value, there is no limit.\\
 \midrule
-\verb|MINAMP=|\(d\)& \verb|float| & 0.0 & 定义该行原子在结构搜索过程中, 偏离初始位置的最小距离.\\
+\verb|MINAMP=|\(d\)& \verb|float| & 0.0 & Define the minimum distance that the atom(s) deviates from the initial position during the structure search process.\\
 \midrule
 \verb|XAMP=|\(d\)& \verb|float| & -1.0 & 定义该行原子在结构搜索过程中, 在X轴方向上移动的最大距离. 若为负值则无限制. 设置该项会令POSAMP和MINAMP失效\\
 \midrule
 \verb|YAMP=|\(d\)& \verb|float| & -1.0 & 定义该行原子在结构搜索过程中, 在Y轴方向上移动的最大距离. 若为负值则无限制. 设置该项会令POSAMP和MINAMP失效.\\
 \midrule
-\verb|ZAMP=|\(d\)& \verb|float| & -1.0 & 定义该行原子在结构搜索过程中, 在Z轴方向上移动的最大距离. 若为负值则无限制. 设置该项会令POSAMP和MINAMP失效.\\
+\verb|ZAMP=|\(d\)& \verb|float| & -1.0 & Define the maximum distance that the row of atoms can move in the X axis direction during the structure search. If it is a negative value, there is no limit. Setting this item will invalidate \verb|POSAMP| and \verb|MINAMP|\\
 \midrule
-\verb|ANGAMP=|\(\theta\)  & \verb|float| \([0,360]\) & -1.0 & 原子绕自身所在\textbf{原子集}中心旋转角度的最大值(与 \verb|POSAMP| 互相独立, 分开作用). 存在晶格标签 \verb|#FIX| 时, \verb|ANGAMP=0|, \verb|POSAMP=0| 与 \verb|NOMOVE(\FIX)| 共用, 可保证原子在原始位置不动. 如果cell文件中所有原子集都只有1个原子, 则该参数失效, \verb|ANGAMP| 强制设为0. 若为负值则无限制.\\
+\verb|ANGAMP=|\(\theta\)  & \verb|float| \([0,360]\) & -1.0 & The maximum value of the rotation angle of the atom around the center of \textbf{atom set} where it is located (independent of \verb|POSAMP|, separate functions). When there is a lattice label \verb|#FIX|, \verb|ANGAMP=0|, \verb|POSAMP=0| is shared with \verb|NOMOVE(\FIX)| to ensure that the atom does not move in the original position. If all atom sets in the cell file have only 1 atom, this parameter is invalid, \verb|ANGAMP| Forced to 0. If it is negative, there is no limit.\\
 \midrule
-\verb|RAD=|\(d\) & \verb|float| & 0.0 & 设置原子的半径, 用于判断两个原子间的最小距离, MINSEP. 其优先级低于直接设置全局参数 \verb|#MINSEP=|.\\
+\verb|RAD=|\(d\) & \verb|float| & 0.0 & Set the radius of the atom, used to judge the minimum distance between two atoms, MINSEP. Its priority is lower than directly setting the global parameter \verb|#MINSEP=|.\\
 \midrule
-\verb|FIX| & \verb|void| & off & 该原子在产生结构时不受PUSH影响. 任何接近该原子的可移动原子都会以2倍的PUSH步长被PUSH回去. 同时向cell文件中写入指令使其在CASTEP弛豫时也不动. 这一指令仅在晶格被 \verb|#FIX| 时有效. 原子标签中的 \verb|FIX| 与晶格标签中的 \verb|#FIX|, \verb|#CFIX|, \verb|#ABFIX|名称相似, 但作用不同. \\
+\verb|FIX| & \verb|void| & off & This atom is not affected by PUSH when it generates a structure. Any movable atom close to this atom will be PUSH back with 2 times the PUSH step. At the same time, write instructions to the cell file to make it immobile when CASTEP relaxes. This command is only valid when the lattice is \verb|#FIX|. \verb|FIX| in the atom tag and \verb|#FIX|, \verb|#CFIX|, \verb|# in the lattice tag ABFIX|Similar names, but different functions. \\
 \midrule
-\verb|NOMOVE| & \verb|void| & off & 该原子在产生结构时不受PUSH影响, 任何接近该原子的可移动原子都会以2倍的PUSH步长被PUSH回去. 这一指令仅在晶格被 \verb|#FIX| 时有效.\\
+\verb|NOMOVE| & \verb|void| & off & This atom is not affected by PUSH when it produces a structure. Any movable atom close to this atom will be PUSH back with 2 times the PUSH step. This instruction is only valid when the lattice is \verb|#FIX|.\\
 \midrule
-\verb|COORD=|\(n\),\hspace{5em} \verb|COORD=|\(n_{min}-n_{max}\) & \verb|int| & -1 & 约束该行原子的配位数(最近邻原子数). 若为负值则无限制.\\
+\verb|COORD=|\(n\),\hspace{5em} \verb|COORD=|\(n_{min}-n_{max}\) & \verb|int| & -1 & Constrain the coordination number (number of nearest neighbors) of atoms in the row. If it is negative, there is no limit.\\
 \midrule
-\verb|NN=|\(\pm{}elm\)  & \verb|string| & null & 规定原子最近邻元素种类, `\(+\)'代表必须近邻该元素, `\(-\)'代表不能近邻该元素. 一个原子只能指定一种元素近邻或不近邻(NN参数仅会被读入一次). 若为空, 则表示无限制\\
+\verb|NN=|\(\pm{}elm\)  & \verb|string| & null & Specify the type of the nearest neighbor element of the atom, `\(+\)' means that the element must be adjacent to the element, and `\(-\)' means that the element cannot be adjacent to the element. Is read once). If it is empty, it means unlimited.\\
 \midrule
-\verb|OCC=|\(p\) & \verb|float| \([0,1]\) & 1.0 & 该点位占据原子的几率, 同种元素在不同位置的占据几率之和必须为大于0的整数. 接收分数形式的输入, 如 \verb|OCC=1/3|. 若该值设为小于0的数, 则强行将该原子的OCC设置为1, 同时不再输出该原子可能因对称性衍生的其他原子位置. 若原子同时有 \verb|FIX| 或 \verb|NOMOVE| 标签, 则 \verb|OCC| 强制设为1. 若该原子OCC大于1, 则将其设置为空位(与将元素名称设为Z的效果相同). 系统存在对称性时, 使用更小的 OCC 可强制某一原子位于对称性更高的点位上. 但更为自然的用法是使用 \verb|MULT| 代替 \verb|OCC| 设置. 若设置了全局参数\verb|#NFORM=n|(n大于0): 在没有对称性条件下, \verb|OCC| 参数失效; 在有对称性条件下, 请参考 \verb|MULT| 中的说明. \\
+\verb|OCC=|\(p\) & \verb|float| \([0,1]\) & 1.0 & The probability of the point occupying an atom. The sum of the probability of occupying the same element in different positions must be an integer greater than 0. Accept input in the form of fractions, such as \verb|OCC=1/3|. If the value is set to less than 0 The number of the atom, the OCC of the atom is forcibly set to 1, and other atom positions that may be derived from the symmetry of the atom are no longer output. If the atom also has the \verb|FIX| or \verb|NOMOVE| label, then \verb |OCC| is forcibly set to 1. If the atom OCC is greater than 1, set it to a space (the same effect as setting the element name to Z). When the system has symmetry, using a smaller OCC can force an atom Located at a point with higher symmetry. But a more natural usage is to use \verb|MULT| instead of \verb|OCC| to set. If the global parameter \verb|#NFORM=n|(n is greater than 0) is set: In the absence of symmetry, the \verb|OCC| parameter is invalid; in the case of symmetry, please refer to the description in \verb|MULT|. \\
 \midrule
-\verb|MULT=|\(m\) & \verb|float| & symm num & 设置该原子点位的 multiplicity.\footnote{这一数值为正时, 会强制将 OCC 参数的值覆盖为 MULT/SYMM\_NUM, 其中 SYMM\_NUM 为晶格对称群元的个数. 也即在AIRSS中, multiplicities 是通过设置分数OCC实现的, 因此不设置MULT而直接设置分数的OCC也可达到一样的效果.} 格点的 multiplicity 告诉我们, 如果我们在该位置上放置一个原子, 那么对称性将产生多少个原子. 使用这一参数, 可以限制某一行原子由晶体对称性实际生成原子的个数, 以及所处位置对称性的高低. 该参数默认大小为群操作个数, 也即默认只寻找 general position. 若该行原子有标签 \verb|FIX| 或 \verb|NOMOVE|, 则MULT失效, 同时将\verb|OCC|强制设为-1. 若设置了全局参数\verb|#NFORM=n|(n大于0), 则等效于将所有原子的 \verb|MULT| 的值设为\(n\), 同时不设置\verb|#NFORM=|. 关于格点 multiplicities 与对称性的更多信息可参考 \href{http://folk.ntnu.no/yingday/NilsYD/PhaseStructure/001Space_Groups.pdf}{PDF: Space Group and Multiplicities}.\\
+\verb|MULT=|\(m\) & \verb|float| & symm num & Set the multiplicity of the atomic point.\footnote{This value is positive, it will force the value of the OCC parameter to be overwritten to MULT/SYMM\_NUM, where SYMM\_NUM is the number of symmetry groups in the lattice. In AIRSS, multiplicities is achieved by setting the score OCC, so the same effect can be achieved by directly setting the score OCC without setting MULT.} The multiplicity of the grid tells us that if we place an atom at this position, then the symmetry How many atoms will be generated. Using this parameter, you can limit the number of atoms in a row of atoms actually generated by the symmetry of the crystal, and the level of symmetry of the position. The default size of this parameter is the number of group operations, that is, the default is only Look for the general position. If the atom in the line has the label \verb|FIX| or \verb|NOMOVE|, the MULT will be invalid, and \verb|OCC| will be forced to -1. If the global parameter \verb|#NFORM=n|(n is greater than 0), it is equivalent to setting the value of \verb|MULT| of all atoms to \(n\), and not setting \verb|#NFORM=|. Regarding lattice multiplicities and symmetry For more information, please refer to \href{http://folk.ntnu.no/yingday/NilsYD/PhaseStructure/001Space_Groups.pdf}{PDF: Space Group and Multiplicities}.\\
 \midrule
-\verb|PERM| & \verb|void| & off & 在完成原子位置选定后, 重排(按一定概率互相交换)指定原子位置间的元素种类. 需要配合全局参数 \verb|#PERMUTE| 使用, 否则该参数将被关闭.\\
+\verb|PERM| & \verb|void| & off & After completing the selection of atomic positions, rearrange (exchange with each other with a certain probability) the types of elements between the specified atomic positions. It needs to be used with the global parameter \verb|#PERMUTE|, otherwise the parameter will be turned off.\\
 \midrule
-\verb|ADATOM| & \verb|void| & off & 表明该行原子是等, 未加该标签的所有原子位置生成结束之后, 再加入的原子.\\
+\verb|ADATOM| & \verb|void| & off & Indicates that the atom in the row is equal, and the atom that is added after the generation of all atom positions without this label.\\
 \midrule
-\verb|ATHOLE| & \verb|void| & off & 表明该原子位于被挖掉的孔洞之中, 输出结构中将自动删除该原子. 常与全局变量 \verb|#HOLE=|, \verb|#HOLEPOS=| 联用.\\
+\verb|ATHOLE| & \verb|void| & off & Indicates that the atom is located in the hole that was dug out, and the atom will be automatically deleted from the output structure. It is often used in conjunction with the global variables \verb|#HOLE=|, \verb|#HOLEPOS=|.\\
 \bottomrule
 \end{longtable}
 \end{center}
 
-\subsubsection{全局参数}
+\subsubsection{Global parameters}
 
-结构搜索过程中整个体系应遵守的条件由全局参数指定.  AIRSS中的全局参数均以井号（\verb|#|）开头, 对体系中晶格以及全部的原子作用. 另外, 有些全局参数和原子标签有相同的作用, 此时, 原子标签设置的优先级要高于全局参数.\\
+The conditions that the entire system should comply with in the structure search process are specified by global parameters. The global parameters in AIRSS all start with a pound sign (\verb|#|), which affect the lattice and all atoms in the system. In addition, some global parameters and Atomic tags have the same effect.At this time, the priority of atomic tags setting is higher than the global parameters.\\
 
-AIRSS中全部可用的全局参数的功能和详细使用方法如\textbf{Table \ref{AIRSS_Cheat_Sheet_Pragma}} 所示.
+The functions and detailed usage methods of all global parameters available in AIRSS are show in \textbf{Table \ref{AIRSS_Cheat_Sheet_Pragma}}.
 
 \begin{center}
 \begin{longtable}{m{11em}|m{4em}<{\centering}|m{3em}<{\centering}|m{15em}}
 \caption{AIRSS Cheat Sheet -- Global Pragma (distance in \r{A})}
 \label{AIRSS_Cheat_Sheet_Pragma} \\ 
 \toprule
-\textbf{参数名称} & \textbf{输入类型} & \textbf{默认值} & \textbf{功能说明}  \\
+\textbf{Parameters} & \textbf{Type} & \textbf{Defualt} & \textbf{Description}  \\
 \midrule
 \midrule
 \endfirsthead
 \multicolumn{4}{c}{\tablename\ \thetable\ -- \textit{Continued from previous page}} \\
 \toprule
-\textbf{参数名称} & \textbf{输入类型} & \textbf{默认值} & \textbf{功能说明}  \\
+\textbf{Parameters} & \textbf{Type} & \textbf{Defualt} & \textbf{Description}  \\
 \midrule
 \midrule
 \endhead
 \midrule \multicolumn{4}{r}{\textit{Continued on next page...}} \\
 \endfoot
 \endlastfoot
-\verb|#CELLCON=|\(a\;b\;c\;\alpha\;\beta\;\gamma\) & \verb|int| & off &定义晶胞应满足的条件: \(a,b,c\)是晶格常数; \(\alpha,\beta,\gamma\)是三个晶角. 晶格常数可选填的值有\(\{0,-1\}\), 晶角可选填的值有\(\{0,-1, \theta\}\). \(0\)表示无约束, \(-1\)表示相等. 如 \verb|#CELLCON=-1-1 -1 90 90 90| 表示立方晶系.\\
+\verb|#CELLCON=|\(a\;b\;c\;\alpha\;\beta\;\gamma\) & \verb|int| & off & define the conditions that the unit cell should meet: \(a ,b,c\) are the lattice constant; \(\alpha,\beta,\gamma\) are the three crystal angles. The optional values for the lattice constant are \(\{0,-1\}\) , The optional values for crystal angle are \(\{0,-1, \theta\}\). \(0\) means no constraint, \(-1\) means equal. For example, \verb|#CELLCON= -1-1 -1 90 90 90| means cubic crystal system.\\
 \midrule
-\verb|#SYSTEM=|\(sys\) & \verb|string| & off & 设置结构所在的晶系, 可选的输入有 [Tric, Mono, Hexa, Rhom(/Trig), Orth, Tetr, Cubi]. 该参数实际为 \verb|'#CELLCON='| 参数的若干特殊组合.\\
+\verb|#SYSTEM=|\(sys\) & \verb|string| & off & Set the crystal system where the structure is located. The optional inputs are [Tric, Mono, Hexa, Rhom(/Trig), Orth, Tetr, Cubi]. This parameter is actually a number of special combinations of \verb|'#CELLCON='| parameters.\\
 \midrule
-\verb|#CONS=|\(p\) & \verb|float| \((0,1]\) & 0.4 & 约束单胞边长. 接近0表示完全没有约束, 等于1表示尽一切可能约束晶胞abc三边等长.\\
+\verb|#CONS=|\(p\) & \verb|float| \((0,1]\) & 0.4 & Constrain the side length of the unit cell. Close to 0 means no constraint at all, and equal to 1 means do everything possible to constrain the unit cell abc to have the same length on the three sides.\\
 \midrule
-\verb|#ACONS=|\(p\)& \verb|float| \((0,1]\) & 0.5 & 约束晶胞晶角, 使其远离某一晶格参数极小、晶胞扁平的情况. 接近0表示完全没有约束, 等于1表示尽一切可能约束三个键角严格等于90度.\\
+\verb|#ACONS=|\(p\)& \verb|float| \((0,1]\) & 0.5 & Constrain the crystal angle of the unit cell to keep it away from a situation where the lattice parameter is extremely small and the unit cell is flat. Close to 0 means no restriction at all, and equal to 1 means doing everything possible to constrain the three bond angles to be strictly equal to 90 degrees.\\
 \midrule
-\verb|#CELLAMP=|\(p\)& \verb|float| & -1.0 & 在一定限度内, 随机变化晶格形状. 设为负值时采用晶格形状将完全随机变化. \(p\)越小, 晶格偏离cell文件中给定值越小. 若要启用该参数, 建议不要设置超过1.0的值.\footnote{该参数使用方法详见 airss-0.9.1/src/buildcell/src/build.f90 第100行cellamp变量的使用.} 使用该参数后, 晶格标签 \verb|#ABFIX| 与 \verb|#CFIX|, 原子标签 \verb|#CONS| 与 \verb|#ACONS| 都将被弃用. 若为负数则关闭该参数设置.\\
+\verb|#CELLAMP=|\(p\)& \verb|float| & -1.0 & Within a certain limit, the lattice shape is changed randomly. When set to a negative value, the lattice shape will change completely randomly. The smaller the \(p\), the smaller the deviation of the lattice from the given value in the cell file. To enable this parameter , It is recommended not to set a value exceeding 1.0.\footnote{For details on how to use this parameter, please refer to the usage of cellamp variable on line 100 of airss-0.9.1/src/buildcell/src/build.f90.} After using this parameter, the grid label \verb|#ABFIX| and \verb|#CFIX|, atomic tags \verb|#CONS| and \verb|#ACONS| will all be deprecated. If it is a negative number, turn off this parameter setting.\\
 \midrule
-\verb|#VACUUM=|\(d\) & \verb|float| & 0.0 & 在晶格(Z方向)中加入\(d\) \r{A}的真空层.\\
+\verb|#VACUUM=|\(d\) & \verb|float| & 0.0 & Add a vacuum layer of \(d\)\r(A) in the lattice (Z direction).\\
 \midrule
-\verb|#NFORM=|\(n\) & \verb|int| & -1 & 声明单胞中实际存在的原子个数是的 \verb|%BLOCK POSITIONS_*| 或 \verb|#SPECIES| 中定义的\(n\)倍. 该选项不可与 \verb|#NATOM| 联用. 若为负值则此参数被关闭.\\
+\verb|#NFORM=|\(n\) & \verb|int| & -1 & Declare that the actual number of atoms in the unit cell is \verb|%BLOCK POSITIONS_*| or \(n\) times defined in \verb|#SPECIES|. This option cannot be combined with \verb|#NATOM|. If it is negative, this parameter is turned off.\\
 \midrule
-\verb|#SUPERCELL=|\(n\) \verb|#SUPERCELL=|\(n_a\;n_b\;n_c\;\;\;\;\;\;\) \hspace{2em}\verb|#SUPERCELL=|\(a_x\; a_y\;a_z\;\)\hspace{2em} \(b_x\;b_y\;b_z\;c_x\;c_y\;c_z\) & \verb|int| & off & 定义超胞的尺寸. 可以使用超胞中单胞的的个数\(n\), 超胞晶格基矢在三个方向的数值\(n_a\;n_b\;n_c\), 或是超胞与单胞晶格基矢之间的变换矩阵\([[a_x,a_y,a_z],[b_x,b_y,b_z],[c_x,c_y,c_z]]\)定义新的超胞. 超胞的构建策略是: 首先用单胞构建符合条件的原子构型, 而后根据扩胞参数复制粘贴得到超胞后直接输出.\\
+\verb|#SUPERCELL=|\(n\) \verb|#SUPERCELL=|\(n_a\;n_b\;n_c\;\;\;\;\;\;\) \hspace{2em}\verb|#SUPERCELL=|\(a_x\; a_y\;a_z\;\)\hspace{2em} \(b_x\;b_y\;b_z\;c_x\;c_y\;c_z\) & \verb|int| & off & Define the size of the super cell. You can use the number of unit cells in the super cell \(n\), the value of the base vector of the super cell lattice in three directions\(n_a\;n_b\;n_c\), or the super cell The transformation matrix between the base vector of the cell and the unit cell \([[a_x,a_y,a_z],[b_x,b_y,b_z],[c_x,c_y,c_z]]\) defines a new super cell. Super cell The construction strategy is: first use the unit cell to construct the qualified atomic configuration, and then copy and paste the super cell according to the expansion cell parameters and directly output it.\\
 \midrule
-\verb|#SLAB| & \verb|void| & off & 声明该结构是一个二维平面结构, 取超胞时将不再向c方向扩胞, 同时检查结构对称性时也将忽略c方向.\\
+\verb|#SLAB| & \verb|void| & off & Declare that the structure is a two-dimensional planar structure. When taking the super cell, the cell will no longer expand in the c direction, and the c direction will be ignored when checking the symmetry of the structure.\\
 \midrule
-\verb|#SURFACE| & \verb|void| & off & 声明该结构是一个表面结构, 表面结构继承SLAB的全部特性, 同时增加一条与表面相关的对称性限制条件.\footnote{见源码airss-0.9.1/src/buildcell/src/cell.90 第3216行}\\
+\verb|#SURFACE| & \verb|void| & off & Declare that the structure is a surface structure, the surface structure inherits all the characteristics of SLAB, and at the same time adds a symmetry restriction condition related to the surface. \footnote{See source code airss-0.9.1/src/buildcell/src/cell.90 row 3216.}\\
 \midrule
-\verb|#MOLECULES|& \verb|void| & off & 声明同一个原子集中的原子构成了一个基本分子构型, 检查配位时将不再对同一个原子集内的原子做检查.\\
+\verb|#MOLECULES|& \verb|void| & off & Stated that the atoms in the same atomic set constitute a basic molecular configuration, and the atoms in the same atomic set will no longer be checked when checking the coordination..\\
 \midrule
-\verb|#CLUSTER| & \verb|void| & off & 声明预测的结构是无周期性的团簇.\\
+\verb|#CLUSTER| & \verb|void| & off & Stated that the predicted structure is acyclic cluster.\\
 \midrule
-\verb|#FOCUS=|\(n\) & \verb|int| & 0 & 约束最终结构必须是\(n\)组分的(由\(n\)种不同的元素构成). 该参数一般用于变组分分析. 小于等于0表示无约束.\\
+\verb|#FOCUS=|\(n\) & \verb|int| & 0 & The final structure of the constraint must be \(n\) components (consisting of \(n\) different elements). This parameter is generally used for variable component analysis. Less than or equal to 0 means no constraint.\\
 \midrule
-\verb|#OCTET|& \verb|void| & off & 检查化学配比是否电子配平(全部电子数是否可以被8整除).\\
+\verb|#OCTET|& \verb|void| & off & Check whether the chemical ratio is electronically balanced (whether all electrons are divisible by 8).\\
 \midrule
-\verb|#POSAMP=|\(d\) & \verb|float|  & -1.0 & 与原子标签中的定义相同, 结构搜索中原子偏离初始点的最大位置. 负值为无限制.\\
+\verb|#POSAMP=|\(d\) & \verb|float|  & -1.0 & Same as the definition in the atom tag, the maximum position of the atom from the initial point in the structure search. Negative values are unlimited.\\
 \midrule
-\verb|#MINAMP=|\(d\) & \verb|float| & -1.0 & 与原子标签中的定义相同, 结构搜索中原子偏离初始点的最小位置. 负值为无限制.\\
+\verb|#MINAMP=|\(d\) & \verb|float| & -1.0 & Same as the definition in the atom tag, the minimum position of the atom from the initial point in the structure search. Negative values are unlimited.\\
 \midrule
-\verb|#XAMP=|\(d\) & \verb|float| & -1.0 & 与原子标签中的定义相同, 结构搜索中原子X方向偏离初始点的最大振幅. 负值为无限制. 设置该项会令 POSAMP 和 MINAMP 失效. \\
+\verb|#XAMP=|\(d\) & \verb|float| & -1.0 & The same as the definition in the atom tag, the maximum amplitude of the atom X-direction deviation from the initial point in the structure search. Negative value is unlimited. Setting this option will invalidate POSAMP and MINAMP. \\
 \midrule
-\verb|#YAMP=|\(d\) & \verb|float| & -1.0 & 与原子标签中的定义相同, 结构搜索中原子Y方向偏离初始点的最大振幅. 负值为无限制. 设置该项会令 POSAMP 和 MINAMP 失效.\\
+\verb|#YAMP=|\(d\) & \verb|float| & -1.0 & Same as the definition in the atom tag, the maximum amplitude of the atom Y-direction deviating from the initial point in the structure search. Negative value is unlimited. Setting this item will invalidate POSAMP and MINAMP.\\
 \midrule
-\verb|#ZAMP=|\(d\) & \verb|float| & -1.0 & 与原子标签中的定义相同, 结构搜索中原子Z方向偏离初始点的最大振幅. 负值为无限制. 设置该项会令 POSAMP 和 MINAMP 失效.\\
+\verb|#ZAMP=|\(d\) & \verb|float| & -1.0 & Same as the definition in the atom tag, the maximum amplitude of the atom Z-direction deviating from the initial point in the structure search. Negative value is unlimited. Setting this item will invalidate POSAMP and MINAMP.\\
 \midrule
-\verb|#ANGAMP=|\(\theta\)& \verb|float| \([0,360]\) & -1.0 & 与原子标签中的定义相同, 原子绕自身所在\textbf{原子集}中心旋转角度的最大值. 负值为无限制.\\
+\verb|#ANGAMP=|\(\theta\)& \verb|float| \([0,360]\) & -1.0 & Same as the definition in the atom tag, the maximum value of the rotation angle of the atom around the center of \textbf{atom set} where it is located. Negative values are unlimited.\\
 \midrule
-\verb|#MINBANGLE=|\(\theta\) & \verb|float| \((0,360]\) & 0.0 & 设置搜索结构中, 原子键角的最小值.\\
+\verb|#MINBANGLE=|\(\theta\) & \verb|float| \((0,360]\) & 0.0 & Set the minimum value of the atom bond angle in the search structure.\\
 \midrule
-\verb|#MAXBANGLE=|\(\theta\) & \verb|float| \((0,360]\) & 180.0 &设置搜索结构中, 原子键角的最大值.\\
+\verb|#MAXBANGLE=|\(\theta\) & \verb|float| \((0,360]\) & 180.0 & Set the maximum value of the atom bond angle in the search structure.\\
 \midrule
-\verb|#MINSEP=|\(d\) \verb|#MINSEP=|\(d\;\)\verb|X-X=|\(d_{X−X}\;\)\ \ \  \ \verb|X-Y=|\(d_{X−Y}\;...\) & \verb|float| & 0.0 & 两原子间最小距离, 也可以用来定义两原子距离固定是多少. 比如 \verb|#MINSEP=| \verb|2.0 Li-Li=2.6 Ge-Ge=2.51|\\
+\verb|#MINSEP=|\(d\) \verb|#MINSEP=|\(d\;\)\verb|X-X=|\(d_{X−X}\;\)\ \ \  \ \verb|X-Y=|\(d_{X−Y}\;...\) & \verb|float| & 0.0 & The minimum distance between two atoms can also be used to define the fixed distance between two atoms. For example, \verb|#MINSEP=| \verb|2.0 Li-Li=2.6 Ge-Ge=2.51|\\
 \midrule
-\verb|#RAD=|\(d\)& \verb|float|  & 0.0 & 与原子标签中的定义相同, 定义原子的半径大小.\\
+\verb|#RAD=|\(d\)& \verb|float|  & 0.0 & Same as the definition in the atom label, define the radius of the atom.\\
 \midrule
-\verb|#COORD=|\(n\)& \verb|int| & -1 & 与原子标签中的定义相同, 设置原子的配位数限制. 负值为无限制.\\
+\verb|#COORD=|\(n\)& \verb|int| & -1 & Same as the definition in the atom label, set the coordination number limit of the atom. Negative value has no limit.\\
 \midrule
-\verb|#SPIN=|\(S_{real}\;S_{mod}\;\;\;\;\;\;\) \verb|#SPIN=|\(S_{real}\;S_{mod}\;\;\;\;\;\) \verb|"|elm\(_1\) elm\(_2\)... \verb|"| & \verb|float|,  \verb|string|& off & 随机设置体系每个原子上共线自旋的取值. 并要求 \(S_{t,real}\)/\(N_{ions}\) = \(S_{real}\), \(S_{t,mod}\)/\(N_{ions}\) = \(S_{mod}\), 其中\(S_{t,real}\)是全部指定原子自旋的和, \(S_{t,mod}\)是全部指定原子自旋绝对值的和. 未被指定的原子自旋保持为0. 可以用被双引号包裹的带空格的元素符号指明哪些是指定原子. 若未指定任何原子, 则默认所有原子都是指定原子. 例如 \verb|#SPIN=0 5 "Fe Co "| 或者 \verb|#SPIN=1 4| \\
+\verb|#SPIN=|\(S_{real}\;S_{mod}\;\;\;\;\;\;\) \verb|#SPIN=|\(S_{real}\;S_{mod}\;\;\;\;\;\) \verb|"|elm\(_1\) elm\(_2\)... \verb|"| & \verb|float|,  \verb|string|& off & Randomly set the value of the collinear spin on each atom of the system. And require \(S_{t,real}\)/\(N_{ions}\) = \(S_{real}\), \(S_{ t,mod}\)/\(N_{ions}\) = \(S_{mod}\), where \(S_{t,real}\) is the sum of the spins of all specified atoms, \(S_(t ,mod)\) is the sum of the absolute values of the spins of all specified atoms. The spins of unspecified atoms remain at 0. The element symbols with spaces enclosed in double quotes can be used to indicate which are specified atoms. If no atom is specified , All atoms are specified by default. For example, \verb|#SPIN=0 5 "Fe Co "| or \verb|#SPIN=1 4|. \\
 \midrule
-\verb|#SPECIES=|\(elm_1\%tags_1,\) \(elm_2\%tags_2,...\;\;\;\;\;\;\) \verb|#SPECIES=|\(elm_1,elm_2...\) & \verb|string|  & off & 使用简化记号定义体系原子组分. 例如, \verb|#SPECIES=Si|\verb|%NUM=1| \verb|COORD=2,|\verb|O%NUM=2|. 该参数不能与\verb|BLOCK POSITIIONS_*|同时出现.\\
+\verb|#SPECIES=|\(elm_1\%tags_1,\) \(elm_2\%tags_2,...\;\;\;\;\;\;\) \verb|#SPECIES=|\(elm_1,elm_2...\) & \verb|string|  & off & Use simplified notation to define the atomic components of the system. For example, \verb|#SPECIES=Si|\verb|%NUM=1| \verb|COORD=2,|\verb|O%NUM=2|. This parameter cannot be combined with \verb|BLOCK POSITIIONS_*| appears at the same time.\\
 \midrule
-\verb|#NATOM=|\(n\) \hspace{6em}\verb|#NATOM=|\(n_{min}-n_{max}\)  & 0 & \verb|int| & 与 \verb|#SPECIES| 联用, 定义单胞中总原子数, 一般用于变组分分析(变胞预测). 且使用此全局参数会使 \verb|#SPECIES| 指令包含的\verb|%|后的原子标签全部失效. \footnote{详细原因请参见源码``airss-0.9.1/src/buildcell/src/cell.f90''第493行与514行区别.} 若 \verb|#SPECIES| 中含有多中元素, 则每种元素随机数目, 保持总和为NATOM. 该参数设为0时自动失效.\\
+\verb|#NATOM=|\(n\) \hspace{6em}\verb|#NATOM=|\(n_{min}-n_{max}\)  & 0 & \verb|int| & Used in conjunction with \verb|#SPECIES| to define the total number of atoms in a unit cell, which is generally used for variable component analysis (metamorphic prediction). And using this global parameter will make \verb|#SPECIES| included in the command \verb| All atomic tags after %| are invalid. \footnote(For detailed reasons, please refer to the difference between line 493 and line 514 of the source code ``airss-0.9.1/src/buildcell/src/cell.f90''.) If there are many elements in \verb|#SPECIES|, the random number of each element is kept, and the total is kept as NATOM. This parameter is automatically invalid when it is set to 0.\\
 \midrule
-\verb|#TARGVOL=|\(V\) \verb|#TARGVOL=|\(V_{min}-V_{max}\) & \verb|float| & init. cell vol. & 固定晶格体积为\(V\), 或\(V_{min}\)到\(V_{max}\)之间的随机数值. 存在晶格标签 \verb|#FIX| 时该参数失效. 默认为初始给定原胞的体积. 该参数常在不引入 \verb|BLOCK POSITION_*| 区块时使用.\\
+\verb|#TARGVOL=|\(V\) \verb|#TARGVOL=|\(V_{min}-V_{max}\) & \verb|float| & init. cell vol. & Fixed lattice volume to \(V\), or a random value between \(V_(min)\) and \(V_(max)\). This parameter is invalid when there is a lattice label \verb|#FIX|. The default is the volume of the initial given primitive cell. This parameter is often used when the \verb|BLOCK POSITION_*| block is not introduced.\\
 \midrule
-\verb|#VARVOL=|\(V\)& \verb|float| & init. cell vol. & 与 \verb|#TARGVOL=| 作用相同, 该参数会覆盖 \verb|#TARGVOL=| 的设置. 默认为初始给定原胞的体积.\\
+\verb|#VARVOL=|\(V\)& \verb|float| & init. cell vol. & It has the same effect as \verb|#TARGVOL=|, this parameter will override the setting of \verb|#TARGVOL=|. The default is the volume of the initial given primitive cell.\\
 \midrule
-\verb|#SLACK=|\(p\)& \verb|float| \([0,1)\) & 0.0 & 使用此参数可整体降低体系对原子间成键(原子相对位置)的限制, \(p\)越大对原子间间距和角度的要求越低. 默认为0, 推荐值0.1--0.3.\\
+\verb|#SLACK=|\(p\)& \verb|float| \([0,1)\) & 0.0 & Using this parameter can reduce the system's restrictions on the bonding between atoms (the relative position of atoms) as a whole, the larger the \(p\), the lower the requirements for the distance and angle between atoms. The default is 0, and the recommended value is 0.1--0.3.\\
 \midrule
-\verb|#AUTOSLACK=|\(p\)& \verb|float| \([0,1)\) & off & 使用此参数可整体降低体系对原子间成键(原子相对位置)的限制, \(p\)越大对原子间间距和角度的要求越低. 若给定的初始值\(p\)不合适, 则以0.01的步长递增SLACK, 直到找到合适的SLACK值.\\
+\verb|#AUTOSLACK=|\(p\)& \verb|float| \([0,1)\) & off & Using this parameter can reduce the system's restrictions on the bonding between atoms (the relative position of atoms) as a whole. The larger the \(p\), the lower the requirements for the distance and angle between atoms. If the given initial value \(p\) is not appropriate, the SLACK is incremented in steps of 0.01 until the appropriate SLACK value is found.\\
 \midrule
-\verb|#FLIP|& \verb|void| & off & 搜索结构时, 对\textbf{原子集}引入随机翻转操作. 若体系中所有原子集中均只有一个原子, 则该参数失效.\\
+\verb|#FLIP|& \verb|void| & off & When searching for the structure, a random flip operation is introduced to \textbf{atomic set}. If there is only one atom in all atom sets in the system, this parameter is invalid.\\
 \midrule
-\verb|#REMOVE|& \verb|void| & off & 删除(PUSH后)重叠的原子(之一). 可以用于高初始原子密度的结构预测.\\
+\verb|#REMOVE|& \verb|void| & off & (After PUSH,) Delete (one of) the overlapping atom. Can be used for structure prediction with high initial atom density.\\
 \midrule
-\verb|#TIGHT|& \verb|void| & off & 使得生成的结构更加紧密.\\
+\verb|#TIGHT|& \verb|void| & off & Make the generated structure more compact.\\
 \midrule
-\verb|#SYMMOPS=|\(n\)\hspace{6em}\verb|#SYMMOPS=~|\(n\;\;\;\;\;\;\;\;\;\;\;\)\hspace{6em}\verb|#SYMMOPS=|\(n_{min}-n_{max}\) & \verb|int| &  off & 声明生成的结构中必须含有\(n\)种对称操作. 若体系是周期性晶体结构, 推荐从下述整数中选取: 1,2,3,4,5,6,8,12,16,24,48. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量\footnote{这里的``数量''是指, 满足对称操作所需的最少同类原子数量, 也即该点位的 multiplicities. }更少的 special position 不予考虑. 若使用\verb|MULT|逐个原子指定 multiplicity, 则波浪号(\(\sim\))被忽略, 但若使用\verb|#NFORM=n|(\(n\)大于0), 则会与波浪号(\(\sim\))冲突. 另外需要注意的是, AIRSS中实现锁定对称性的方法是: 接将原子按对称性复制n份. 例如原子有\(C_4\)对称性, 则最终输出的总原子数将是设定的4倍. 但如果结合原子标签 \verb|OCC, MULT| 等的使用, 可实现在更高对称的点位安放更少原子的操作. 在含有波浪号(\(\sim\))的模式下不推荐使用\verb|#NFORM=n|限制原子对称复制的个数.\\
+\verb|#SYMMOPS=|\(n\)\hspace{6em}\verb|#SYMMOPS=~|\(n\;\;\;\;\;\;\;\;\;\;\;\)\hspace{6em}\verb|#SYMMOPS=|\(n_{min}-n_{max}\) & \verb|int| &  off & State that the generated structure must contain \(n\) symmetry operations. If the system is a periodic crystal structure, it is recommended to select from the following integers: 1,2,3,4,5,6,8,12,16,24,48. If the input contains a tilde (\(\sim\)), it means that only atoms will be placed on general positions when searching for the structure. For the more symmetrical but quantity \footnote{here ``quantity'' Refers to the minimum number of atoms of the same kind required for the symmetry operation, that is, the multiplicities of the point. }Less special positions are not considered. If you use \verb|MULT| to specify multiplicity by atom, the tilde (\(\sim\)) is ignored, but if \verb|#NFORM=n|(\(n\) is greater than 0) is used, it will conflict with the tilde (\(\sim\)). Also note that, The method to achieve lock symmetry in AIRSS is to copy n atoms according to the symmetry. For example, if the atom has \(C_4\) symmetry, the total number of atoms output will be 4 times the set. But if you combine atoms The use of tags \verb|OCC, MULT| can realize the operation of placing fewer atoms at higher symmetry points. It is not recommended to use \verb|#NFORM=n|  to limit the number of atomic symmetric copies under the mode containing tilde (\(\sim\)).\\
 \midrule
-\verb|#SYMM=|\(spg\)\hspace{6em} \verb|#SYMM=~|\(spg\)& \verb|string| & off & 生成的结构必须在\(spg\)空间群中, \(spg\)是空间群的名称. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量更少的 special position 不予考虑, 在此模式下不推荐使用\verb|#NFORM=n|限制原子对称复制的个数.\\
+\verb|#SYMM=|\(spg\)\hspace{6em} \verb|#SYMM=~|\(spg\)& \verb|string| & off & The generated structure must be in the \(spg\) space group, \(spg\) is the name of the space group. If the input contains a tilde (\(\sim\)), it means that the structure search will only be in general positions Place atoms on the upper side. Special positions with higher symmetry but fewer numbers are not considered. In this mode, \verb|#NFORM=n| is not recommended to limit the number of symmetric copies of atoms.\\
 \midrule
-\verb|#SYMMNO=|\(n\)\hspace{6em} \verb|#SYMMNO=~|\(n\) & \verb|int| & off & 生成的结构必须在第\(n\)号空间群中, \(n\)是空间群的序号. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量更少的 special position 不予考虑, 在此模式下不推荐使用\verb|#NFORM=n|限制原子对称复制的个数.\\
+\verb|#SYMMNO=|\(n\)\hspace{6em} \verb|#SYMMNO=~|\(n\) & \verb|int| & off & The generated structure must be in the space group No. \(n\), \(n\) is the number of the space group. If the input contains a tilde (\(\sim\)), it means that the structure search will only be in Atoms are placed on general positions, and special positions with higher symmetry but fewer numbers are not considered. In this mode, it is not recommended to use \verb|#NFORM=n| to limit the number of symmetric copies of atoms.\\
 \midrule
-\verb|#SYMMORPHIC| & \verb|void| & off & 只检查体系是否存在点式对称操作.\\
+\verb|#SYMMORPHIC| & \verb|void| & off & Only check the point symmetry operation.\\
 \midrule
-\verb|#SGRANK=|\(n\) & \verb|int| & 230 & 设置空间群寻找/锁定的序号上限\(n\). 此值设为230时, 接受任何空间群的对称性锁定.\\
+\verb|#SGRANK=|\(n\) & \verb|int| & 230 & Set the upper limit of the sequence number for space group \(n\). When this value is set to 230, symmetry locking of any space group is accepted.\\
 \midrule
-\verb|#ADJGEN=|\(n\)\hspace{4em}\verb|#ADJGEN=|\(n_{min}-n_{max}\)  & \verb|int|  & 0 & 调整晶胞中使用 general positions(GP) 的个数. 该值为0时, 会最大程度地使用GP点位. 增大该值则将逐渐更多地使用 Special positions(SP)点位. 如果尝试后发现难以生成符合条件结构, 则程序将动态增加该值. 关于 SP/GP 与晶体空间群的关系请参考: \href{https://en.wikipedia.org/wiki/Wyckoff_positions}{Wiki: Wyckoff Position}.\\
+\verb|#ADJGEN=|\(n\)\hspace{4em}\verb|#ADJGEN=|\(n_{min}-n_{max}\)  & \verb|int|  & 0 & Adjust the number of general positions (GP) used in the unit cell. When this value is 0, the GP points will be used to the greatest extent. Increasing the value will gradually use more Special positions (SP) points. If you try After finding that it is difficult to generate a qualified structure, the program will dynamically increase this value. For the relationship between SP/GP and crystal space group, please refer to: \href{https://en.wikipedia.org/wiki/Wyckoff_positions}{Wiki: Wyckoff Position}.\\
 \midrule
-\verb|#BREAKAMP=|\(d\) & \verb|float| & 0.0 & 在晶格矢量a方向随机移动原子破坏原有对称性, 原子分数坐标移动距离: \(d^{(frac)}_a=(random(0,1)\times{}d)^{1/3}\)\\
+\verb|#BREAKAMP=|\(d\) & \verb|float| & 0.0 & Moving atoms randomly in the direction of the lattice vector a destroys the original symmetry, and the moving distance of the atomic fractional coordinates is calculated with: \(d^{(frac)}_a=(random(0,1)\times{}d)^{1/3}\)\\
 \midrule
-\verb|#NOPUSH|& \verb|void| & off & 对于距离过近的原子不引入PUSH步, 直接拒绝该构型. 该关键字不会关闭 \verb|#SPHERE| 等关键字引入的晶体中心势场的PUSH步.\\
+\verb|#NOPUSH|& \verb|void| & off & For atoms that are too close, do not introduce a PUSH step, directly reject the configuration. This keyword will not close the PUSH step of the crystal center potential field introduced by keywords such as \verb|#SPHERE|.\\
 \midrule
-\verb|#PUSHSTEP=|\(p\)& \verb|float| & 0.25 & 每一步PUSH移动距离大小(stepsize)的比例参数.\\
+\verb|#PUSHSTEP=|\(p\)& \verb|float| & 0.25 & The scale parameter of each step of PUSH moving distance (stepsize).\\
 \midrule
-\verb|#PUSHMAX=|\(n\)& \verb|int| & 100 &设置最大PUSH步数(在 \verb|buildcell| 的输出中, 两个X之间所夹的 \verb!* | : -! 符号的个数).\\
+\verb|#PUSHMAX=|\(n\)& \verb|int| & 100 & Set the maximum number of PUSH steps (in the output of \verb|buildcell|, the number of \verb!* |: -! symbols between two Xs).\\
 \midrule
-\verb|#OVERLAP=|\(cov\)& \verb|float| & off & 结束PUSH之后, 再附加采用TPSD\footnote{Two-point Step Size Gradient Methods - Barzilai and Borwein, IMA Journal of Numerical Analysis (1988) 8, 141-148}对势对晶体结构进行简单弛豫. \(cov\)为收敛判据, 其值越小对晶格收敛限制越高, 推荐值为0.1--0.2.\\
+\verb|#OVERLAP=|\(cov\)& \verb|float| & off & After PUSH is over, TPSD\footnote{Two-point Step Size Gradient Methods-Barzilai and Borwein, IMA Journal of Numerical Analysis, 8, 141 (1988)} is additionally used to perform simple relaxation of the potential pair crystal structure. \(cov \) is the convergence criterion. The smaller the value, the higher the limit on the lattice convergence. The recommended value is 0.1--0.2.\\
 \midrule
-\verb|#RASH|& \verb|float| & off & 在使用TPSD对势弛豫结束后再引入原子集之间的随机位移和旋转(SHAKE step). 设置过 \verb|#OVERLAP| 之后此参数才有效.\\
+\verb|#RASH|& \verb|float| & off & After using TPSD to relax the potential, introduce random displacement and rotation between the atom sets (SHAKE step). This parameter is only effective after setting \verb|#OVERLAP|.\\
 \midrule
-\verb|#RASH_POSAMP=|\(d\)& \verb|float| & 1.0 & 设置由 RASH 引入的 SHAKE 步移动原子集的最大距离, 与POSAMP类似. 该项必须为一个小的正值, \textbf{不可设为负数}.\\
+\verb|#RASH_POSAMP=|\(d\)& \verb|float| & 1.0 & Set the maximum distance of the SHAKE step introduced by RASH to move the atomic set, similar to POSAMP. This item must be a small positive value, \textbf{cannot be set to a negative number}.\\
 \midrule
-\verb|#RASH_ANGAMP=|\(\theta\) & \verb|float| \((0,360]\) & 30.0 & 设置由 RASH 引入的 SHAKE 步原子集绕自身中点转动的最大角度, 与ANGAMP类似. 该项必须为一个小的正值, \textbf{不可设为负数}.\\
+\verb|#RASH_ANGAMP=|\(\theta\) & \verb|float| \((0,360]\) & 30.0 & Set the maximum angle of rotation of the SHAKE step atom set introduced by RASH around its midpoint, similar to ANGAMP. This item must be a small positive value, \textbf{cannot be set to a negative number}.\\
 \midrule
-\verb|#CELLADAPT|& \verb|void| & off & 在设置\verb|#OVERLAP|的情况下附加设置此项, 可强制要求TPSD简单结构弛豫时同时尝试在保持体积不变的情况下改变单胞的形状. 体系默认不会在TPSD结构优化步改变单胞形状. 若存在晶格标记\verb|#FIX| 或者设置了 \verb|#CELLAMP=0| 则此参数失效. \\
+\verb|#CELLADAPT|& \verb|void| & off & In the case of setting \verb|#OVERLAP|, you can set this additionally to force the relaxation of the simple structure of TPSD and try to change the shape of the unit cell while keeping the volume unchanged. By default, the system will not optimize the TPSD structure. Change the shape of the unit cell. If there is a lattice mark \verb|#FIX| or \verb|#CELLAMP=0| is set, this parameter is invalid. \\
 \midrule
-\verb|#THREE=|\(p\)& \verb|float| & TODO & 使用三体势能代替TPSD弛豫结构, \textbf{该参数对应的功能尚未在airss-0.9.1中实现}.\\
+\verb|#THREE=|\(p\)& \verb|float| & TODO & Use three-body potential energy instead of TPSD relaxation structure, \textbf{The function corresponding to this parameter has not been implemented in airss-0.9.1}.\\
 \midrule
-\verb|#COMPACT|& \verb|void| & on & 对最终生成的单胞进行 niggli reduce 操作. 在晶格形状没有被锁定时(未引入晶格标签\verb|#FIX, #CFIX, #ABFIX|), 该项默认打开. \href{http://atztogo.github.io/niggli/#algorithm}{R. W. Grosse-Kunstleve, N. K. Sauter and P. D. Adams, Acta Cryst., A60, 1-6 (2004)} \\
+\verb|#COMPACT|& \verb|void| & on & Perform a niggli reduce operation on the final unit cell. When the lattice shape is not locked (the lattice label \verb|#FIX, #CFIX, #ABFIX| is not introduced), this item is turned on by default. \href{http://atztogo.github.io/niggli/#algorithm}{R. W. Grosse-Kunstleve, N. K. Sauter and P. D. Adams, Acta Cryst., A60, 1-6 (2004)} \\
 \midrule
-\verb|#NOCOMPACT| & \verb|void| & off & 强制关闭 COMPACT 操作.\\
+\verb|#NOCOMPACT| & \verb|void| & off & Forcely close COMPACT operation.\\
 \midrule
-\verb|#PERMUTE| & \verb|void| & off & 在完成原子位置选定后, 重排(按一定概率互相交换)指定原子位置间的元素种类. 可以联合原子标签 \verb|PERM| 使用.\\
+\verb|#PERMUTE| & \verb|void| & off & After completing the selection of the atomic positions, rearrange (exchange with each other with a certain probability) the types of elements between the specified atomic positions. You can use it in conjunction with the atomic label \verb|PERM|.\\
 \midrule
-\verb|#PERMFRAC=|\(p\) & \verb|float| \([0,1]\)  & 1.0 & 设置重排发生的概率.\\
+\verb|#PERMFRAC=|\(p\) & \verb|float| \([0,1]\)  & 1.0 & Set the probability of rearrangement.\\
 \midrule
-\verb|#HOLE=|\(d\) & \verb|float| & -1.0 & 设置在晶格上切割球洞的半径. 设为负数时不对成型的结构做任何处理.\\
+\verb|#HOLE=|\(d\) & \verb|float| & -1.0 & Set the radius of the hole to be cut on the lattice. When set to a negative number, no processing will be done on the formed structure.\\
 \midrule
-\verb|#HOLEPOS=|\(f_a\;f_b\;f_c\) & \verb|float| & random & 设置在晶格上切割球洞的位置(分数坐标). 默认为随机位置. 可与原子标签中的\verb|ATHOLE|联用.\\
+\verb|#HOLEPOS=|\(f_a\;f_b\;f_c\) & \verb|float| & random & Set the position (fractional coordinates) of the cut hole on the lattice. The default is a random position. Can be used with \verb|ATHOLE| in the atomic tag.\\
 \midrule
-\verb|#VACANCIES=|\(n\)\verb|@|\(elm\)& \verb|float|, \verb|string| & off & 等待结构生成完毕后, 选取\(n\)个元素种类为elm的原子替换为空位. \footnote{该参数本来还设计了一种不加@符号的输入, 但目前在airss-0.9.1中, 这种输入在后续处理中存在一些BUG, 因此在此未予说明.}\\
+\verb|#VACANCIES=|\(n\)\verb|@|\(elm\)& \verb|float|, \verb|string| & off & After waiting for the structure to be generated, select \(n\) atoms whose element type is elm and replace them with vacancies. \footnote{This parameter originally designed an input without the @ symbol, but it is currently in airss-0.9.1 , This input has some bugs in the subsequent processing, so it is not explained here.}\\
 \midrule
-\verb|#MAXTIME=|\(t\)& \verb|float| & 1.0 & 设置对一个猜测结构PUSH步使用时间的上限, 超过该时间程序将停止PUSH并重新猜测新结构. 默认\(t=1\)s.\\
+\verb|#MAXTIME=|\(t\)& \verb|float| & 1.0 & Set the upper limit of the time used for the PUSH step of a guess structure, after which the program will stop PUSH and re-guess the new structure. Default \(t=1\) second.\\
 \midrule
-\verb|#NFAILS=|\(n\)& \verb|int| & 0 & 每个结构允许的失败次数(在 \verb|buildcell| 命令输出中出现 \verb|X| 的次数). 若其值为0, 则无限制.\\
+\verb|#NFAILS=|\(n\)& \verb|int| & 0 & The number of failures allowed for each structure (the number of occurrences of \verb|X| in the output of the \verb|buildcell| command). If its value is 0, there is no limit.\\
 \midrule
-\verb|#SPHERE=|\(r\) & \verb|float| & off & 在单胞中心处引入一球状势能. 设置球势能的吸引半径为\(r\). 当原子与晶格中心距离大于\(r\)时, 会受到指向晶格中心的PUSH.\\
+\verb|#SPHERE=|\(r\) & \verb|float| & off & Introduce a spherical potential energy at the center of the unit cell. Set the radius of attraction of the spherical potential energy to \(r\). When the distance between the atom and the center of the lattice is greater than \(r\), it will be PUSH directed to the center of the lattice.\\
 \midrule
-\verb|#ELLIPSOID=|\(r\;\varepsilon\) & \verb|float|  & off & 在单胞中心处引入一椭球状吸引势. \(r\) 为椭球势能半长轴长度, \(\varepsilon\)为形变程度. 当原子与晶格中心距离大于\(r\)时, 会受到指向晶格中心的PUSH. \(\varepsilon=0\)为球形, \(\varepsilon\)越大畸变越严重. \\
+\verb|#ELLIPSOID=|\(r\;\varepsilon\) & \verb|float|  & off & An ellipsoidal attractive potential is introduced at the center of the unit cell. \(r\) is the length of the semi-major axis of the ellipsoid potential energy, and \(\varepsilon\) is the degree of deformation. When the distance between the atom and the center of the lattice is greater than \(r\) , Will be subjected to PUSH pointing to the center of the lattice. \(\varepsilon=0\) is spherical, the larger the \(\varepsilon\), the more serious the distortion. \\
 \midrule
-\verb|#PANCAKE=|\(r\;\varepsilon\) & \verb|float|  & off & 在单胞中心处引入一圆饼状吸引势. \(r\)为圆饼半径, \(\varepsilon\)为形变程度. 当原子与晶格中心距离大于\(r\)时, 会受到指向晶格中心的PUSH. \(\varepsilon=0\)为偏平圆饼, \(\varepsilon=1\)为接近球形的势能. \\
+\verb|#PANCAKE=|\(r\;\varepsilon\) & \verb|float|  & off & Introduce a pie-shaped attraction potential at the center of the unit cell. \(r\) is the radius of the disc, \(\varepsilon\) is the degree of deformation. When the distance between the atom and the center of the lattice is greater than \(r\), it will be affected PUSH pointing to the center of the lattice. \(\varepsilon=0\) is a flat round pie, \(\varepsilon=1\) is the potential energy close to the sphere. \\
 \midrule
-\verb|#CIGAR=|\(r\;\varepsilon\) & \verb|float| & off & 在单胞中心处引入一雪茄状吸引势. \(r\)为雪茄长度, \(\varepsilon\)为形变程度. 当原子与晶格中心距离大于\(r\)时, 会受到指向晶格中心的PUSH. \(\varepsilon=0\)为针尖状势能, \(\varepsilon=1\)为接近球形的势能. \\
+\verb|#CIGAR=|\(r\;\varepsilon\) & \verb|float| & off & A cigar-like attractive potential is introduced at the center of the unit cell. \(r\) is the length of the cigar, \(\varepsilon\) is the degree of deformation. When the distance between the atom and the center of the lattice is greater than \(r\), it will be directed to the crystal The PUSH in the center of the lattice. \(\varepsilon=0\) is the tip-like potential energy, and \(\varepsilon=1\) is the potential energy close to the spherical shape.\\
 \midrule
-\verb|#CYLINDER=|\(r\) & \verb|float| & off & 在单胞中心处引入一圆筒状势能(原子在Z方向不受力). \(r\)为圆筒势能吸引半径. 当原子与晶格中心距离大于\(r\)时, 会受到指向晶格中心的XY方向的PUSH.\\
+\verb|#CYLINDER=|\(r\) & \verb|float| & off & Introduce a cylindrical potential energy at the center of the unit cell (the atom is not subject to force in the Z direction). \(r\) is the radius of attraction of the cylindrical potential energy. When the distance between the atom and the center of the lattice is greater than \(r\), it will receive PUSH in the XY direction pointing to the center of the lattice.\\
 \midrule
-\verb|#CORE=|\(r\) & \verb|float| & off & 对定义的球状(椭球状, 圆饼状, 雪茄状, 圆筒状)吸引势附加排斥核心. 设置排斥核心半径(长轴长度, 半径, 雪茄长度, 圆筒半径)为\(r\). 当原子与晶格中心距离小于\(r\)时, 会受到远离晶格中心方向的PUSH.\\
+\verb|#CORE=|\(r\) & \verb|float| & off & Attach a repulsive core to the defined spherical (ellipsoid, round pie, cigar, cylindrical) attraction potential. Set the repulsive core radius (major axis length, radius, cigar length, cylinder radius) to \(r\). When the distance between the atom and the center of the lattice is less than \(r\), it will be PUSH away from the center of the lattice.\\
 \midrule
-\verb|#WIDTH=|\(l\)& \verb|float| & off & 使用平面状势能(原子在X和Y方向均不受力), 附加计算PUSH步的距离. \(l\)为平面状势能吸引长度. 当原子与原点(origin)距离大于\(l\)时, 会受到指向原点的Z方向的PUSH.\\
+\verb|#WIDTH=|\(l\)& \verb|float| & off & Use planar potential energy (atoms are not subject to force in the X and Y directions), and additionally calculate the distance of the PUSH step. \(l\) is the length of the planar potential energy attraction. When the distance between the atom and the origin is greater than \(l\) When, it will be PUSH in the Z direction pointing to the origin.\\
 \midrule
-\verb|#SHIFT=|\(h\)& \verb|float|& 0.0  & 将平面势移动至Z=\(h\)的位置(origin的位置), 默认\(h=0\).\\
+\verb|#SHIFT=|\(h\)& \verb|float|& 0.0  & Move the plane potential to the position of Z=\(h\) (the position of origin), by default \(h=0\).\\
 \bottomrule
 \end{longtable}
 \end{center}
 
 \newpage
-现在您应该可以轻松读懂下述内容了:
+Now you should be able to easily understand the following:
 
 \begin{lstlisting}[language={bash},numbers=left]
 %BLOCK LATTICE_CART
@@ -593,7 +593,7 @@ Al 0.0 0.0 0.0 # Al1 % NUM=7-13 COORD=4
 #MAXBANGLE=120
 \end{lstlisting}
 
-另外, *.cell 文件中还可以完全不出现结构数据对应的数据区块. 比如您只对晶体大概的结构有一些模糊的认识(比如, 只知道其晶体原子构成, 晶格大概的体积大小等), 仍然可以使用AIRSS进行结构搜索. 下面就是这样两则符合规范且十分简洁的AIRSS结构种子文件.\\
+In addition, the data block corresponding to the structure data may not appear in the *.cell file at all. For example, you only have some vague understanding of the approximate structure of the crystal (for example, you only know the atomic composition of the crystal, the approximate volume of the crystal lattice, etc. ), you can still use AIRSS for structure search. Here are two AIRSS structure seed files that conform to the specification and are very concise.\\
 \emph{例4.1}
 \begin{lstlisting}[language={bash},numbers=left]
 #VARVOL=15
@@ -609,15 +609,15 @@ Al 0.0 0.0 0.0 # Al1 % NUM=7-13 COORD=4
 #MINSEP=1.5        
 \end{lstlisting}
 
-这里用 \verb|#VARVOL| 代替了晶格参数数据区块 \verb|BLOCK LATTICE_CART|, 用 \verb|#SPECIES| 代替了原子位置数据区块 \verb|BLOCK POSITIONS_FRAC|.
+Here, \verb|#VARVOL| is used to replace the lattice parameter data block \verb|BLOCK LATTICE_CART|, and \verb|#SPECIES| is used to replace the atomic position data block \verb|BLOCK POSITIONS_FRAC|.
 
 \newpage
-\section{结构弛豫与能量计算}
+\section{Structural relaxation and energy calculation}
 
-\subsection{联合airss-pp3模块弛豫}
-使用 AIRSS 联合 \verb|airss-pp3| 计算模块预测结构时, 除了要准备一个 *.cell 的文件外, 还需要准备一个名为 *.pp 文件. 
+\subsection{Relax with airss-pp3 module}
+When using AIRSS combined with \verb|airss-pp3| to calculate the prediction structure of the module, in addition to preparing a *.cell file, you also need to prepare a file named *.pp.
 
-\verb|airss-pp3|是AIRSS自带的pp3对势(pair potential)计算模块. 其功能是使用化学上经典的分子势场(如6-12势)弛豫原子结构并输出体系能量. 由于这一模块使用的是维象的晶体能量模型, 不涉及任何第一性原理的复杂运算, 因此其实现简单、效果稳定、计算速度极快, 适用于简单组分的小体系. 更具体的, \verb|airss-pp3| 采用了如下势能计算原子的受力和体系总能:
+\verb|airss-pp3| is the pp3 pair potential calculation module that comes with AIRSS. Its function is to use the classical molecular potential field (such as 6-12 potential) to relax the atomic structure and output the energy of the system. This module uses the crystal energy model of the dimensional image and does not involve any first-principle complex calculations, so its implementation is simple, the effect is stable, and the calculation speed is extremely fast. It is suitable for small systems with simple components. More specifically, \verb|airss-pp3| uses the following potential energy to calculate the force on the atom and the total energy of the system:
 \begin{subequations}
   \label{eq:pp3}
   \begin{align}
@@ -625,9 +625,9 @@ Al 0.0 0.0 0.0 # Al1 % NUM=7-13 COORD=4
     E &= \sum_{i<j}^{\text{all ions}} E_{ij}
   \end{align}
 \end{subequations}
-其中 \(i,j\)标定了不同原子位置, 当元素种类不同时, \(\varepsilon_{ij},\sigma_{ij}\)等变量对应不同的值.
+Where, \(i,j\) calibrates different atomic positions. When the types of elements are different, variables such as \(\varepsilon_{ij},\sigma_{ij}\) correspond to different values.
 
-使用该模块时, 需要首先配置名为*.pp的参数文件. 这个文件中存储了对势的相关参数, 其内部书写形式如下: 
+When using this module, you need to configure a parameter file named *.pp first. This file stores the relevant parameters of the potential, and its internal writing form is as follows:
 \begin{lstlisting}[language={bash},numbers=left]
 n_spec m n range
 specs
@@ -646,16 +646,16 @@ beta_22 ...
 \end{lstlisting}
 
 \noindent\fcolorbox{mygray}[HTML]{E7E7E7}{\parbox{\textwidth}{%
-\noindent \textbf{上述参数中, }
+\noindent \textbf{Among the above parameters,}
 \begin{maineu}
-  \item 第1行各项分别是: 元素个数; 对势中指数\(m,n\)的数值; 对势中能量极小值(力为0处)处距离原子中心的距离\(d_{min}\)与\(\sigma\)的比值, 也即 \(d_{min}^{(ij)} = \sigma_{ij}*d_{range}\). 
-  \item 第2行指明了体系中的元素种类, 不同元素间用空格隔开. 
-  \item 第3行是注释行, 在程序中无意义, 但必须存在. 
-  \item 第4至(\(n_{spec}+3\))行声明了元素之间的\(varepsilon\)值对应的矩阵.
-  \item 第(\(n_{spec}+4\))行是注释行, 在程序中无意义, 但必须存在. 
-  \item 第(\(n_{spec}+5\))至(\(2n_{spec}+4\))行声明了元素之间的\(sigma\)值对应的矩阵.
-  \item 第(\(2n_{spec}+5\))行必须为书写含有``Beta"字符的注释. 若此字符未出现, 则系统将强制把全部\(beta\)值设为1.
-  \item 第(\(2n_{spec}+6\))至(\(3n_{spec}+5\))行声明了元素之间的\(beta\)值对应的矩阵.
+  \item The items in the first line are: the number of elements; the value of the exponent \(m,n\) in the potential; the distance from the center of the atom at the minimum energy value (where the force is 0) in the potential \(d_{min}\) and the ratio of \(\sigma\), that is, \(d_{min}^{(ij)} = \sigma_{ij}*d_{range}\).
+  \item The second line specifies the types of elements in the system, and different elements are separated by spaces.
+  \item Line 3 is a comment line, meaningless in the program, but must exist.
+  \item Lines 4 to (\(n_{spec}+3\)) declare the matrix corresponding to the \(\varepsilon\) value between the elements.
+  \item The line (\(n_{spec}+4\)) is a comment line, meaningless in the program, but must exist.
+  \item Lines (\(n_{spec}+5\)) to (\(2n_{spec}+4\)) declare the matrix corresponding to the value of \(\sigma\) between the elements.
+  \item The line (\(2n_{spec}+5\)) must be a comment containing the character "Beta". If this character does not appear, the system will force all \(\beta\) values to 1.
+  \item Lines (\(2n_{spec}+6\)) to (\(3n_{spec}+5\)) declare the matrix corresponding to the \(\beta\) value between the elements.
 \end{maineu}}}\\
 
 例如,
@@ -670,7 +670,7 @@ A B
 1.76
 \end{lstlisting}
 
-下面通过一个例子来演示AIRSS联合 \verb|pp3| 的计算过程.
+Let's use an example to demonstrate the calculation process of AIRSS combined with \verb|pp3|.
 \begin{lstlisting}[language={bash}]
 user@machine_name$ ls 
 Al.cell Al.pp
@@ -706,46 +706,48 @@ Al.pp
 user@machine_name$
 \end{lstlisting}
 
-\subsection{联合CASTEP弛豫}
-官方推荐AIRSS结合CASTEP使用, 且构建了 AIRSS 和 CASTEP 间十分完善的接口. 
+\subsection{Relaxed with CASTEP}
+It is officially recommended that AIRSS be used in combination with CASTEP, and a very complete interface between AIRSS and CASTEP is constructed.
 
-要使用 CASTEP 联合 AIRSS 计算, 首先需要将成功安装的 CASTEP 可执行文件 \verb|castep.serial| 或 \verb|castep.mpi| 复制到 AIRSS 的 \verb|bin| 目录中, 并重命名为 \verb|castep|.
+To use CASTEP combined with AISS calculation, first you need to copy the successfully installed CASTEP executable file \verb|castep.serial| or \verb|castep.mpi| to the \verb|bin| directory of AIRSS, and rename it to \verb|castep|.
 
-使用 CASTEP 联合 AIRSS 计算时, 除了*.cell外, 还需要准备 *.param 文件. *.param 是CASTEP的配置文件, 您可以在其中定义CASTEP计算过程中的必要配置参数, 包括, 计算的类型(结构优化, 自洽, 光学性质计算, 能带计算 等), 电荷, 自旋取向, 截断能, 收敛标准等. 该文件通常由若干行组成, 每一行包含一个 \verb|keyword| 及其相应的赋值.
+When using CASTEP combined with AIRSS calculation, in addition to *.cell, you also need to prepare *.param files. *.param is the configuration file of CASTEP, in which you can define the necessary configuration parameters during the calculation of CASTEP, including, the type of calculation (Structure optimization, self-consistency, calculation of optical properties, band calculation, etc.), charge, spin orientation, truncation energy, convergence criteria, etc. The file usually consists of several lines, each line contains a \verb|keyword| and its corresponding assignment.
 
 \noindent\fcolorbox{mygray}[HTML]{E7E7E7}{\parbox{\textwidth}{%
-\noindent \textbf{*.param 文件主要有以下特点:}
+\noindent \textbf{*.param files mainly have the following characteristics:}
 \begin{maineu}
-\item 任何两个 keywords 之间没有书写顺序上的限制.
-\item 您可以使用 \# 或 ; 或 ! 又或者单词 COMMENT 来添加注释.
-\item *.param 中设定的所有的 keywords 和数据均不区分大小写, 同时, 任何标点符号(除了标明注释内容的符号),多余的空格和任何空行都将被自动忽略.
-\item 文件的任何一行中最多只能出现一个 keywords 及其对应参数.
+\item There is no restriction on the writing order between any two keywords.
+\item You can use \# or; or! Or the word COMMENT to add comments.
+\item All keywords and data set in *.param are not case-sensitive. At the same time, any punctuation (except for symbols that indicate the content of the comment), extra spaces and any blank lines will be automatically ignored.
+\item At most one keyword and its corresponding parameter can appear in any line of the file.
 \end{maineu}}}\\
 
-*.param 文件每一行的基本格式均为:
+The basic format of each line of the *.param file is:
 \begin{lstlisting}
 [keywords] : [value]
 \end{lstlisting}
-其中的`\verb|:|'是为了书写美观便于区分内容所加, 程序实际执行时会自动忽略, 您也可以完全不加入这一符号转而用空格代替.
+Among them, `\verb|:|' is added for beautiful writing and easy to distinguish content. It will be automatically ignored when the program is actually executed. You can also skip this symbol at all and replace it with a space.
 
-CASTEP中\verb|[keywords]|的定义和使用方法, 可参考: \href{http://www.tcm.phy.cam.ac.uk/castep/documentation/WebHelp/content/modules/castep/keywords/k_main_structure.htm}{CASTEP cell keywords and data blocks}.
+For the definition and usage of \verb|[keywords]| in CASTEP, please refer to: \href{http://www.tcm.phy.cam.ac.uk/castep/documentation/WebHelp/content/modules/castep/keywords/k_main_structure.htm}{CASTEP cell keywords and data blocks}.
 
-AIRSS默认联合CASTEP计算, 因此运行下述命令即可启动结构搜索.
+AIRSS combines CASTEP calculation by default, so run the following command to start the structure search.
 \begin{lstlisting}[language={bash},numbers=left]
 user@machine_name$ airss.pl -max 3 -seed Al
 \end{lstlisting}
 
-\subsection{联合VASP弛豫}
-AIRSS自带了 \verb|airss.pl -vasp| 选项用于联合VASP弛豫计算. 但官方自带的接口在并行计算方面还有待完善. 基于AIRSS, 笔者用一套bash命令集重新编写了AIRSS至VASP的接口, 将其命名为\href{https://github.com/kYangLi/airss4vasp}{airss4vasp(a4v)}. 后虽考虑过将此命令集使用python重新编写, 但AIRSS本身无法在Windows上运行, 而复写工程又过于庞大且收效甚微, 因此a4v目前仍然主要基于bash实现.
+\subsection{Relax with VASP}
+AIRSS comes with the \verb|airss.pl -vasp| option for joint VASP relaxation calculation. However, the official interface needs to be improved in terms of parallel computing. Based on AIRSS, the author rewritten AIRSS with a set of bash commands The interface to VASP is named \href{https://github.com/kYangLi/airss4vasp}{airss4vasp(a4v)}. Although I have considered this command set to be rewritten in python, but AISS itself cannot be used on Windows However, the replication project is too large and has little effect, so a4v is still mainly based on bash.
 
-a4v可以看做是AIRSS的改版, 无需安装原生AIRSS便可独立运行. 其主要基于AIRSS原生的 \verb|buildcell| 模块, 同时内嵌了PBS, NSCC, Slurm等作业提交系统指令, 真正做到了一键提交 AIRSS+VASP 任务的功能, 同时对计算的并行也有较好的支持. 其具体用法可参见项目内部的 \verb|README.md| 文件. \footnote{事实上, 该说明手册也在此项目中.(笑} 
+a4v can be regarded as a revised version of AIRSS. It can run independently without installing native AIRSS. It is mainly based on AIRSS's native \verb|buildcell| module, and it also embeds PBS, NSCC, Slurm and other job submission system commands, which truly achieves one Key to submit the function of AISS+VASP task, and it also has better support for parallel calculation. For specific usage, please refer to the file \verb|README.md| inside the project. \footnote{In fact, the instruction manual is also in this project In. (laughs}
 
-在 *.cell 文件设置方面: a4v增加了对应原子位置弛豫固定的\verb|SD-XYZ|, \verb|SD-XY|, \verb|SD-X|等原子标签; 同时删减了原先buildcell中设置共线自旋数值的全局参数, \verb|#SPIN=|.
+In the *.cell file settings: a4v adds \verb|SD-XYZ|, \verb|SD-XY|, \verb|SD-X| and other atom labels that correspond to the fixed atomic position relaxation; at the same time deletes the original Set the global parameters of the collinear spin value in buildcell, \verb|#SPIN=|.
 
 \newpage
-\section{数据后处理}
-\subsection{*.res文件结构}
+\section{Data post-processing}
+\subsection{*.res file structure}
 AIRSS的计算结果全部储存在了 *.res 文件中. 这种 *.res 结构文件最早在 \href{https://strucbio.biologie.uni-konstanz.de/ccp4wiki/index.php/SHELXL}{SHELX} 中使用. 由于一些历史原因被 CASTEP 和 AIRSS 复用. 由于 SHELX 本身是对 Windows 友好的程序, 因此其输入输出文件的书写格式也沿袭了部分Windows文档的特点, 如 倾向使用大写字母, \verb|REM| 代表注释行, 文件使用 \verb|END| 结尾等.
+
+The calculation results of AIRSS are all stored in the *.res file. This *.res structure file was first used in \href{https://strucbio.biologie.uni-konstanz.de/ccp4wiki/index.php/SHELXL}{SHELX}. Due to some historical reasons, it was reused by CASTEP and AIRSS. Because SHELX itself is a Windows-friendly program, the writing format of its input and output files also follows the characteristics of some Windows documents, such as the tendency to use uppercase letters, \verb|REM| stands for comment lines, and the file ends with \verb|END|.
 
 \begin{lstlisting}[language={bash}]
 user@machine_name$ cat Al-43867-3302-1.res
@@ -769,26 +771,26 @@ user@machine_name$
 \end{lstlisting}
 
 \noindent\fcolorbox{mygray}[HTML]{E7E7E7}{\parbox{\textwidth}{%
-\noindent \textbf{AIRSS输出的 *.res 文件各行的含义如下:}
+\noindent \textbf{The meaning of each line in the *.res file output by AIRSS is as follows:}
 \begin{maineu}
-\item 第一行TITL中的第一项是软件分配给该结构的名称标签, 第二项是系统外加静水压(GPa), 第三项是单胞体积, 第四项是每个单胞总的焓(能量), 第五项是原子自旋值的平均值, 第六项是原子自旋绝对值的平均值, 第七项是体系的总原子数, 第八项是体系所在空间群名称, 最后一项是固定字符 n - 1.
-\item 之后若干以REM开头的行是注释行, 记录了文件生成的基本信息, 删除后不会有任何影响.
-\item 紧接着以CELL开头的行记录了基本的晶胞信息. 其中, 第一项是一个无意义的小数, 这个小数在原来的SHELX程序中是用来记录得到相关结构所用衍射谱的波长, 在AIRSS中锁定为了一个无意义的小数. 第二至四项是晶格常数\(a\;b\;c\), 接下来五至七项是晶角\(\alpha\;\beta\;\gamma\).
-\item 下面一行是LATT -1. 这一行在SHELX中用于标定晶格的对称性, 在AIRSS中锁定为固定值-1.
-\item 接下来以 SFAC 开头的一行记录了构成体系的全部元素名称, 不同的元素用一个空格隔开.
-\item 最后若干行标定了单胞中原子的位置. 这些行中的第一列是元素符号, 第二列指明了该元素在SFAC 行中出现的次序, 第三到五列是该行储存了原子的分数坐标, 最后一列是原子的占据数, 一般设为1.
-\item 文件最终以END行结尾.
+\item The first item in the first line of TITL is the name tag assigned by the software to the structure, the second item is the system's additional hydrostatic pressure (GPa), the third item is the unit cell volume, and the fourth item is the total of each unit cell Enthalpy (energy), the fifth term is the average value of the atomic spin value, the sixth term is the average value of the absolute value of the atomic spin, the seventh term is the total number of atoms in the system, and the eighth term is the name of the space group where the system is located. The last item is the fixed character n-1.
+\item Afterwards, several lines beginning with REM are comment lines, which record the basic information generated by the file, and will not have any effect after deletion.
+\item The line beginning with CELL records the basic unit cell information. Among them, the first item is a meaningless decimal, which is used to record the wavelength of the diffraction spectrum used to obtain the relevant structure in the original SHELX program. In AIRSS The middle is locked as a meaningless decimal. The second to fourth terms are lattice constants \(a\;b\;c\), and the next five to seven terms are crystal angles\(\alpha\;\beta\;\ gamma\).
+\item The bottom line is LATT -1. This line is used in SHELX to calibrate the symmetry of the lattice, and it is locked to a fixed value of -1 in AIRSS.
+\item The next line starting with SFAC records the names of all the elements that make up the system, and different elements are separated by a space.
+\item The last few rows mark the positions of the atoms in the unit cell. The first column of these rows is the element symbol, the second column indicates the order in which the element appears in the SFAC row, and the third to fifth columns are the rows where the atoms are stored Fractional coordinates, the last column is the number of atoms occupied, generally set to 1.
+\item The file ends with an END line.
 \end{maineu}}}\\
 
-\subsection{数据批量化处理}
-有了计算数据*.res文件后, 就可以使用\verb|ca|指令进行数据处理了. \verb|ca| 是对AIRSS中基本分析套件 \verb|cryan| 的封装. 
+\subsection{Data batch processing}
+Once you have the calculation data *.res file, you can use the \verb|ca| command to process the data. \verb|ca| is the package of the basic analysis suite \verb|cryan| in AIRSS.
 \begin{lstlisting}[language={bash}]
 user@machine_name$ ca
 ca [-R(recurcsive)] [command line arguments for cryan]
 user@machine_name$
 \end{lstlisting}
 
-\verb|cryan|的使用方法如下:\footnote{为了行文简洁, 对参数的说明做了少许简化, 请自行运行上述指令查看更详细的信息.}
+\verb|cryan| is used as follows:\footnote{For the sake of brevity, the description of the parameters has been simplified a little, please run the above command yourself to view more detailed information.}
 \begin{lstlisting}[language={bash}]
 user@machine_name$ cryan
 
@@ -838,7 +840,7 @@ cryan options (note - the order matters):
 user@machine_name$
 \end{lstlisting}
 
-使用\verb|ca|就可以对之前的计算结果进行分析.
+Use \verb|ca| to analyze the previous calculation results.
 \begin{lstlisting}[language={bash}]
 user@machine_name$ ca -r > analysis.data
 user@machine_name$ cat analysis.data
@@ -849,19 +851,19 @@ user@machine_name$
 \end{lstlisting}
 
 \noindent\fcolorbox{mygray}[HTML]{E7E7E7}{\parbox{\textwidth}{%
-\noindent \textbf{上述输出结果中,}
+\noindent \textbf{In the above output result,}
 \begin{maineu}
-  \item 第一列是AIRSS软件分配给该结构的名称标签
-  \item 第二列压力值(GPa)
-  \item 第三列是每个化学式结构单元(fu)的体积
-  \item 第四列第一行是一个化学式结构单元(fu)的焓值, 之后的几行是不同结构下相对于第一行的焓值
-  \item 第五列是单胞中化学式结构单元(fu)的总个数(单胞中fug的个数乘以一个fug中fu的个数.)
-  \item 第六列是化学式结构单元(fu)的化学式
-  \item 第七列是空间群名称
-  \item 第八列是所有搜索结果中出现该结构的次数
+  \item The first column is the name tag assigned by the AIRSS software to the structure.
+  \item Second column pressure value (GPa).
+  \item The third column is the volume of each chemical formula structural unit (fu).
+  \item The first row of the fourth column is the enthalpy value of the structural unit (fu) of a chemical formula, and the following rows are the enthalpy values of the first row under different structures.
+  \item The fifth column is the total number of chemical formula structural units (fu) in the unit cell.
+  \item The sixth column is the chemical formula of the structural unit (fu).
+  \item The seventh column is the space group name.
+  \item The eighth column is the number of times the structure appears in all search results.
 \end{maineu}}}\\
 
-如果您认为所列结果过多, 可以使用\verb|-u|选项, 但是要注意, \verb|-u| 一定要排在\verb|-r|之前使用.\footnote{事实上, 所有排在 rank (-r) 任务之后的参数都会被自动忽略.} 如果您仔细看过 \verb|cryan| 的 help 信息就不难发现这样一个提醒: ``note - the order matters''.
+If you think there are too many results listed, you can use the \verb|-u| option, but note that \verb|-u| must be used before \verb|-r|. \footnote{In fact, all rows The parameters after the rank (-r) task are automatically ignored.} If you read the help information of \verb|cryan|, it is not difficult to find such a reminder: ``note-the order matters''.
 \begin{lstlisting}[language={bash}]
 user@machine_name$ ca -u 0.01 -r > analysis.data
 user@machine_name$ cat analysis.data
@@ -870,420 +872,6 @@ Al-43867-3302-3   0.00  7.564   0.005   8 Al  Fm-3m    1
 user@machine_name$
 \end{lstlisting}
 
-指令 \verb|ca -u| 后所跟的数字是一个无量纲的比例. 可以将这一参数简单的做如下理解:  他标定了晶格相似度阈值. 该数值越大, 容忍度越高, 最终展示出来的不同结构越少. 更详细的, 这一参数标定的距离, 是原子结构内部最接近的两个原子之间距离的倍数. 例如, 现有两个结构十分相似, 晶格中最短键长为1.5 \r{A}, 则 \verb|ca -u 0.1| 就意味着, 依次比较两结构对应原子的两两距离, 如果未能发现这些距离差存在大于0.15 \r{A} 的情况, 则标定这两个结构一致. \footnote{这一段描述只是一个粗浅直观的解释, 实际使用的算法要更加复杂且稳定. 详细见源码``airss-0.9.1/src/cryan/src/cryan.f90''2133行.} 该值可根据需求调整, 建议在0.1--0.01之间选择.
-
-\newpage
-\appendix
-\section{AIRSS安装日志}
-\label{sec:airss-install} 
-\textbf{下面将以 airss-0.9.0 版本为例, 简要记录AIRSS的安装.}
-
-AIRSS只支持在命令行(Command Line)使用, 且仅能安装在*nix系统中. 安装此软件前, 您最好已经了解 \href{https://www.gnu.org/software/make/manual/}{GNU make} 的使用方法. 当然, 如果您实在对此不感兴趣, 这不是必须的. 前提是您能完全按照以下步骤操作.
-
-\subsection{软件主体安装}
-具体的安装分为以下几步, 非必须步骤已使用\verb|*|标出:
-\begin{description}
-\item [*(I) 建立安装包文件管理系统] 在开始一切安装之前, 建议作为非\verb|root|用户但是有\verb|sudo|权限的您: 在自己能进行任意操作的家目录\verb|~/|中建立一个安装包管理文件夹, 如\verb|~/install_package|; 同时在系统目录\verb|/usr/local|中建立一个存放airss和其他程序二进制可执行文件的目录, 如\verb|/usr/local/| \verb|airss-0.9/bin|. 
-
-之所以这样建议, 是为了减少您安装过程中在系统目录下需要进行的操作, 降低由此可能引发的事故的概率, 同时让安装过程更简洁(避免每个命令都要使用前缀\verb|sudo ...|, \verb|sudo sh -c "...>..."|). 
-
-当然, 您也可以完全不将软件安装在系统目录, 一切都凭您的个人喜好.
-\begin{lstlisting}[language={bash}]
-user@machine_name$ cd /usr/local/
-user@machine_name$ sudo mkdir -p airss-0.9/bin
-Password:
-user@machine_name$ cd airss-0.9
-user@machine_name$ ls -F 
-bin/
-user@machine_name$ cd
-user@machine_name$ mkdir -p  install_package/AIRSS
-user@machine_name$ cd install_package
-user@machine_name$ ls -F
-AIRSS/
-\end{lstlisting}
-
-\item [(II) AIRSS安装包下载]您可以访问前文所述\href{https://www.mtg.msm.cam.ac.uk/Codes/AIRSS}{官方网站}下载 airss-0.9.0.
-
-您可以选择在浏览器上下载, 也可以使用\verb|wget|指令.
-
-\begin{lstlisting}[language={bash}]
-user@machine_name$ wget -P ~/Downloads https://www.mtg.msm.
-cam.ac.uk/files/airss-0.9.tgz
-\end{lstlisting}
-
-\item [(III) 拷贝并解压安装包] 将您下载的\verb|airss-0.9-2.tag|拷贝到安装包管理文件夹中, 并使用\verb|tar|解压.
-\begin{lstlisting}[language={bash}]
-user@machine_name$ cd AIRSS
-user@machine_name$ cp ~/Downloads/airss-0.9-2.tgz .
-user@machine_name$ tar -zxvf airss-0.9-2.tgz
-x airss-0.9/.hg_archival.txt
-x airss-0.9/.hgignore
-x airss-0.9/LICENCE
-x airss-0.9/README
-x airss-0.9/VERSION 
-...
-...
-\end{lstlisting}
-
-\item[(IV) 使用 GNU make 指令安装 AIRSS] 使用\verb|make|等指令安装编译安装AIRSS.
-\begin{lstlisting}[language={bash}]
-user@machine_name$ cd airss-0.9
-user@machine_name$ make
-(cd src/pp3/src; make)
-gfortran -O3 -c ../../common/constants.f90
-gfortran -O3 -c cell.f90
-gfortran -O3 -c pp.f90
-gfortran -O3 -c opt.f90
-gfortran -O3 -c pp3.f90
-...
-...
-user@machine_name$ make install > make_install.log 2>&1
-user@machine_name$
-user@machine_name$ cat make_install.log
-(cp src/pp3/src/pp3 bin/)
-(cp src/cabal/src/cabal bin/)
-(cp src/buildcell/src/buildcell bin/)
-(cp src/cryan/src/cryan bin/)
-user@machine_name$
-\end{lstlisting}
-
-十分鼓励您今后使用\verb|make isntall|指令时, 将其输出重定向到一个记录文件中, 这样会给您卸载软件时提供便利.
-
-\item[*(V)安放可执行文件] \verb|~/install_package/AIRSS/airss-0.9/bin|存放了安装完毕的可执行文件, 将其拷贝至系统目录下.
-\begin{lstlisting}[language={bash}]
-user@machine_name$ sudo cp -r bin/ /usr/local/airss-0.9/bin
-Password:
-user@machine_name$ ls /usr/local/airss-0.9/bin
-airss.pl     cabal          cell2lammps  crud.pl      
-despawn      gulp_relax mc  pp3_relax    psi4_relax   
-spawn-slow   tidy.pl        buildcell    castep2res   
-check_airss  cryan          gap_relax    lammps2cell  
-niggli       press          run.pl       stopairss    
-ca           castep_relax   comp2minsep  csymm        
-gencell      lammps_relax   pp3          prim         
-spawn        symm
-
-\end{lstlisting}
-
-\item[(VI) 设置系统环境变量] 完成以上所有设置后, 您实际上就可以通过使用使用命令\verb|/usr/local/airss-0.9/bin/airss.pl -[option] [parameter] ...|来运行AIRSS了. 为了简便, 可以考虑在\verb|~/.bash_profile|文件中加入如下内容
-\begin{lstlisting}[language={bash}]
-## Setting PATH for AIRSS
-export PATH="/usr/local/airss-0.9/bin:${PATH}"
-\end{lstlisting}
-
-修改储存并退出后, 请重新登入终端, 或运行\verb|source|指令完成环境变量的更新.
-\begin{lstlisting}[language={bash}]
-user@machine_name$ source ~/.bash_profile 
-\end{lstlisting}
-
-这样您就可以在系统中的任何路径上执行\verb|airss.pl|等AIRSS的指令了.
-
-\item[(VII) 检查安装情况] 设置好环境变量后, 您可以在\verb|~/install_package/AIRSS/|
-\\\verb|airss-0.9/|下输入\verb|make check|指令检查AIRSS安装情况. 
-\begin{lstlisting}[language={bash}]
-user@machine_name$ make check
-(sh bin/check_airss)
-Essential:
-
-airss.pl +
-run.pl +
-crud.pl +
-castep2res +
-buildcell +
-cryan +
-pp3 +
-cabal +
-cellsym - Install cellsym: http://www.tcm.phy.cam.ac.uk/sw
-/check2xsf/cellsym.html
-symmol - Patch and install symmol: http://www.
-ccp14.ac.uk/ccp/web-mirrors/symmol/~pila/symmol.zip
-bob - Get Bob!
-
-Recommended:
-
-castep - Install castep: http://www.castep.org/
-optados - Install optados: http://www.tcm.phy.cam.ac.uk/
-~ajm255/optados/index.html
-qhull - Install qhull from package manager, or: 
-http://www.qhull.org/
-qconvex - Install qhull from package manager, or: 
-http://www.qhull.org/
-xmgrace - Install grace from package manager or: 
-http://plasma-gate.weizmann.ac.il/Grace/
-Rscript - Install R/Rscript and ggtern from package manager
-or: https://cran.r-project.org/
-
-Optional:
-
-gulp - Install gulp: http://projects.ivec.org/gulp/
-cif2cell - Install cif2cell from: http://cif2cell.
-sourceforge.net/
-
-Very optional:
-
-lammps - Install lammps: http://lammps.sandia.gov/
-hull - Install hull: http://www.netlib.org/voronoi/
-hull.html
-off_util - Install antiprism: http://www.antiprism.com/
-files/antiprism-0.24.1.tar.gz
-
-Pseudopotentials:
-
-pspot - set $PSPOT_DIR to location of the CASTEP pspot 
-directory
-
-Spawn file:
-
-.spawn - 
-
---------------------
-Tests run in .check:
---------------------
-
-Running example 1.1 (Crystals):
-
-Al-9002-4643-1   -0.00   7.561    -6.659   8 Al     n/a   1
-Al-9002-4643-2    0.00   7.564     0.005   8 Al     n/a   1
-
-Running example 1.2 (Clusters):
-
-Al-9274-4255-2    0.00   615.385  -3.014  13 Al     n/a   1
-Al-9274-4255-1    0.00   615.385   0.019  13 Al     n/a   1
-
-Skipping example 3.1 (Gulp)
-Skipping example 2.1a (Castep)
-\end{lstlisting}       
-\end{description}
-如果您仔细阅读了上述输出文件, 会发现必要的组件中还有\verb|cellsym|和\verb|symmol|没有安装. 这直接导致了晶体和团簇空间群符号输出为\verb|n/a|. 
-\subsection{辅助插件安装}
-AIRSS支持的全部插件信息可查询\verb|~/install_package/AIRSS/airss-0.9/|
-\verb|README|文件.下面只演示最核心的\verb|cellsym|和\verb|symmol|插件的安装过程.
-\begin{description}
-\item[(I) 下载插件安装包]
-\verb|cellsym|的安装包官方网站是:
-
-\url{http://www.tcm.phy.cam.ac.uk/sw/check2xsf/cellsym.html}
-
-需要注意的是, \verb|cellsym|源码是使用C语言编写的, 安装此程序前, 需要下载并安装库文件\verb|spglib.h|.
-
-\verb|spglib.h|的下载地址是:
-
-\url{http://www.tcm.phy.cam.ac.uk/sw/check2xsf/spglib-1.9.4.tar.gz}
-
-\verb|cellsym|的下载地址是:
-
-\url{http://www.tcm.phy.cam.ac.uk/sw/check2xsf/cellsym.tgz}
-
-\verb|symmol|插件安装包的下载地址是:
-
-\url{http://www.ccp14.ac.uk/ccp/web-mirrors/symmol/~pila/symmol.zip}
-
-您可以通过浏览器下载上述文件, 也可以使用\verb|wget|指令下载.
-\begin{lstlisting}[language={bash}]
-user@machine_name$ wget -P ~/Downloads 
-www.tcm.phy.cam.ac.uk/sw/check2xsf/spglib-1.9.4.tar.gz 
-www.tcm.phy.cam.ac.uk/sw/check2xsf/cellsym.tgz 
-www.ccp14.ac.uk/ccp/web-mirrors/symmol/~pila/symmol.zip
-\end{lstlisting}
-
-\item[(II) 拷贝并解压插件]将您下载的三个压缩包拷贝到安装包管理文件夹中, 并使用\verb|tar|和\verb|unzip|解压.
-\begin{lstlisting}[language={bash}]
-user@machine_name$ cd ~/Downloads
-user@machine_name$ cp cellsym.tar spglib-1.9.4.tar 
-symmol.zip ~/install_package/AIRSS
-user@machine_name$ cd ~/install_package/AIRSS
-user@machine_name$ tar -xvf cellsym.tar
-...
-user@machine_name$ tar -xvf spglib-1.9.4.tar
-...
-user@machine_name$ unzip symmol.zip -d symmol
-...
-user@machine_name$ ls -F
-airss-0.9/     airss-0.9-2.tgz   cellsym-0.16a/  
-cellsym.tar    spglib-1.9.4/     spglib-1.9.4.tar  
-symmol/        symmol.zip
-\end{lstlisting}
-
-\item[(III) 编译插件]将解压好的插件按如下顺序操作.
-
-首先安装库文件 \verb|spglib|.使用 GNU make 指令. 
-\begin{lstlisting}[language={bash}]
-user@machine_name$ cd spglib1.9.4/
-user@machine_name$ ./configure
-...
-user@machine_name$ make
-...
-user@machine_name$ sudo sh -c 'make install > make_install.log 2>&1'
-Password:
-user@machine_name$ cat make_install.log 
-Making install in src
-.././install-sh -c -d '/usr/local/lib'
-/bin/sh ../libtool   --mode=install /usr/bin/install -c   libsymspg.la '/usr/local/lib'
-libtool: install: /usr/bin/install -c .libs/libsymspg.0.dylib /usr/local/lib/libsymspg.0.dylib
-libtool: install: (cd /usr/local/lib && { ln -s -f libsymspg.0.dylib libsymspg.dylib || { rm -f libsymspg.dylib && ln -s libsymspg.0.dylib libsymspg.dylib; }; })
-libtool: install: /usr/bin/install -c .libs/libsymspg.lai /usr/local/lib/libsymspg.la
-libtool: install: /usr/bin/install -c .libs/libsymspg.a /usr/local/lib/libsymspg.a
-libtool: install: chmod 644 /usr/local/lib/libsymspg.a
-libtool: install: ranlib /usr/local/lib/libsymspg.a
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib: file: /usr/local/lib/libsymspg.a(debug.o) has no symbols
-.././install-sh -c -d '/usr/local/include/spglib'
-/usr/bin/install -c -m 644 arithmetic.h cell.h debug.h delaunay.h hall_symbol.h kgrid.h kpoint.h mathfunc.h niggli.h pointgroup.h primitive.h refinement.h site_symmetry.h sitesym_database.h spacegroup.h spg_database.h spglib.h spin.h symmetry.h version.h '/usr/local/include/spglib'
-make[2]: Nothing to be done for `install-exec-am'.
-make[2]: Nothing to be done for `install-data-am'.
-user@machine_name$
-user@machine_name$
-user@machine_name$ make install check
-...
-...
-...
-PASS: spglib_test
-=====================================
-Testsuite summary for spglib 1.9.4
-=====================================
-# TOTAL: 1
-# PASS:  1
-# SKIP:  0
-# XFAIL: 0
-# FAIL:  0
-# XPASS: 0
-# ERROR: 0
-=====================================
-make[1]: Nothing to be done for `check-am'.
-user@machine_name$
-\end{lstlisting}
-
-使用\verb|make install check|检查PASS后, 就可以开始编译\verb|cellsym|了.
-\begin{lstlisting}[language={bash}]
-user@machine_name$ cd ../cellsym-0.16a/
-user@machine_name$ make
-...
-user@machine_name$ ls -all cellsym
--rwxr-xr-x  1 user  groups  53628 Jan 25 12:28 cellsym
-user@machine_name$ 
-\end{lstlisting}
-
-顺利编译完成后, 会生成一个名为\verb|cellsym|的可执行文件.
-注意, \verb|make|执行过程中可能会出现编译警告, 但这并不影响程序执行, 可忽略.
-
-编译并确认生成了\verb|cellsym|文件后, 就可以开始编译另一个插件\verb|symmol|了.
-\verb|symmol|是使用Fortran写成的. 在网站上下载的是其源码, 需要编译使其变为可执行文件.
-需要注意的是, 原版的\verb|symmol.f|并不兼容AIRSS, 需要为其打上\verb|~/install_package/AIRSS/airss-0.9/misc|中提供的\verb|symmol.patch|补丁.
-\begin{lstlisting}[language={bash}]
-user@machine_name$ cd ../airss-0.9/misc/
-user@machine_name$ cp ../../symmol/symmol.f .
-user@machine_name$ ls
-symmol.f     symmol.patch
-user@machine_name$ patch -p0 symmol.f symmol.patch 
-patching file symmol.f
-user@machine_name$ gfortran symmol.f -o symmol 
-user@machine_name$ ls 
-symmol       symmol.f     symmol.patch
-user@machine_name$ echo '-o 后跟的文件名一定要是 symmol'
--o 后跟的文件名一定要是 symmol
-user@machine_name$ ls -all symmol
--rwxr-xr-x  1 user  group  106800 Jan 25 12:41 symmol
-user@machine_name$
-\end{lstlisting}
-
-至此, 我们完成了所有插件的编译. 生成了\verb|symmol|和\verb|cellsym|两个可执行文件.
-
-\item[(IV) 将插件导入AIRSS]
-这一步的操作十分简单, 将编译好的两个插件复制到系统目录下的\verb|bin/|文件夹即可. 为了以防万一, 可以在安装包管理文件夹保存一个\verb|bin/|的备份
-\begin{lstlisting}[language={bash}]
-user@machine_name$ pwd
-/home/user_name/install_package/AIRSS/airss-0.9/misc
-user@machine_name$ cp symmol ../bin/
-user@machine_name$ sudo cp symmol /usr/local/airss-0.9/bin
-Password:
-user@machine_name$ cd ../../cellsym-0.16a/
-user@machine_name$ cp cellsym ../airss-0.9/bin/
-user@machine_name$ sudo cp cellsym /usr/local/airss-0.9/bin
-\end{lstlisting}
-
-\item[(V) 安装最终检查]
-回到\verb|airss-0.9|中执行\verb|make|的文件夹. 重新输入\verb|make check|检查安装情况.
-\begin{lstlisting}[language={bash}]
-user@machine_name$ cd ../airss-0.9
-user@machine_name$ make check
-(sh bin/check_airss)
-Essential:
-
-airss.pl +
-run.pl +
-crud.pl +
-castep2res +
-buildcell +
-cryan +
-pp3 +
-cabal +
-cellsym +
-symmol +
-bob - Get Bob!
-
-Recommended:
-
-castep - Install castep: http://www.castep.org/
-
-...
-...
-...
-
---------------------
-Tests run in .check:
---------------------
-
-Running example 1.1 (Crystals):
-
-Al-14776-403-2  -0.00   7.784  -6.398   8 Al    C2/m    1
-Al-14776-403-1   0.00   7.820   0.066   8 Al    P21/m   1
-
-Running example 1.2 (Clusters):
-
-Al-15054-7410-1  0.00   615.385  -3.190  13 Al    Cs    1
-Al-15054-7410-2  0.00   615.385   0.006  13 Al    Cs    1
-
-Skipping example 3.1 (Gulp)
-Skipping example 2.1a (Castep)
-user@machine_name$
-\end{lstlisting}
-\end{description}
-
-成功输出了晶体的空间群名称! 
-
-至此, 我们完成了AIRSS的基本安装, 您现在已经可以使用AIRSS的pp3模块(默认是CASTEP)进行结构搜索了.
-
-AIRSS是受GPL许可证保护的开源软件. 对此程序您有以下三种权利:
-\begin{enumerate}
-\item [*]以任何目的运行此程序
-\item [*]再复制
-\item [*]改进此程序, 并公开发布改进
-\end{enumerate}
-
-\subsection{卸载软件}
-AIRSS卸载可分为三步:
-\begin{description}
-\item [(I)卸载spglib] 进入安装包管理文件夹, 使用\verb|make uninstall|卸载spglib.
-\begin{lstlisting}[language={bash}]
-user@machine_name$ cd ~/install_package/AIRSS/spglib-1.9.4
-user@machine_name$ sudo make uninstall
-...
-user@machine_name$
-\end{lstlisting}
-
-\item [(II)删除相关文件夹] 删除系统目录中的bin文件. 您可以选择保留安装文件. 保留安装文件可以在您试图恢复使用AIRSS时提供便利.\footnote{强烈建议您对文件进行删除时, 在离此文件较近的路径上操作, 并杜绝使用绝对路径, 以免打出文章开头提到的的毁灭性指令.}
-\begin{lstlisting}[language={bash}]
-user@machine_name$ cd /usr/local/
-user@machine_name$ sudo rm -ri airss-0.9 
-Password:
-user@machine_name$ cd ~/install_package/
-user@machine_name$ rm -r AIRSS
-\end{lstlisting}
-
-\item [(III)恢复PATH变量] 进入\verb|~/.bashrc|文件, 删除修改环境变量的语句即可.
-\begin{lstlisting}[language={bash}]
-###Setting PATH for AIRSS
-export PATH="/usr/local/airss-0.9/bin:${PATH}"
-\end{lstlisting}
-\end{description}
+The number following the command \verb|ca -u| is a dimensionless ratio. This parameter can be simply understood as follows: It calibrates the lattice similarity threshold. The larger the value, the higher the tolerance. In the end, there are fewer different structures displayed. In more detail, the distance calibrated by this parameter is a multiple of the distance between the two closest atoms inside the atomic structure. For example, the two existing structures are very similar, and the shortest in the crystal lattice The bond length is 1.5 \r(A), then \verb|ca -u 0.1| means that the pairwise distances of the corresponding atoms of the two structures are compared in turn, if it is not found that these distance differences are greater than 0.15 \r(A) In this case, the two structures are the same as the calibration. \footnote{This paragraph description is just a superficial and intuitive explanation. The algorithm actually used is more complicated and stable. For details, see the source code ``airss-0.9.1/src/cryan/src/ cryan.f90'' line 2133.} This value can be adjusted according to needs, and it is recommended to choose between 0.1--0.01.
 
 \end{document}

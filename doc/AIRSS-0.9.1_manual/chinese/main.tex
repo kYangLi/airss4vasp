@@ -494,11 +494,11 @@ AIRSS中全部可用的全局参数的功能和详细使用方法如\textbf{Tabl
 \midrule
 \verb|#TIGHT|& \verb|void| & off & 使得生成的结构更加紧密.\\
 \midrule
-\verb|#SYMMOPS=|\(n\)\hspace{6em}\verb|#SYMMOPS=~|\(n\;\;\;\;\;\;\;\;\;\;\;\)\hspace{6em}\verb|#SYMMOPS=|\(n_{min}-n_{max}\) & \verb|int| &  off & 声明生成的结构中必须含有\(n\)种对称操作. 若体系是周期性晶体结构, 推荐从下述整数中选取: 1,2,3,4,5,6,8,12,16,24,48. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量\footnote{这里的``数量''是指, 满足对称操作所需的最少同类原子数量, 也即该点位的 multiplicities. }更少的 special position 不予考虑. 若使用\verb|MULT|逐个原子指定 multiplicity, 则波浪号(\(\sim\))被忽略, 但若使用\verb|#NFORM=n|(\(n\)大于0), 则会与波浪号(\(\sim\))冲突. 另外需要注意的是, AIRSS中实现锁定对称性的方法是: 接将原子按对称性复制n份. 例如原子有\(C_4\)对称性, 则最终输出的总原子数将是设定的4倍. 但如果结合原子标签 \verb|OCC, MULT| 等的使用, 可实现在更高对称的点位安放更少原子的操作. 在含有波浪号(\(\sim\))的模式下不推荐使用\verb|#NFORM=n|限制原子对称复制的个数.\\
+\verb|#SYMMOPS=|\(n\)\hspace{6em}\verb|#SYMMOPS=~|\(n\;\;\;\;\;\;\;\;\;\;\;\)\hspace{6em}\verb|#SYMMOPS=|\(n_{min}-n_{max}\) & \verb|int| &  off & 声明生成的结构中必须含有\(n\)种对称操作. 若体系是周期性晶体结构, 推荐从下述整数中选取: 1,2,3,4,5,6,8,12,16,24,48. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量\footnote{这里的``数量''是指, 满足对称操作所需的最少同类原子数量, 也即该点位的 multiplicities. }更少的 special position 不予考虑. 若使用\verb|MULT|逐个原子指定 multiplicity, 则波浪号(\(\sim\))被忽略, 但若使用\verb|#NFORM=n|(\(n\)大于0), 则会与波浪号(\(\sim\))冲突. 因此在含有波浪号(\(\sim\))的模式下不推荐使用\verb|MULT|限制原子对称复制的个数. \textbf{值得说明的是,} AIRSS中实现锁定对称性的方法是: 接将原子按对称性复制n份. 例如原子有\(C_4\)对称性, 则最终输出的总原子数将是设定的4倍. 但如果结合原子标签 \verb|OCC, MULT| 等的使用, 可实现在更高对称的点位安放更少原子的操作. \\
 \midrule
-\verb|#SYMM=|\(spg\)\hspace{6em} \verb|#SYMM=~|\(spg\)& \verb|string| & off & 生成的结构必须在\(spg\)空间群中, \(spg\)是空间群的名称. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量更少的 special position 不予考虑, 在此模式下不推荐使用\verb|#NFORM=n|限制原子对称复制的个数.\\
+\verb|#SYMM=|\(spg\)\hspace{6em} \verb|#SYMM=~|\(spg\)& \verb|string| & off & 生成的结构必须在\(spg\)空间群中, \(spg\)是空间群的名称. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量更少的 special position 不予考虑, 在此模式下不推荐使用\verb|MULT|限制原子对称复制的个数.\\
 \midrule
-\verb|#SYMMNO=|\(n\)\hspace{6em} \verb|#SYMMNO=~|\(n\) & \verb|int| & off & 生成的结构必须在第\(n\)号空间群中, \(n\)是空间群的序号. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量更少的 special position 不予考虑, 在此模式下不推荐使用\verb|#NFORM=n|限制原子对称复制的个数.\\
+\verb|#SYMMNO=|\(n\)\hspace{6em} \verb|#SYMMNO=~|\(n\) & \verb|int| & off & 生成的结构必须在第\(n\)号空间群中, \(n\)是空间群的序号. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量更少的 special position 不予考虑, 在此模式下不推荐使用\verb|MULT|限制原子对称复制的个数.\\
 \midrule
 \verb|#SYMMORPHIC| & \verb|void| & off & 只检查体系是否存在点式对称操作.\\
 \midrule
@@ -730,11 +730,16 @@ user@machine_name$ airss.pl -max 3 -seed Al
 \end{lstlisting}
 
 \subsection{联合VASP弛豫}
-AIRSS自带了 \verb|airss.pl -vasp| 选项用于联合VASP弛豫计算. 但官方自带的接口在并行计算方面还有待完善. 基于AIRSS, 笔者用一套bash命令集重新编写了AIRSS至VASP的接口, 将其命名为\href{https://github.com/kYangLi/airss4vasp}{airss4vasp(a4v)}. 后虽考虑过将此命令集使用python重新编写, 但AIRSS本身无法在Windows上运行, 而复写工程又过于庞大且收效甚微, 因此a4v目前仍然主要基于bash实现.
+AIRSS自带了联合VASP弛豫计算的选项. 
+\begin{lstlisting}[language={bash},numbers=left]
+user@machine_name$ airss.pl -vasp -max 3 -seed Al
+\end{lstlisting}
 
-a4v可以看做是AIRSS的改版, 无需安装原生AIRSS便可独立运行. 其主要基于AIRSS原生的 \verb|buildcell| 模块, 同时内嵌了PBS, NSCC, Slurm等作业提交系统指令, 真正做到了一键提交 AIRSS+VASP 任务的功能, 同时对计算的并行也有较好的支持. 其具体用法可参见项目内部的 \verb|README.md| 文件. \footnote{事实上, 该说明手册也在此项目中.(笑} 
+但官方自带的接口在并行计算方面还有待完善. 基于AIRSS, 笔者用一套bash命令集重新编写了AIRSS至VASP的接口, 将其命名为\href{https://github.com/kYangLi/airss4vasp}{airss4vasp(a4v)}. 后虽考虑过将此命令集使用python重新编写, 但AIRSS本身无法在Windows上运行, 而复写工程又过于庞大且收效甚微, 因此a4v目前仍然主要基于bash实现.\footnote{如果把C++比作文言文, 则python相当于现代白话, bash等shell语言则是口语. 因此一般大规模脚本推荐使用python书写.}
 
-在 *.cell 文件设置方面: a4v增加了对应原子位置弛豫固定的\verb|SD-XYZ|, \verb|SD-XY|, \verb|SD-X|等原子标签; 同时删减了原先buildcell中设置共线自旋数值的全局参数, \verb|#SPIN=|.
+a4v可以看做是AIRSS的改版, 无需安装原生AIRSS便可独立运行. 其主要基于AIRSS原生的 \verb|buildcell| 模块, 同时内嵌了PBS, NSCC, Slurm等作业提交系统指令, 真正做到了一键提交 AIRSS+VASP 任务的功能, 同时对计算的并行也有较好的支持. 其具体用法可参见项目内部的 \href{https://github.com/kYangLi/airss4vasp/blob/master/README.md}{README.md} 文件. \footnote{事实上, 该说明手册也在此项目中.(笑} 
+
+在 *.cell 文件设置方面: a4v增加了对应原子位置弛豫固定的\verb|SD-XYZ|, \verb|SD-XY|, \verb|SD-X|等原子标签; 同时删减了原先buildcell中设置共线自旋数值的全局参数, \verb|#SPIN=|. 此外由于VASP本身对团簇(cluster)计算不是十分友好, 因此a4v中并未集成有关cluster的计算组件(如对称性判断组件等).
 
 \newpage
 \section{数据后处理}
@@ -845,14 +850,14 @@ user@machine_name$
 \noindent\fcolorbox{mygray}[HTML]{E7E7E7}{\parbox{\textwidth}{%
 \noindent \textbf{上述输出结果中,}
 \begin{maineu}
-  \item 第一列是AIRSS软件分配给该结构的名称标签
-  \item 第二列压力值(GPa)
-  \item 第三列是每个化学式结构单元(fu)的体积
-  \item 第四列第一行是一个化学式结构单元(fu)的焓值, 之后的几行是不同结构下相对于第一行的焓值
-  \item 第五列是单胞中化学式结构单元(fu)的总个数(单胞中fug的个数乘以一个fug中fu的个数.)
-  \item 第六列是化学式结构单元(fu)的化学式
-  \item 第七列是空间群名称
-  \item 第八列是所有搜索结果中出现该结构的次数
+  \item 第一列是AIRSS软件分配给该结构的名称标签.
+  \item 第二列是体系静水压力值(GPa).
+  \item 第三列是每个化学式结构单元(fu)的体积.
+  \item 第四列第一行是对应结构的总能(焓, eV/f.u.), 之后的几行是不同结构下相对于第一行的能量差.
+  \item 第五列是单胞中化学式结构单元(f.u.)的总数.
+  \item 第六列是化学式结构单元(f.u.)的化学式.
+  \item 第七列是空间群名称.
+  \item 第八列是所有搜索结果中出现该结构的次数.
 \end{maineu}}}\\
 
 如果您认为所列结果过多, 可以使用\verb|-u|选项, 但是要注意, \verb|-u| 一定要排在\verb|-r|之前使用.\footnote{事实上, 所有排在 rank (-r) 任务之后的参数都会被自动忽略.} 如果您仔细看过 \verb|cryan| 的 help 信息就不难发现这样一个提醒: ``note - the order matters''.
