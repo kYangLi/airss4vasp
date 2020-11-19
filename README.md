@@ -52,19 +52,19 @@ Parameter Name | Type | Descripution
 :-|:-|:-
 SEED_NAME         | Char  | AIRSS seed name.
 TASK_NAME         | Char  | A4V task name.
-INTEL_MODULE      | Char  | Intel Module load command, if you are using Intel Lib for VASP and AIRSS.
+INTEL_MODULE      | Char  | Intel Module load command, if you are using Intel lib for VASP.
 VASP_PROG         | Char  | Path of VASP executive program.
 NODES_NUM         | Int   | Total Nodes number used in task.
 CORES_PER_NODE    | Int   | The number of cores of each nodes in your machine(or you want to use).
-COACH_NUM         | Int   | The number of coach (parallel tasker).
+CORES_PER_COACH   | Int   | The number of cores used by each coach.
 STR_NUM           | Int   | AIRSS random structure number. 
 IS_2D_MATERIAL    | T/F   | Whether the structure is 2D system, useful only when generate KPOINTS using `genkp`.
 KP_SEP_LIST       | List  | Kpoints sepration list, useful only when generate KPOINTS using `genkp`.
 SYMM_PREC         | Float | Symmetry precise used in `cellsym`.
-SYS_TYPE          | Char  | Job system type, choice one from [pbs, nscc, slurm, direct].
-PBS_WALLTIME      | Int   | PBS walltime, useful only when using PBS job system.
+SYS_TYPE          | Char  | Job system type, choice one from [pbs, nscc, slurm, direct]. The `nscc` is job manage system for TianHe, and the `direct` means run vasp on current node directly.
+PBS_WALLTIME      | Int   | PBS walltime in hours, useful only when using PBS job system.
 PBS_QUEUE         | Char  | PBS queue, useful only when using PBS job system. Use 'unset-pbs-queue' to comment it out.
-VASP_WALLTIME     | Int   | Walltime for a single VASP relazation(one INCAR step).
+VASP_WALLTIME     | Int   | Walltime for a single VASP relazation(one INCAR step) in seconds.
 KEEP_CALC_DETAILS | T/F   | Whether keep all VASP calculation details or not.
 
 Here is a example of `a4v.input`:
@@ -75,7 +75,7 @@ INTEL_MODULE      = source /intel/cl2020/linux/bin/compilervars.sh intel64
 VASP_PROG         = /bin/vasp_ncl
 NODES_NUM         = 4
 CORES_PER_NODE    = 40
-COACH_NUM         = 4
+CORES_PER_COACH   = 20
 STR_NUM           = 100
 IS_2D_MATERIAL    = F
 KP_SEP_LIST       = 0.2,0.1

@@ -57,7 +57,7 @@ install:
 	(cp external/cellsym/cellsym-0.16a/cellsym bin/)
 	@echo
 	@echo 'Add '$(PWD)'/bin to your path by placing this line in your ~/.bashrc:'
-	@echo 'export PATH='$(PWD)'/bin:$$PATH'
+	@echo 'export PATH="'$(PWD)'/bin:$${PATH}"'
 	@echo 'To update your path "source ~/.bashrc"'
 
 neat_internal:

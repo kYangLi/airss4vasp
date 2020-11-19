@@ -79,7 +79,7 @@ read -p '[input]> ' seed_name
 if [ -z "${seed_name}" ];then
   seed_name="${default_seed_name}"
 fi
-echo "[info] Seed name: ${seed_name}"
+printf "[info] Seed name: \033[01;31m${seed_name}\033[0m.\n"
 echo ""
 ## Task Name
 default_task_name=$(grep_input_file 'TASK_NAME')
@@ -92,7 +92,7 @@ read -p '[input]> ' task_name
 if [ -z "${task_name}" ];then
   task_name="${default_task_name}"
 fi
-echo "[info] Task name: ${task_name}"
+printf "[info] Task name: \033[01;31m${task_name}\033[0m.\n"
 echo ""
 ## Intel Module
 default_intel_module=$(grep_input_file 'INTEL_MODULE')
@@ -104,7 +104,7 @@ if [ -z "${intel_module}" ];then
 fi
 echo "[info] Intel module: ${intel_module}"
 mklroot=$(echo "${intel_module}; echo \${MKLROOT}" | bash)
-echo "[info] You are using MKL: ${mklroot}"
+printf "[info] You are using MKL: \033[01;31m${mklroot}\033[0m.\n"
 echo ""
 ## Vasp Program
 default_vasp_prog=$(grep_input_file 'VASP_PROG')
@@ -114,21 +114,7 @@ read -p '[input]> ' vasp_prog
 if [ -z "${vasp_prog}" ];then
   vasp_prog="${default_vasp_prog}"
 fi
-echo "[info] VASP program: ${vasp_prog}"
-echo ""
-## Nodes Number
-default_nodes_num=$(grep_input_file 'NODES_NUM')
-echo "[input] Please input the NODES NUM."
-echo "[input] Default: ${default_nodes_num}"
-read -p '[input]> ' nodes_num
-if [ -z "${nodes_num}" ];then
-  nodes_num=${default_nodes_num}
-fi
-if ! [ "${nodes_num}" -gt "0" ] 2>/dev/null; then
-  echo "[error] NODES NUM input invalid..."
-  exit 1
-fi
-echo "[info] Using nodes number: ${nodes_num}"
+printf "[info] VASP program: \033[01;31m${vasp_prog}\033[0m.\n"
 echo ""
 ## Cores Number Per Node
 default_cores_per_node=$(grep_input_file 'CORES_PER_NODE')
@@ -142,31 +128,63 @@ if ! [ "${cores_per_node}" -gt "0" ] 2>/dev/null; then
   echo "[error] CORES PER NODE input invalid..."
   exit 1
 fi 
-echo "[info] Using cores per node: ${cores_per_node}"
+printf "[info] Cores per node: \033[01;31m${cores_per_node}\033[0m.\n"
 echo ""
-## Coach Number
-default_coach_num=$(grep_input_file 'COACH_NUM')
-if [ -z "${default_coach_num}" ]; then 
-  default_coach_num=${nodes_num}
+## Nodes Number
+default_nodes_num=$(grep_input_file 'NODES_NUM')
+echo "[input] Please input the total NODES NUM you are going to use."
+echo "[input] Default: ${default_nodes_num}"
+read -p '[input]> ' nodes_num
+if [ -z "${nodes_num}" ];then
+  nodes_num=${default_nodes_num}
+fi
+if ! [ "${nodes_num}" -gt "0" ] 2>/dev/null; then
+  echo "[error] NODES NUM input invalid..."
+  exit 1
+fi
+printf "[info] Nodes number: \033[01;31m${nodes_num}\033[0m.\n"
+echo ""
+## Cores Number Per Coach
+default_cores_per_coach=$(grep_input_file 'CORES_PER_COACH')
+echo "[input] Please input the CORES PER COACH."
+echo "[input] Default: ${default_cores_per_coach}"
+read -p '[input]> ' cores_per_coach
+if [ -z "${cores_per_coach}" ];then
+  cores_per_coach=${default_cores_per_coach}
+fi
+if ! [ "${cores_per_coach}" -gt "0" ] 2>/dev/null; then
+  echo "[error] CORES PER COACH input invalid..."
+  exit 1
 fi 
-echo "[input] Please input the COACH NUM."
-echo "[input] Default: ${default_coach_num}"
-read -p '[input]> ' coach_num
-if [ -z "${coach_num}" ];then
-  coach_num=${default_coach_num}
+printf "[info] Cores per coach: \033[01;31m${cores_per_coach}\033[0m.\n"
+## Coach Number
+if [ "${cores_per_node}" -gt "${cores_per_coach}" ]; then
+  coaches_per_node=$(echo ${cores_per_node} ${cores_per_coach} | \
+                     awk '{print $1/$2}')
+  coaches_per_node_is_correct=$(echo ${coaches_per_node} | grep "\.")
+  if [ ! -z "${coaches_per_node_is_correct}"]; then 
+    echo "[error] the cores_per_coach must be a factor of cores_per_node!!!"
+    exit 0
+  fi 
+  coach_num=$((coaches_per_node*nodes_num))
+  nodes_pre_coach=1
+else
+  nodes_pre_coach=$(echo ${cores_per_coach} ${cores_per_node} | \
+                    awk '{print $1/$2}')
+  nodes_pre_coach_is_correct=$(echo ${nodes_pre_coach} | grep "\.")
+  if [ ! -z "${nodes_pre_coach_is_correct}"]; then 
+    echo "[error] the cores_per_node must be a factor of cores_per_coach!!!"
+    exit 0
+  fi 
+  coach_num=$((nodes_num/nodes_pre_coach))
 fi
 if ! [ "${coach_num}" -gt "0" ] 2>/dev/null; then
   echo "[error] COACH NUM input invalid..."
   exit 1
 fi
-nodes_pre_coach=$(echo ${nodes_num} ${coach_num} | awk '{print $1/$2}')
-coach_num_is_correct=$(echo ${nodes_pre_coach} | grep "\.")
-if [ ! -z "${coach_num_is_correct}"]; then 
-  echo "[error] the COACH NUMBER must be a factor of NODES NUMBER!!!"
-  exit 0
-fi 
-echo "[info] Using coach number: ${coach_num}"
-echo "[info] Each coach will use '${nodes_pre_coach}' nodes."
+
+printf "[info] Coach number: \033[01;31m${coach_num}\033[0m.\n"
+printf "[info] Each coach will use \033[01;31m${nodes_pre_coach}\033[0m nodes.\n"
 echo ""
 ## Structure Number
 default_str_num=$(grep_input_file 'STR_NUM')
@@ -177,7 +195,7 @@ if [ -z "${str_num}" ];then
   str_num=${default_str_num}
 fi
 declare -i str_num=${str_num}
-echo "[info] Totally '${str_num}' structures will be searched."
+printf "[info] Totally \033[01;31m${str_num}\033[0m structures will be searched.\n"
 echo ""
 ## Symmetry Precise
 default_symm_prec=$(grep_input_file 'SYMM_PREC')
@@ -190,7 +208,7 @@ read -p '[input]> ' symm_prec
 if [ -z "${symm_prec}" ];then
   symm_prec=${default_symm_prec}
 fi
-echo "[info] Using symmetry precision: ${symm_prec}"
+printf "[info] Using symmetry precision: \033[01;31m${symm_prec}\033[0m.\n"
 echo ""
 ## Kpoints separation
 need_read_is_2d=0
@@ -210,7 +228,7 @@ for incar in ${seed_name}.INCAR-[0-9]*; do
     default_is_2d_material=$(grep_input_file 'IS_2D_MATERIAL')
     echo "[input] Is this a 2D material? (T/F)"
     echo "[input] Default: ${default_is_2d_material}"
-    echo "[tips] Please make sure the vaccum layer is in Z direction."
+    echo "[tips] (Make sure the vaccum layer is in Z direction.)"
     read -p '[input]> ' is_2d_material
     if [ -z "${is_2d_material}" ];then
       is_2d_material=${default_is_2d_material}
@@ -220,7 +238,7 @@ for incar in ${seed_name}.INCAR-[0-9]*; do
       echo "[error] input invalid, please input 'T'(true) or 'F'(false)..."
       exit 1
     fi
-    echo "[info] Is a 2D Material: ${is_2d_material}"
+    printf "[info] Is a 2D Material: \033[01;31m${is_2d_material}\033[0m.\n"
     echo ""
   fi
   default_kp_sep=$(echo ${default_kp_sep_list} | cut -d ',' -f ${incar_index})
@@ -231,7 +249,7 @@ for incar in ${seed_name}.INCAR-[0-9]*; do
   kp_sep_list="${kp_sep_list}${kp_sep},"
 done
 kp_sep_list=$(echo ${kp_sep_list} | sed s/[[:space:]]//g  | sed 's/.$//')
-echo "[info] Using kpoints separation list: [${kp_sep_list}]"
+printf "[info] Using kpoints separation list: \033[01;31m[${kp_sep_list}]\033[0m.\n"
 echo ""
 ## System type
 default_sys_type=$(grep_input_file 'SYS_TYPE')
@@ -247,7 +265,7 @@ if [ -z "${is_correct_sys_type}" ];then
   echo "[tips] choice one from: pbs, slurm, nscc, direct."
   exit 1
 fi
-echo "[info] Intel module: ${sys_type}"
+printf "[info] System type: \033[01;31m${sys_type}\033[0m.\n"
 echo ""
 if [ "${sys_type}" == "pbs" ]; then
   ## PBS walltime
@@ -261,7 +279,7 @@ if [ "${sys_type}" == "pbs" ]; then
   if [ -z "${pbs_walltime}" ];then
     pbs_walltime="${default_pbs_walltime}"
   fi
-  echo "[info] Using PBS walltime: ${pbs_walltime} hours."
+  printf "[info] Using PBS walltime: \033[01;31m${pbs_walltime}\033[0m hours.\n"
   echo ""
   ## PBS Queue
   default_pbs_queue=$(grep_input_file 'PBS_QUEUE')
@@ -274,7 +292,7 @@ if [ "${sys_type}" == "pbs" ]; then
   if [ -z "${pbs_queue}" ];then
     pbs_queue="${default_pbs_queue}"
   fi
-  echo "[info] Using PBS queue: ${pbs_queue}."
+  printf "[info] Using PBS queue: \033[01;31m${pbs_queue}\033[0m.\n"
   echo ""
 fi
 ## VASP walltime
@@ -288,7 +306,7 @@ read -p '[input]> ' vasp_walltime
 if [ -z "${vasp_walltime}" ];then
   vasp_walltime="${default_vasp_walltime}"
 fi
-echo "[info] Using VASP walltime: ${vasp_walltime} seconds."
+printf "[info] Using VASP walltime: \033[01;31m${vasp_walltime}\033[0m seconds.\n"
 echo ""
 ## Delete Calculation Files
 default_keep_calc_details=$(grep_input_file 'KEEP_CALC_DETAILS')
@@ -302,7 +320,7 @@ if [ -z "${keep_calc_details}" ];then
   keep_calc_details="${default_keep_calc_details}"
 fi
 keep_calc_details=$(echo ${keep_calc_details} | awk '{print toupper($0)}')
-echo "[info] Keep calculation details: ${keep_calc_details}"
+printf "[info] Keep calculation details: \033[01;31m${keep_calc_details}\033[0m.\n"
 echo ""
 
 #======================#
@@ -322,7 +340,7 @@ INTEL_MODULE      = ${intel_module}
 VASP_PROG         = ${vasp_prog}
 NODES_NUM         = ${nodes_num}
 CORES_PER_NODE    = ${cores_per_node}
-COACH_NUM         = ${coach_num}
+CORES_PER_COACH   = ${cores_per_coach}
 NODES_PER_COACH   = ${nodes_pre_coach}
 STR_NUM           = ${str_num}
 IS_2D_MATERIAL    = ${is_2d_material}
@@ -342,7 +360,7 @@ INTEL_MODULE      = ${intel_module}
 VASP_PROG         = ${vasp_prog}
 NODES_NUM         = ${nodes_num}
 CORES_PER_NODE    = ${cores_per_node}
-COACH_NUM         = ${coach_num}
+CORES_PER_COACH   = ${cores_per_coach}
 STR_NUM           = ${str_num}
 IS_2D_MATERIAL    = ${is_2d_material}
 KP_SEP_LIST       = ${kp_sep_list}
@@ -497,12 +515,16 @@ vasp_calc_script="${A4V_PATH}/vasp_submit/vasp_calc_script.sh"
 submit_script="${A4V_PATH}/vasp_submit/submit_${sys_type}.sh"
 curr_sub_scrp="a4v.${sys_type}.sh"
 cp ${submit_script} ${curr_sub_scrp}
-((total_cores_num=cores_per_node*nodes_pre_coach))
+if [ "${cores_per_node}" -gt "${cores_per_coach}" ]; then
+  ppn=${cores_per_coach}
+else
+  ppn=${cores_per_node}
+fi
 case ${sys_type} in
 'pbs')
   str_repalce "__task_name__"        "${task_name}__tag__" "${curr_sub_scrp}"
   str_repalce "__nodes_num__"        "${nodes_pre_coach}"  "${curr_sub_scrp}"
-  str_repalce "__cores_per_node__"   "${cores_per_node}"   "${curr_sub_scrp}"
+  str_repalce "__ppn__"              "${ppn}"              "${curr_sub_scrp}"
   str_repalce "__pbs_walltime__"     "${pbs_walltime}"     "${curr_sub_scrp}"
   str_repalce "__mpi_mechinefile__"  "${MPI_MECHINEFILE}"  "${curr_sub_scrp}"
   str_repalce "__vasp_calc_script__" "${vasp_calc_script}" "${curr_sub_scrp}"
@@ -517,7 +539,7 @@ case ${sys_type} in
 'slurm')
   str_repalce "__task_name__"        "${task_name}__tag__" "${curr_sub_scrp}"
   str_repalce "__nodes_num__"        "${nodes_pre_coach}"  "${curr_sub_scrp}"
-  str_repalce "__total_cores__"  "${total_cores_num}"  "${curr_sub_scrp}"
+  str_repalce "__cores_per_coach__"  "${cores_per_coach}"  "${curr_sub_scrp}"
   str_repalce "__vasp_calc_script__" "${vasp_calc_script}" "${curr_sub_scrp}"
   if [ "${pbs_queue}" == "unset-pbs-queue" ]; then 
     str_repalce '#SBATCH -p' '##SBATCH -p' "${curr_sub_scrp}"
@@ -530,7 +552,7 @@ case ${sys_type} in
 'nscc')
   str_repalce "__task_name__"        "${task_name}__tag__" "${curr_sub_scrp}"
   str_repalce "__nodes_num__"        "${nodes_pre_coach}"  "${curr_sub_scrp}"
-  str_repalce "__total_cores__"  "${total_cores_num}"  "${curr_sub_scrp}"
+  str_repalce "__cores_per_coach__"  "${cores_per_coach}"  "${curr_sub_scrp}"
   str_repalce "__vasp_calc_script__" "${vasp_calc_script}" "${curr_sub_scrp}"
   submit_command="yhbatch ${curr_sub_scrp}"
   kill_command='yhcancel'

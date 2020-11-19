@@ -19,6 +19,7 @@ declare -r  INTEL_MODULE=$(grep_input_file 'INTEL_MODULE')
 declare -r  VASP_PROG=$(grep_input_file 'VASP_PROG')
 declare -ri STR_NUM=$(grep_input_file 'STR_NUM')
 declare -r  NODES_PER_COACH=$(grep_input_file 'NODES_PER_COACH')
+declare -r  CORES_PER_COACH=$(grep_input_file 'CORES_PER_COACH')
 declare -r  CORES_PER_NODE=$(grep_input_file 'CORES_PER_NODE')
 declare -r  SYMM_PREC=$(grep_input_file 'SYMM_PREC')
 declare -r  VASP_WALLTIME_INS=$(grep_input_file 'VASP_WALLTIME')
@@ -36,21 +37,19 @@ declare -r  CABAL="${A4V_PATH}/cabal"
 # Get Current Worker Folder Name
 current_coach=$(pwd | awk -F '/' '{print $NF}')
 current_coach_index=${current_coach##*-}
-# Calc. the total cores number.
-total_cores=$((NODES_PER_COACH*CORES_PER_NODE))
 # Parallel Calculation Parameters
 case ${SYS_TYPE} in
 'pbs')
-  vasp_mpirun="export I_MPI_JOB_TIMEOUT=${VASP_WALLTIME_INS}; ${INTEL_MODULE}; mpirun -machinefile ${MPI_MECHINEFILE} -np ${total_cores} -envall ${VASP_PROG}"
+  vasp_mpirun="export I_MPI_JOB_TIMEOUT=${VASP_WALLTIME_INS}; ${INTEL_MODULE}; mpirun -machinefile ${MPI_MECHINEFILE} -np ${CORES_PER_COACH} -envall ${VASP_PROG}"
   ;;
 'slurm')
   vasp_mpirun="${INTEL_MODULE}; srun --time=${VASP_WALLTIME_INM} ${VASP_PROG}"
   ;;
 'nscc')
-  vasp_mpirun="${INTEL_MODULE}; yhrun -N ${NODES_PER_COACH} -n ${total_cores} --time=${VASP_WALLTIME_INM} ${VASP_PROG}"
+  vasp_mpirun="${INTEL_MODULE}; yhrun -N ${NODES_PER_COACH} -n ${CORES_PER_COACH} --time=${VASP_WALLTIME_INM} ${VASP_PROG}"
   ;;
 'direct')
-  vasp_mpirun="export I_MPI_JOB_TIMEOUT=${VASP_WALLTIME_INS}; ${INTEL_MODULE}; mpirun -machinefile ${MPI_MECHINEFILE} -np ${total_cores} -envall ${VASP_PROG}"
+  vasp_mpirun="export I_MPI_JOB_TIMEOUT=${VASP_WALLTIME_INS}; ${INTEL_MODULE}; mpirun -machinefile ${MPI_MECHINEFILE} -np ${CORES_PER_COACH} -envall ${VASP_PROG}"
   ;;
 esac
 
