@@ -171,7 +171,7 @@ AIRSS 的核心组件名为 \textbf{buildcell}. 这个组件的作用就是依�
 \item 通过 cell.f90 模块读取 *.cell 文件中的配置信息.
 \item 通过 build.f90, opt.f90 等模块生成满足要求的结构. 
   \begin{subeu}
-    \item 首先根据给定的原子及其半径确定合理的晶格常数, 若存在晶格标签\footnote{如果您感觉对这一部分的概念并不熟悉, 可以先跳过本段, 更详细的介绍会在后文中展现.} \#FIX 则忽略此步骤.
+    \item 首先根据给定的初始原胞, 以0.95-1.05的比例调整原胞体积, 同时生成满足该体积的晶格参数. 若存在晶格标记 \#FIX 则忽略此步骤.
     \item 按要求在随机位置生成某个原子.
     \item 根据约束选择: 接受这一位置, 拒绝这一位置, 或者\textbf{PUSH}当前原子. \textbf{PUSH}是指: 将原子位置过近的两原子在其连线方向上, 反向移开相同距离. 当原子标签中有 FIX 或 NOMOVE 时, 忽略这一操作.
     \item 遍历体系中的全部原子, 直至更新完整个结构.
@@ -268,7 +268,7 @@ user@machine_name$
 
 可以在AIRSS中使用的数据区块关键字(\verb|[keywords]|)已在 \textbf{Table \ref{BLOCKkeywords}} 中列出.
 \begin{center}
-\begin{longtable}{m{13em}<{\centering} | m{19em}<{\centering}}
+\begin{longtable}{m{13em}<{\centering} | m{19em}}
 \caption{AIRSS Cheat Sheet -- Data BOLCK}
 \label{BLOCKkeywords} \\
 \toprule
@@ -285,9 +285,9 @@ user@machine_name$
 \midrule \multicolumn{2}{r}{\textit{Continued on next page...}} \\
 \endfoot
 \endlastfoot 
-\verb|LATTICE_CART|  & 使用笛卡尔坐标系, 以一个\(3\times3\)的矩阵定义\textbf{单胞}基矢. 通过在该区块中附加以下标签: \verb|#FIX,|\verb|#CFIX,|\verb|#ABFIX|, 可分别实现: 固定整个晶格形状, 固定晶格常数c, 固定晶格常数ab. 另外, 需要强调的是, 如果要确保晶格参数不变, 除了在晶格参数数据区块中加入\verb|#FIX|, 以保证在猜测晶格结构时保持其为常值外, 还需要在DFT弛豫软件中做相应的设置, 以保证其在结构弛豫时也不变.\\
+\verb|LATTICE_CART|  & 使用笛卡尔坐标系, 以一个\(3\times3\)的矩阵定义\textbf{单胞}基矢. 通过在该区块中附加以下标签: \verb|#FIX,|\verb|#CFIX,|\verb|#ABFIX|, 可分别实现: 固定整个晶格形状, 固定晶格常数c, 固定晶格常数ab. 另外, 需要强调的是, 如果要确保晶格参数不变, 除了在晶格参数数据区块中加入\verb|#FIX|, 以保证在猜测晶格结构时保持其为常值外, 还需要在DFT弛豫软件中做相应的设置, 以保证其在结构弛豫时也不变. \textbf{需要特别注意的是}, 如果晶格形状可以随机变换(也即没有晶格标签\verb|#FIX|), 则该区块中定义的晶胞基矢所对应的体积\(V_{targ}\)\textbf{不是}原胞的初始总体积. 体系最终的总体积算法如下: \(V_{cell} = V_{targ} N_{symm} N_{all} / N_{lines}\) 或者 \(V_{cell} = V_{targ} N_{symm} N_{atom} \), 其中\(N_{all}\)是考虑\verb|NUM=n|定义后的单胞总原子数, \(N_{lines}\)是\verb|BLOCK POSITIONS_*|区块中定义的原子的总行数, \(N_{symm}\)是体系对称操作群元个数, \(N_{atom}\)是使用\verb|#NATOM=|定义的原子个数.\footnote{之所对体系单胞体积做这样的设计, 是为了给变组分或变原子数目搜索提供便利.}\\
 \midrule
-\verb|LATTICE_ABC| & 以一个\(2\times3\)的矩阵定义单胞的晶格参数.矩阵第一行是参数abc, 第二行是三个夹角. 在同一个\verb|.cell|中, 与\verb|LATTICE_CART|二选一即可. 通过在该区块中附加以下标签: \verb|#FIX,|\verb|#CFIX,|\verb|#ABFIX|, 可分别实现: 固定整个晶格形状, 固定晶格常数c, 固定晶格常数ab.\\
+\verb|LATTICE_ABC| & 以一个\(2\times3\)的矩阵定义单胞的晶格参数.矩阵第一行是参数abc, 第二行是三个夹角. 在同一个\verb|.cell|中, 与\verb|LATTICE_CART|二选一即可. 通过在该区块中附加以下标签: \verb|#FIX,|\verb|#CFIX,|\verb|#ABFIX|, 可分别实现: 固定整个晶格形状, 固定晶格常数c, 固定晶格常数ab.\textbf{需要特别注意的是}, 如果晶格形状可以随机变换(也即没有晶格标签\verb|#FIX|), 则该区块中定义晶胞常数所对应的体积\(V_{targ}\)\textbf{不是}原胞的初始总体积. 体系最终的总体积算法如下: \(V_{cell} = V_{targ} N_{symm} N_{all} / N_{lines}\) 或者 \(V_{cell} = V_{targ} N_{symm} N_{atom} \), 其中\(N_{all}\)是考虑\verb|NUM=n|定义后的单胞总原子数, \(N_{lines}\)是\verb|BLOCK POSITIONS_*|区块中定义的原子的总行数, \(N_{symm}\)是体系对称操作群元个数, \(N_{atom}\)是使用\verb|#NATOM=|定义的原子个数.\\
 \midrule
 \verb|POSITIONS_FRAC| & 以晶格基矢坐标系下的分数坐标定义原子位置.\\
 \midrule
@@ -314,6 +314,7 @@ user@machine_name$
 上述字段构建了一个\(20\times20\times20\) \r{A}\(^3\)的正方体作为晶体的单胞. 这里的 \verb|#FIX| 被称为\textbf{晶格标签}(Lattice Tags). 
 
 它声明了晶格常数在搜寻(生成初始随机结构)过程中是不能改变的. 如果您想保证体系晶格常数在进行DFT弛豫时也不变, 则需要在相应计算软件的输入文件中设置.
+
 
 \paragraph{原子位置} 再介绍原子位置的设置方法, 以\verb|POSITIONS_FRAC|为例.\\
 \emph{例2.}
@@ -363,7 +364,7 @@ H   0.0 0.0 0.0 # H-set % ANGAMP=0 POSAMP=0
 \midrule \multicolumn{4}{r}{\textit{Continued on next page...}} \\
 \endfoot
 \endlastfoot
-\verb|NUM=|\(n\)\hspace{4em} \verb|NUM=|\(n_{min}-n_{max}\) & \verb|int| & 1 & 定义该行原子实际代表的原子个数. 使用 \verb|NUM| 定义的重复原子会被逐个单独分配到不同的\textbf{原子集}中.\\
+\verb|NUM=|\(n\)\hspace{4em} \verb|NUM=|\(n_{min}-n_{max}\) & \verb|int| & 1 & 定义该行原子实际代表的原子个数. 使用 \verb|NUM| 定义的重复原子会被逐个单独分配到不同的\textbf{原子集}中. \textbf{需要特别注意的是}, 如果晶格形状可以随机变换(也即没有晶格标签\verb|#FIX|), 则使用\verb|BLOCK LATTICE_*|晶格数据区块中定义晶胞常数(基矢)所对应的使用全局参数\verb|#TARGVOL=|,\verb|#VARVOL=|定义的体积\(V_{targ}\)\textbf{不是}原胞的初始总体积. 体系最终的总体积算法如下: \(V_{cell} = V_{targ}(N_{all}/N_{lines})N_{symm}\), 其中\(N_{all}\)是考虑\verb|NUM=n|定义后的单胞总原子数, \(N_{lines}\)是\verb|BLOCK POSITIONS_*|区块中定义的原子的总行数, \(N_{symm}\)是体系对称操作群元个数.\\
 \midrule
 \verb|POSAMP=|\(d\)& \verb|float| & -1.0 & 定义该行原子在结构搜索过程中, 能偏离初始位置的最大距离. 若为负值则无限制.\\
 \midrule
@@ -375,7 +376,7 @@ H   0.0 0.0 0.0 # H-set % ANGAMP=0 POSAMP=0
 \midrule
 \verb|ZAMP=|\(d\)& \verb|float| & -1.0 & 定义该行原子在结构搜索过程中, 在Z轴方向上移动的最大距离. 若为负值则无限制. 设置该项会令POSAMP和MINAMP失效.\\
 \midrule
-\verb|ANGAMP=|\(\theta\)  & \verb|float| \([0,360]\) & -1.0 & 原子绕自身所在\textbf{原子集}中心旋转角度的最大值(与 \verb|POSAMP| 互相独立, 分开作用). 存在晶格标签 \verb|#FIX| 时, \verb|ANGAMP=0|, \verb|POSAMP=0| 与 \verb|NOMOVE(\FIX)| 共用, 可保证原子在原始位置不动. 如果cell文件中所有原子集都只有1个原子, 则该参数失效, \verb|ANGAMP| 强制设为0. 若为负值则无限制.\\
+\verb|ANGAMP=|\(\theta\)  & \verb|float| \([0,180]\) & -1.0 & 原子绕自身所在\textbf{原子集}中心旋转角度的最大值(与 \verb|POSAMP| 互相独立, 分开作用). 存在晶格标签 \verb|#FIX| 时, \verb|ANGAMP=0|, \verb|POSAMP=0| 与 \verb|NOMOVE(\FIX)| 共用, 可保证原子在原始位置不动. 如果cell文件中所有原子集都只有1个原子, 则该参数失效, \verb|ANGAMP| 强制设为0. 若为负值则无限制.\\
 \midrule
 \verb|RAD=|\(d\) & \verb|float| & 0.0 & 设置原子的半径, 用于判断两个原子间的最小距离, MINSEP. 其优先级低于直接设置全局参数 \verb|#MINSEP=|.\\
 \midrule
@@ -389,7 +390,7 @@ H   0.0 0.0 0.0 # H-set % ANGAMP=0 POSAMP=0
 \midrule
 \verb|OCC=|\(p\) & \verb|float| \([0,1]\) & 1.0 & 该点位占据原子的几率, 同种元素在不同位置的占据几率之和必须为大于0的整数. 接收分数形式的输入, 如 \verb|OCC=1/3|. 若该值设为小于0的数, 则强行将该原子的OCC设置为1, 同时不再输出该原子可能因对称性衍生的其他原子位置. 若原子同时有 \verb|FIX| 或 \verb|NOMOVE| 标签, 则 \verb|OCC| 强制设为1. 若该原子OCC大于1, 则将其设置为空位(与将元素名称设为Z的效果相同). 系统存在对称性时, 使用更小的 OCC 可强制某一原子位于对称性更高的点位上. 但更为自然的用法是使用 \verb|MULT| 代替 \verb|OCC| 设置. 若设置了全局参数\verb|#NFORM=n|(n大于0): 在没有对称性条件下, \verb|OCC| 参数失效; 在有对称性条件下, 请参考 \verb|MULT| 中的说明. \\
 \midrule
-\verb|MULT=|\(m\) & \verb|float| & symm num & 设置该原子点位的 multiplicity.\footnote{这一数值为正时, 会强制将 OCC 参数的值覆盖为 MULT/SYMM\_NUM, 其中 SYMM\_NUM 为晶格对称群元的个数. 也即在AIRSS中, multiplicities 是通过设置分数OCC实现的, 因此不设置MULT而直接设置分数的OCC也可达到一样的效果.} 格点的 multiplicity 告诉我们, 如果我们在该位置上放置一个原子, 那么对称性将产生多少个原子. 使用这一参数, 可以限制某一行原子由晶体对称性实际生成原子的个数, 以及所处位置对称性的高低. 该参数默认大小为群操作个数, 也即默认只寻找 general position. 若该行原子有标签 \verb|FIX| 或 \verb|NOMOVE|, 则MULT失效, 同时将\verb|OCC|强制设为-1. 若设置了全局参数\verb|#NFORM=n|(n大于0), 则等效于将所有原子的 \verb|MULT| 的值设为\(n\), 同时不设置\verb|#NFORM=|. 关于格点 multiplicities 与对称性的更多信息可参考 \href{http://folk.ntnu.no/yingday/NilsYD/PhaseStructure/001Space_Groups.pdf}{PDF: Space Group and Multiplicities}.\\
+\verb|MULT=|\(m\) & \verb|float| & symm num & 设置该原子点位的 multiplicity.\footnote{这一数值为正时, 会强制将 OCC 参数的值覆盖为 MULT/SYMM\_NUM, 其中 SYMM\_NUM 为晶格对称群元的个数. 也即在AIRSS中, multiplicities 是通过设置分数OCC实现的, 因此不设置MULT而直接设置分数的OCC也可达到一样的效果.} 格点的 multiplicity 告诉我们, 如果我们在该位置上放置一个原子, 那么对称性将产生多少个原子. 使用这一参数, 可以限制某一行原子由晶体对称性实际生成原子的个数, 以及所处位置对称性的高低. 该参数默认大小为群操作个数, 也即默认只寻找 general position. 若该行原子有标签 \verb|FIX| 或 \verb|NOMOVE|, 则MULT失效, 同时将\verb|OCC|强制设为-1. 若设置了全局参数\verb|#NFORM=n|(n大于0), 则等效于将所有原子的 \verb|MULT| 的值设为\(n\). 关于格点 multiplicities 与对称性的更多信息可参考 \href{http://folk.ntnu.no/yingday/NilsYD/PhaseStructure/001Space_Groups.pdf}{PDF: Space Group and Multiplicities}.\\
 \midrule
 \verb|PERM| & \verb|void| & off & 在完成原子位置选定后, 重排(按一定概率互相交换)指定原子位置间的元素种类. 需要配合全局参数 \verb|#PERMUTE| 使用, 否则该参数将被关闭.\\
 \midrule
@@ -436,7 +437,7 @@ AIRSS中全部可用的全局参数的功能和详细使用方法如\textbf{Tabl
 \midrule
 \verb|#VACUUM=|\(d\) & \verb|float| & 0.0 & 在晶格(Z方向)中加入\(d\) \r{A}的真空层.\\
 \midrule
-\verb|#NFORM=|\(n\) & \verb|int| & -1 & 声明单胞中实际存在的原子个数是的 \verb|%BLOCK POSITIONS_*| 或 \verb|#SPECIES| 中定义的\(n\)倍. 该选项不可与 \verb|#NATOM| 联用. 若为负值则此参数被关闭.\\
+\verb|#NFORM=|\(n\)\ \ \ \ \verb|#NFORM=|\(n_{min}-n_{max}\) & \verb|int| & -1 & 声明单胞中实际存在的原子个数是的 \verb|%BLOCK POSITIONS_*| 或 \verb|#SPECIES| 中定义的\(n\)倍. 若为负值则此参数被关闭. 该参数在存在对称性时使用, 可约束原子因对称性而复制的份数, 替代原子标签\verb|MULT|的部分作用. 同时使用该参数, 可将体系总体积计算公式中的\(N_{symm}\)替换为\(N_{fu}\), 也即, \(V_{cell} = V_{targ} N_{fu} N_{all} / N_{lines}\) 或者 \(V_{cell} = V_{targ} N_{fu} N_{atom} \), 其中\(N_{all}\)是考虑\verb|NUM=n|定义后的单胞总原子数, \(N_{lines}\)是\verb|BLOCK POSITIONS_*|区块中定义的原子的总行数, \(N_{fu}\)是\verb|#NFORM=|后跟的整数, \(N_{atom}\)是使用\verb|#NATOM=|定义的原子个数. 而使用原子标签\verb|MULT|或\verb|OCC|限制对称性时则没有此效果. 同时, 在没有对称性时, \verb|#NFORM=|不能(也没有必要)与\verb|#NATOM=|联用.\\
 \midrule
 \verb|#SUPERCELL=|\(n\) \verb|#SUPERCELL=|\(n_a\;n_b\;n_c\;\;\;\;\;\;\) \hspace{2em}\verb|#SUPERCELL=|\(a_x\; a_y\;a_z\;\)\hspace{2em} \(b_x\;b_y\;b_z\;c_x\;c_y\;c_z\) & \verb|int| & off & 定义超胞的尺寸. 可以使用超胞中单胞的的个数\(n\), 超胞晶格基矢在三个方向的数值\(n_a\;n_b\;n_c\), 或是超胞与单胞晶格基矢之间的变换矩阵\([[a_x,a_y,a_z],[b_x,b_y,b_z],[c_x,c_y,c_z]]\)定义新的超胞. 超胞的构建策略是: 首先用单胞构建符合条件的原子构型, 而后根据扩胞参数复制粘贴得到超胞后直接输出.\\
 \midrule
@@ -447,8 +448,6 @@ AIRSS中全部可用的全局参数的功能和详细使用方法如\textbf{Tabl
 \verb|#MOLECULES|& \verb|void| & off & 声明同一个原子集中的原子构成了一个基本分子构型, 检查配位时将不再对同一个原子集内的原子做检查.\\
 \midrule
 \verb|#CLUSTER| & \verb|void| & off & 声明预测的结构是无周期性的团簇.\\
-\midrule
-\verb|#FOCUS=|\(n\) & \verb|int| & 0 & 约束最终结构必须是\(n\)组分的(由\(n\)种不同的元素构成). 该参数一般用于变组分分析. 小于等于0表示无约束.\\
 \midrule
 \verb|#OCTET|& \verb|void| & off & 检查化学配比是否电子配平(全部电子数是否可以被8整除).\\
 \midrule
@@ -462,11 +461,11 @@ AIRSS中全部可用的全局参数的功能和详细使用方法如\textbf{Tabl
 \midrule
 \verb|#ZAMP=|\(d\) & \verb|float| & -1.0 & 与原子标签中的定义相同, 结构搜索中原子Z方向偏离初始点的最大振幅. 负值为无限制. 设置该项会令 POSAMP 和 MINAMP 失效.\\
 \midrule
-\verb|#ANGAMP=|\(\theta\)& \verb|float| \([0,360]\) & -1.0 & 与原子标签中的定义相同, 原子绕自身所在\textbf{原子集}中心旋转角度的最大值. 负值为无限制.\\
+\verb|#ANGAMP=|\(\theta\)& \verb|float| \([0,180]\) & -1.0 & 与原子标签中的定义相同, 原子绕自身所在\textbf{原子集}中心旋转角度的最大值. 负值为无限制.\\
 \midrule
-\verb|#MINBANGLE=|\(\theta\) & \verb|float| \((0,360]\) & 0.0 & 设置搜索结构中, 原子键角的最小值.\\
+\verb|#MINBANGLE=|\(\theta\) & \verb|float| \((0,180]\) & 0.0 & 设置搜索结构中, 原子键角的最小值.\\
 \midrule
-\verb|#MAXBANGLE=|\(\theta\) & \verb|float| \((0,360]\) & 180.0 &设置搜索结构中, 原子键角的最大值.\\
+\verb|#MAXBANGLE=|\(\theta\) & \verb|float| \((0,180]\) & 180.0 &设置搜索结构中, 原子键角的最大值.\\
 \midrule
 \verb|#MINSEP=|\(d\) \verb|#MINSEP=|\(d\;\)\verb|X-X=|\(d_{X−X}\;\)\ \ \  \ \verb|X-Y=|\(d_{X−Y}\;...\) & \verb|float| & 0.0 & 两原子间最小距离, 也可以用来定义两原子距离固定是多少. 比如 \verb|#MINSEP=| \verb|2.0 Li-Li=2.6 Ge-Ge=2.51|\\
 \midrule
@@ -476,13 +475,15 @@ AIRSS中全部可用的全局参数的功能和详细使用方法如\textbf{Tabl
 \midrule
 \verb|#SPIN=|\(S_{real}\;S_{mod}\;\;\;\;\;\;\) \verb|#SPIN=|\(S_{real}\;S_{mod}\;\;\;\;\;\) \verb|"|elm\(_1\) elm\(_2\)... \verb|"| & \verb|float|,  \verb|string|& off & 随机设置体系每个原子上共线自旋的取值. 并要求 \(S_{t,real}\)/\(N_{ions}\) = \(S_{real}\), \(S_{t,mod}\)/\(N_{ions}\) = \(S_{mod}\), 其中\(S_{t,real}\)是全部指定原子自旋的和, \(S_{t,mod}\)是全部指定原子自旋绝对值的和. 未被指定的原子自旋保持为0. 可以用被双引号包裹的带空格的元素符号指明哪些是指定原子. 若未指定任何原子, 则默认所有原子都是指定原子. 例如 \verb|#SPIN=0 5 "Fe Co "| 或者 \verb|#SPIN=1 4| \\
 \midrule
-\verb|#SPECIES=|\(elm_1\%tags_1,\) \(elm_2\%tags_2,...\;\;\;\;\;\;\) \verb|#SPECIES=|\(elm_1,elm_2...\) & \verb|string|  & off & 使用简化记号定义体系原子组分. 例如, \verb|#SPECIES=Si|\verb|%NUM=1| \verb|COORD=2,|\verb|O%NUM=2|. 该参数不能与\verb|BLOCK POSITIIONS_*|同时出现.\\
+\verb|#SPECIES=|\(elm_1\%tags_1,\) \(elm_2\%tags_2,...\;\;\;\;\;\;\) \verb|#SPECIES=|\(elm_1,elm_2...\) & \verb|string|  & off & 使用简化记号定义体系原子组分. 例如, \verb|#SPECIES=Si|\verb|%NUM=1| \verb|COORD=2,|\verb|O%NUM=2|. 该参数不能与\verb|BLOCK POSITIONS_*|同时出现.\\
 \midrule
-\verb|#NATOM=|\(n\) \hspace{6em}\verb|#NATOM=|\(n_{min}-n_{max}\)  & 0 & \verb|int| & 与 \verb|#SPECIES| 联用, 定义单胞中总原子数, 一般用于变组分分析(变胞预测). 且使用此全局参数会使 \verb|#SPECIES| 指令包含的\verb|%|后的原子标签全部失效. \footnote{详细原因请参见源码``airss-0.9.1/src/buildcell/src/cell.f90''第493行与514行区别.} 若 \verb|#SPECIES| 中含有多中元素, 则每种元素随机数目, 保持总和为NATOM. 该参数设为0时自动失效.\\
+\verb|#NATOM=|\(n\) \hspace{6em}\verb|#NATOM=|\(n_{min}-n_{max}\)  & 0 & \verb|int| & 与 \verb|#SPECIES| 联用, 定义单胞中总原子数, 一般用于变组分分析(变胞预测). 且使用此全局参数会使 \verb|#SPECIES| 指令包含的\verb|%|后的原子标签全部失效. \footnote{详细原因请参见源码``airss-0.9.1/src/buildcell/src/cell.f90''第493行与514行区别.} 若 \verb|#SPECIES| 中含有多中元素, 则每种元素随机数目, 保持总和为NATOM. 该参数设为0时自动失效. \textbf{需要特别注意的是}, 如果晶格形状可以随机变换(也即没有晶格标签\verb|#FIX|), 则使用\verb|BLOCK LATTICE_*|晶格数据区块中定义晶胞常数(基矢)所对应的、以及使用全局参数\verb|#TARGVOL=|,\verb|#VARVOL=|定义的体积\(V_{targ}\)\textbf{不是}原胞的初始总体积. 体系最终的总体积算法如下: \(V_{cell} = V_{targ} N_{symm} N_{atom} \), 其中\(N_{symm}\)是体系对称操作群元个数, \(N_{atom}\)是使用\verb|#NATOM=|定义的原子个数.\\
 \midrule
-\verb|#TARGVOL=|\(V\) \verb|#TARGVOL=|\(V_{min}-V_{max}\) & \verb|float| & init. cell vol. & 固定晶格体积为\(V\), 或\(V_{min}\)到\(V_{max}\)之间的随机数值. 存在晶格标签 \verb|#FIX| 时该参数失效. 默认为初始给定原胞的体积. 该参数常在不引入 \verb|BLOCK POSITION_*| 区块时使用.\\
+\verb|#FOCUS=|\(n\) & \verb|int| & 0 & 与\verb|#NATOM=|联用, 约束最终结构必须是\(n\)组分的(由\(n\)种不同的元素构成). 该参数一般用于变组分分析. 小于等于0表示无约束.\\
 \midrule
-\verb|#VARVOL=|\(V\)& \verb|float| & init. cell vol. & 与 \verb|#TARGVOL=| 作用相同, 该参数会覆盖 \verb|#TARGVOL=| 的设置. 默认为初始给定原胞的体积.\\
+\verb|#TARGVOL=|\(V\) \verb|#TARGVOL=|\(V_{min}-V_{max}\) & \verb|float| & init. cell vol. & 固定晶格体积为\(V\), 或\(V_{min}\)到\(V_{max}\)之间的随机数值, 结构搜索中该体积不再随机变化. 默认为初始给定原胞的体积. 该参数常在不引入 \verb|BLOCK POSITION_*| 区块时使用. \textbf{需要特别注意的是}, 该处定义的体积\(V_{targ}\)\textbf{不是}原胞的初始总体积. 体系最终的总体积算法如下: \(V_{cell} = V_{targ} N_{symm} N_{all} / N_{lines}\)或者\(V_{cell} = V_{targ} N_{symm} N_{atom} \), 其中\(N_{all}\)是考虑\verb|NUM=n|定义后的单胞总原子数, \(N_{lines}\)是\verb|BLOCK POSITIONS_*|区块中定义的原子的总行数, \(N_{symm}\)是体系对称操作群元个数, \(N_{atom}\)是使用\verb|#NATOM=|定义的原子个数.\\
+\midrule
+\verb|#VARVOL=|\(V\)& \verb|float| & init. cell vol. & 给定初始晶格体积, 实际的晶格体积会在给定体积的0.95-1.05倍之间随机选取. \textbf{需要特别注意的是}, 则该处定义的体积\(V_{targ}\)\textbf{不是}原胞的初始总体积. 体系最终的总体积算法如下: \(V_{cell} = V_{targ} N_{symm} N_{all} / N_{lines}\)或者\(V_{cell} = V_{targ} N_{symm} N_{atom} \), 其中\(N_{all}\)是考虑\verb|NUM=n|定义后的单胞总原子数, \(N_{lines}\)是\verb|BLOCK POSITIONS_*|区块中定义的原子的总行数, \(N_{symm}\)是体系对称操作群元个数, \(N_{atom}\)是使用\verb|#NATOM=|定义的原子个数.\\
 \midrule
 \verb|#SLACK=|\(p\)& \verb|float| \([0,1)\) & 0.0 & 使用此参数可整体降低体系对原子间成键(原子相对位置)的限制, \(p\)越大对原子间间距和角度的要求越低. 默认为0, 推荐值0.1--0.3.\\
 \midrule
@@ -492,13 +493,13 @@ AIRSS中全部可用的全局参数的功能和详细使用方法如\textbf{Tabl
 \midrule
 \verb|#REMOVE|& \verb|void| & off & 删除(PUSH后)重叠的原子(之一). 可以用于高初始原子密度的结构预测.\\
 \midrule
-\verb|#TIGHT|& \verb|void| & off & 使得生成的结构更加紧密.\\
+\verb|#TIGHT|& \verb|void| & off & 使得生成的结构(键长)更加紧密. 该参数仅在原子标签\verb|RAD|生效时有作用.\\
 \midrule
-\verb|#SYMMOPS=|\(n\)\hspace{6em}\verb|#SYMMOPS=~|\(n\;\;\;\;\;\;\;\;\;\;\;\)\hspace{6em}\verb|#SYMMOPS=|\(n_{min}-n_{max}\) & \verb|int| &  off & 声明生成的结构中必须含有\(n\)种对称操作. 若体系是周期性晶体结构, 推荐从下述整数中选取: 1,2,3,4,5,6,8,12,16,24,48. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量\footnote{这里的``数量''是指, 满足对称操作所需的最少同类原子数量, 也即该点位的 multiplicities. }更少的 special position 不予考虑. 若使用\verb|MULT|逐个原子指定 multiplicity, 则波浪号(\(\sim\))被忽略, 但若使用\verb|#NFORM=n|(\(n\)大于0), 则会与波浪号(\(\sim\))冲突. 因此在含有波浪号(\(\sim\))的模式下不推荐使用\verb|MULT|限制原子对称复制的个数. \textbf{值得说明的是,} AIRSS中实现锁定对称性的方法是: 接将原子按对称性复制n份. 例如原子有\(C_4\)对称性, 则最终输出的总原子数将是设定的4倍. 但如果结合原子标签 \verb|OCC, MULT| 等的使用, 可实现在更高对称的点位安放更少原子的操作. \\
+\verb|#SYMMOPS=|\(n\)\hspace{6em}\verb|#SYMMOPS=~|\(n\;\;\;\;\;\;\;\;\;\;\;\)\hspace{6em}\verb|#SYMMOPS=|\(n_{min}-n_{max}\) & \verb|int| &  off & 声明生成的结构中必须含有\(n\)种对称操作. 若体系是周期性晶体结构, 推荐从下述整数中选取: 1,2,3,4,5,6,8,12,16,24,48. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量\footnote{这里的``数量''是指, 满足对称操作所需的最少同类原子数量, 也即该点位的 multiplicities. }更少的 special position 不予考虑. 若使用\verb|MULT|逐个原子指定 multiplicity, 则波浪号(\(\sim\))被忽略, 但若使用\verb|#NFORM=n|(\(n\)大于0), 则会与波浪号(\(\sim\))冲突. 因此在含有波浪号(\(\sim\))的模式下不能使用\verb|MULT|或\verb|#NFORM=|限制原子对称复制的个数. \textbf{需要补充说明的是,} AIRSS中实现锁定对称性的方法是: 接将原子按对称性复制n份. 例如原子有\(C_4\)对称性, 则最终输出的总原子数将是设定的4倍. 但如果结合原子标签 \verb|OCC, MULT, #NFORM=| 等的使用, 可实现在更高对称的点位安放更少原子的操作. \\
 \midrule
-\verb|#SYMM=|\(spg\)\hspace{6em} \verb|#SYMM=~|\(spg\)& \verb|string| & off & 生成的结构必须在\(spg\)空间群中, \(spg\)是空间群的名称. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量更少的 special position 不予考虑, 在此模式下不推荐使用\verb|MULT|限制原子对称复制的个数.\\
+\verb|#SYMM=|\(spg\)\hspace{6em} \verb|#SYMM=~|\(spg\)& \verb|string| & off & 生成的结构必须在\(spg\)空间群中, \(spg\)是空间群的名称. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量更少的 special position 不予考虑, 在此模式下不能使用\verb|MULT|或\verb|NFORM|限制原子对称复制的个数.\\
 \midrule
-\verb|#SYMMNO=|\(n\)\hspace{6em} \verb|#SYMMNO=~|\(n\) & \verb|int| & off & 生成的结构必须在第\(n\)号空间群中, \(n\)是空间群的序号. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量更少的 special position 不予考虑, 在此模式下不推荐使用\verb|MULT|限制原子对称复制的个数.\\
+\verb|#SYMMNO=|\(n\)\hspace{6em} \verb|#SYMMNO=~|\(n\) & \verb|int| & off & 生成的结构必须在第\(n\)号空间群中, \(n\)是空间群的序号. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量更少的 special position 不予考虑, 在此模式下不能使用\verb|MULT|或\verb|NFORM|限制原子对称复制的个数.\\
 \midrule
 \verb|#SYMMORPHIC| & \verb|void| & off & 只检查体系是否存在点式对称操作.\\
 \midrule
@@ -512,7 +513,7 @@ AIRSS中全部可用的全局参数的功能和详细使用方法如\textbf{Tabl
 \midrule
 \verb|#PUSHSTEP=|\(p\)& \verb|float| & 0.25 & 每一步PUSH移动距离大小(stepsize)的比例参数.\\
 \midrule
-\verb|#PUSHMAX=|\(n\)& \verb|int| & 100 &设置最大PUSH步数(在 \verb|buildcell| 的输出中, 两个X之间所夹的 \verb!* | : -! 符号的个数).\\
+\verb|#PUSHMAX=|\(n\)& \verb|int| & 100 &设置最大PUSH步数. 在 \verb|buildcell| 的输出有六中:\verb!~, X, -, :, |, *!. \verb|~|代表结构产生成功; \verb|X|代表产生失败, 失败原因可能是结构生成失败, 或者PUSH步失败, 而PUSH失败的判断标准就是经过PUSHMAX步的PUSH后, 体系是否满足要求; \verb!-, :, |, *!四个字符反映了体系中所有原子被PUSH的总次数, 从左到右依次代表被PUSH了0-9, 10-99, 100-999, 1000+ 次, 当前PUSH步刷新了之前单步PUSH内PUSH次数的记录时, 相应的符号才会输出. \\
 \midrule
 \verb|#OVERLAP=|\(cov\)& \verb|float| & off & 结束PUSH之后, 再附加采用TPSD\footnote{Two-point Step Size Gradient Methods - Barzilai and Borwein, IMA Journal of Numerical Analysis (1988) 8, 141-148}对势对晶体结构进行简单弛豫. \(cov\)为收敛判据, 其值越小对晶格收敛限制越高, 推荐值为0.1--0.2.\\
 \midrule
@@ -520,7 +521,7 @@ AIRSS中全部可用的全局参数的功能和详细使用方法如\textbf{Tabl
 \midrule
 \verb|#RASH_POSAMP=|\(d\)& \verb|float| & 1.0 & 设置由 RASH 引入的 SHAKE 步移动原子集的最大距离, 与POSAMP类似. 该项必须为一个小的正值, \textbf{不可设为负数}.\\
 \midrule
-\verb|#RASH_ANGAMP=|\(\theta\) & \verb|float| \((0,360]\) & 30.0 & 设置由 RASH 引入的 SHAKE 步原子集绕自身中点转动的最大角度, 与ANGAMP类似. 该项必须为一个小的正值, \textbf{不可设为负数}.\\
+\verb|#RASH_ANGAMP=|\(\theta\) & \verb|float| \((0,180]\) & 30.0 & 设置由 RASH 引入的 SHAKE 步原子集绕自身中点转动的最大角度, 与ANGAMP类似. 该项必须为一个小的正值, \textbf{不可设为负数}.\\
 \midrule
 \verb|#CELLADAPT|& \verb|void| & off & 在设置\verb|#OVERLAP|的情况下附加设置此项, 可强制要求TPSD简单结构弛豫时同时尝试在保持体积不变的情况下改变单胞的形状. 体系默认不会在TPSD结构优化步改变单胞形状. 若存在晶格标记\verb|#FIX| 或者设置了 \verb|#CELLAMP=0| 则此参数失效. \\
 \midrule
@@ -590,14 +591,13 @@ Al 0.0 0.0 0.0 # Al1 % NUM=7-13 COORD=4
 另外, *.cell 文件中还可以完全不出现结构数据对应的数据区块. 比如您只对晶体大概的结构有一些模糊的认识(比如, 只知道其晶体原子构成, 晶格大概的体积大小等), 仍然可以使用AIRSS进行结构搜索. 下面就是这样两则符合规范且十分简洁的AIRSS结构种子文件.\\
 \emph{例4.1}
 \begin{lstlisting}[language={bash},numbers=left]
-#VARVOL=15
-#SPECIES=A%NUM=4,B%NUM=1
-#NFORM=2 
+#VARVOL=14
+#SPECIES=A%NUM=2,B%NUM=2
 #MINSEP=1.5
 \end{lstlisting}
 \emph{例4.2}
 \begin{lstlisting}[language={bash},numbers=left]
-#VARVOL=15 
+#VARVOL=7
 #SPECIES=A,B,C
 #NATOM=2-8
 #MINSEP=1.5        
