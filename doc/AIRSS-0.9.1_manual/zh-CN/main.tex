@@ -157,7 +157,7 @@ user@machine_name$
 \end{lstlisting}
 
 
-\verb|airss.pl| 是使用AIRSS执行结构搜索的主要指令. 欢迎界面中已经系统且简要地说明了该指令的用法. 用法解释中的表格有三列. 第一列是传入参数的名称; 第二列是传入参数的数据类型, \verb|f|代表浮点数, \verb|n|代表整数, \verb|s|代表字符串, ``空''代表逻辑字符串 \verb!true! 或 \verb!false!. 第三列是对相应参数的简单描述.
+ \verb|airss.pl| 是使用AIRSS执行结构搜索的主要指令. 欢迎界面中已经系统且简要地说明了该指令的用法. 用法解释中的表格有三列. 第一列是传入参数的名称; 第二列是传入参数的数据类型, \verb|f|代表浮点数, \verb|n|代表整数, \verb|s|代表字符串, ``空''代表逻辑字符串 \verb!true! 或 \verb!false!. 第三列是对相应参数的简单描述.
 
 \newpage
 \section{自定义随机结构}
@@ -209,7 +209,7 @@ AIRSS 则是使用了另一种结构搜索的策略. 它的 *.cell 文件中提�
 
 也许看到这, 你会说, 如果我们一开始在遗传算法中把第一代设置得和AIRSS中一样多, 比如10000个, 那最终的结果不是比AIRSS这种算法要好得多, 毕竟AIRSS只相当于遗传算法的第一步? 但事实是, 在一个小的相空间中, 我们用每代10000个构型迭代100代所得到的结果, 和直接用1000000个随机结构弛豫计算, 其实差别不大, 有时甚至是后者更精确一些. 而且光是说出``每代10000个构型迭代100代''这样的话就会感觉荒唐, 因为这种计算需要的算力是海量的. 一般来说, 我们会取每代构型数量在100这个量级. 所以我更倾向于认为这两种算法是互补的关系, 一个适用于串行地寻找一个超大相空间中的部分低能极值点, 另一个适用于并行地寻找某个被牢牢限制的小相空间内的全部极值点. 而且根据本人的经验, AIRSS在较大的相空间中的表现, 并不像我们想象的那么差. 因为对实际满足物理约束的相空间, 其内的极值点是少量的(不然这个结构在实验上可能会存在大量的亚稳态), 完全可以依赖第一性原理计算的弛豫过程, 由一个看起来随机但其实就在DFT弛豫能力范围内的初始点, 找到这些最终的极值点.
 
-使用 \textbf{精准限制相空间大小} 加 \textbf{随机搜索} 的策略搜索结构, 可以说是一种非常清奇且有效的思路. 因为大部分时候, 我们并非需要完全理论的预测某个结构, 而是和实验合作(比如实验上已经知道了元素配比和晶报形状, 有时甚至可以通过电镜知道其大概的原子位置), 共同研究某种材料的原子结构. 此时原子可变的相空间可能并不是很大, 因此``如何更精确地定义所研究的相空间''就变成了比``如何优化算法更快从而更快得到极小值点''更重要的问题. 当然相空间的大小也是相对的, 比如我们选取10个随机构型显然不能覆盖任何所谓的``小的相空间'', 只有当这个数字增大到比如10000的时候, 对某些体系, 我们才能勉强这么说. 但这里就引出了随机生成结构的另一个好处, 那就是天生适合并行计算. 我们知道, 结构搜索中几乎全部的时间都花在了结构弛豫上. 如果我们手上有8000个核, 使用8个核优化一个构型, 那么在同一时间我们就可以同时搜寻1000个结构, 如果有80000个核(当然这几乎是不可能的, 捂脸笑.jpg ), 那么同一时间就可以计算10000个结构. 这种简单粗暴的高效并行方式, 是其他算法所不能比拟. AIRSS同时集合了\textbf{精准限制相空间大小} 和 \textbf{随机产生结构} 两大特点, 在很多时候(尤其在与实验合作共同搜寻原子结构时), 是十分高效的.
+使用 \textbf{精准限制相空间大小} 加 \textbf{随机搜索} 的策略搜索结构, 可以说是一种非常清奇且有效的思路. 因为大部分时候, 我们并非需要完全理论的预测某个结构, 而是和实验合作(比如实验上已经知道了元素配比和晶胞形状, 有时甚至可以通过电镜知道其大概的原子位置), 共同研究某种材料的原子结构. 此时原子可变的相空间可能并不是很大, 因此``如何更精确地定义所研究的相空间''就变成了比``如何优化算法更快从而更快得到极小值点''更重要的问题. 当然相空间的大小也是相对的, 比如我们选取10个随机构型显然不能覆盖任何所谓的``小的相空间'', 只有当这个数字增大到比如10000的时候, 对某些体系, 我们才能勉强这么说. 但这里就引出了随机生成结构的另一个好处, 那就是天生适合并行计算. 我们知道, 结构搜索中几乎全部的时间都花在了结构弛豫上. 如果我们手上有8000个核, 使用8个核优化一个构型, 那么在同一时间我们就可以同时搜寻1000个结构, 如果有80000个核, 那么同一时间就可以计算10000个结构. 这种简单粗暴的高效并行方式, 是其他算法所不能比拟. AIRSS同时集合了\textbf{精准限制相空间大小} 和 \textbf{随机产生结构} 两大特点, 在很多时候(尤其在与实验合作共同搜寻原子结构时), 是十分高效的.
 
 \noindent\fcolorbox{mygray}[HTML]{E7E7E7}{\parbox{\textwidth}{%
 \noindent \textbf{目前 *.cell 文件中可用参数的功能可分为以下几类:}
@@ -266,7 +266,7 @@ user@machine_name$
 %BLOCKEND [keywords]
 \end{lstlisting}
 
-可以在AIRSS中使用的数据区块关键字(\verb|[keywords]|)已在 \textbf{Table \ref{BLOCKkeywords}} 中列出.
+可以在AIRSS中使用的数据区块关键字( \verb|[keywords]|)已在 \textbf{Table \ref{BLOCKkeywords}} 中列出.
 \begin{center}
 \begin{longtable}{m{13em}<{\centering} | m{19em}}
 \caption{AIRSS Cheat Sheet -- Data BOLCK}
@@ -285,22 +285,22 @@ user@machine_name$
 \midrule \multicolumn{2}{r}{\textit{Continued on next page...}} \\
 \endfoot
 \endlastfoot 
-\verb|LATTICE_CART|  & 使用笛卡尔坐标系, 以一个\(3\times3\)的矩阵定义\textbf{单胞}基矢. 通过在该区块中附加以下标签: \verb|#FIX,|\verb|#CFIX,|\verb|#ABFIX|, 可分别实现: 固定整个晶格形状, 固定晶格常数c, 固定晶格常数ab. 另外, 需要强调的是, 如果要确保晶格参数不变, 除了在晶格参数数据区块中加入\verb|#FIX|, 以保证在猜测晶格结构时保持其为常值外, 还需要在DFT弛豫软件中做相应的设置, 以保证其在结构弛豫时也不变. \textbf{需要特别注意的是}, 如果晶格形状可以随机变换(也即没有晶格标签\verb|#FIX|), 则该区块中定义的晶胞基矢所对应的体积\(V_{targ}\)\textbf{不是}原胞的初始总体积. 体系最终的总体积算法如下: \(V_{cell} = V_{targ} N_{symm} N_{all} / N_{lines}\) 或者 \(V_{cell} = V_{targ} N_{symm} N_{atom} \), 其中\(N_{all}\)是考虑\verb|NUM=n|定义后的单胞总原子数, \(N_{lines}\)是\verb|BLOCK POSITIONS_*|区块中定义的原子的总行数, \(N_{symm}\)是体系对称操作群元个数, \(N_{atom}\)是使用\verb|#NATOM=|定义的原子个数.\footnote{之所对体系单胞体积做这样的设计, 是为了给变组分或变原子数目搜索提供便利.}\\
+ \verb|LATTICE_CART|  & 使用笛卡尔坐标系, 以一个\(3\times3\)的矩阵定义\textbf{单胞}基矢. 通过在该区块中附加以下标签: \verb|#FIX,| \verb|#CFIX,| \verb|#ABFIX|, 可分别实现: 固定整个晶格形状, 固定晶格常数c, 固定晶格常数ab. 另外, 需要强调的是, 如果要确保晶格参数不变, 除了在晶格参数数据区块中加入 \verb|#FIX|, 以保证在猜测晶格结构时保持其为常值外, 还需要在DFT弛豫软件中做相应的设置, 以保证其在结构弛豫时也不变. \textbf{需要特别注意的是}, 如果晶格形状可以随机变换(也即没有晶格标签 \verb|#FIX|), 则该区块中定义的晶胞基矢所对应的体积\(V_{targ}\)\textbf{不是}原胞的初始总体积. 体系最终的总体积算法如下: \(V_{cell} = V_{targ} N_{symm} N_{all} / N_{lines}\) 或者 \(V_{cell} = V_{targ} N_{symm} N_{atom} \), 其中\(N_{all}\)是考虑 \verb|NUM=n|定义后的单胞总原子数, \(N_{lines}\)是 \verb|BLOCK POSITIONS_*|区块中定义的原子的总行数, \(N_{symm}\)是体系对称操作群元个数, \(N_{atom}\)是使用 \verb|#NATOM=|定义的原子个数.\footnote{之所对体系单胞体积做这样的设计, 是为了给变组分或变原子数目搜索提供便利.}\\
 \midrule
-\verb|LATTICE_ABC| & 以一个\(2\times3\)的矩阵定义单胞的晶格参数.矩阵第一行是参数abc, 第二行是三个夹角. 在同一个\verb|.cell|中, 与\verb|LATTICE_CART|二选一即可. 通过在该区块中附加以下标签: \verb|#FIX,|\verb|#CFIX,|\verb|#ABFIX|, 可分别实现: 固定整个晶格形状, 固定晶格常数c, 固定晶格常数ab.\textbf{需要特别注意的是}, 如果晶格形状可以随机变换(也即没有晶格标签\verb|#FIX|), 则该区块中定义晶胞常数所对应的体积\(V_{targ}\)\textbf{不是}原胞的初始总体积. 体系最终的总体积算法如下: \(V_{cell} = V_{targ} N_{symm} N_{all} / N_{lines}\) 或者 \(V_{cell} = V_{targ} N_{symm} N_{atom} \), 其中\(N_{all}\)是考虑\verb|NUM=n|定义后的单胞总原子数, \(N_{lines}\)是\verb|BLOCK POSITIONS_*|区块中定义的原子的总行数, \(N_{symm}\)是体系对称操作群元个数, \(N_{atom}\)是使用\verb|#NATOM=|定义的原子个数.\\
+ \verb|LATTICE_ABC| & 以一个\(2\times3\)的矩阵定义单胞的晶格参数.矩阵第一行是参数abc, 第二行是三个夹角. 在同一个 \verb|.cell|中, 与 \verb|LATTICE_CART|二选一即可. 通过在该区块中附加以下标签: \verb|#FIX,| \verb|#CFIX,| \verb|#ABFIX|, 可分别实现: 固定整个晶格形状, 固定晶格常数c, 固定晶格常数ab.\textbf{需要特别注意的是}, 如果晶格形状可以随机变换(也即没有晶格标签 \verb|#FIX|), 则该区块中定义晶胞常数所对应的体积\(V_{targ}\)\textbf{不是}原胞的初始总体积. 体系最终的总体积算法如下: \(V_{cell} = V_{targ} N_{symm} N_{all} / N_{lines}\) 或者 \(V_{cell} = V_{targ} N_{symm} N_{atom} \), 其中\(N_{all}\)是考虑 \verb|NUM=n|定义后的单胞总原子数, \(N_{lines}\)是 \verb|BLOCK POSITIONS_*|区块中定义的原子的总行数, \(N_{symm}\)是体系对称操作群元个数, \(N_{atom}\)是使用 \verb|#NATOM=|定义的原子个数.\\
 \midrule
-\verb|POSITIONS_FRAC| & 以晶格基矢坐标系下的分数坐标定义原子位置.\\
+ \verb|POSITIONS_FRAC| & 以晶格基矢坐标系下的分数坐标定义原子位置.\\
 \midrule
-\verb|POSITIONS_ABS| & 以笛卡尔坐标系下的绝对数值坐标定义原子位置. 与 \verb|POSITIONS_FRAC| 二者选一即可.\\
+ \verb|POSITIONS_ABS| & 以笛卡尔坐标系下的绝对数值坐标定义原子位置. 与 \verb|POSITIONS_FRAC| 二者选一即可.\\
 \midrule
-\verb|SYMMETRY_OPS| & 定义生成的单胞所必须满足的对称操作, 四行一组, 前三行定义旋转操作, 第四行行定义平移操作. 具体用法可参考 \href{http://www.tcm.phy.cam.ac.uk/castep/documentation/WebHelp/content/modules/castep/keywords/k_symmetry_ops_castep.htm}{CASTEP:SYMMETRY OPS}.\\
+ \verb|SYMMETRY_OPS| & 定义生成的单胞所必须满足的对称操作, 四行一组, 前三行定义旋转操作, 第四行行定义平移操作. 具体用法可参考 \href{http://www.tcm.phy.cam.ac.uk/castep/documentation/WebHelp/content/modules/castep/keywords/k_symmetry_ops_castep.htm}{CASTEP:SYMMETRY OPS}.\\
 \bottomrule
 \end{longtable}
 \end{center}
 
 下面简单介绍, \textbf{晶格参数}数据区块和\textbf{原子位置}数据区块的详细书写方法.
 
-\paragraph{晶格参数} 首先介绍晶格参数的设定, 以\verb|LATTICE_CART|为例.\\
+\paragraph{晶格参数} 首先介绍晶格参数的设定, 以 \verb|LATTICE_CART|为例.\\
 \emph{例1.}
 \begin{lstlisting}[language={bash},numbers=left]
 %BLOCK LATTICE_CART
@@ -316,7 +316,7 @@ user@machine_name$
 它声明了晶格常数在搜寻(生成初始随机结构)过程中是不能改变的. 如果您想保证体系晶格常数在进行DFT弛豫时也不变, 则需要在相应计算软件的输入文件中设置.
 
 
-\paragraph{原子位置} 再介绍原子位置的设置方法, 以\verb|POSITIONS_FRAC|为例.\\
+\paragraph{原子位置} 再介绍原子位置的设置方法, 以 \verb|POSITIONS_FRAC|为例.\\
 \emph{例2.}
 \begin{lstlisting}[language={bash},numbers=left]
 %BLOCK POSITIONS_FRAC
@@ -364,46 +364,46 @@ H   0.0 0.0 0.0 # H-set % ANGAMP=0 POSAMP=0
 \midrule \multicolumn{4}{r}{\textit{Continued on next page...}} \\
 \endfoot
 \endlastfoot
-\verb|NUM=|\(n\)\hspace{4em} \verb|NUM=|\(n_{min}-n_{max}\) & \verb|int| & 1 & 定义该行原子实际代表的原子个数. 使用 \verb|NUM| 定义的重复原子会被逐个单独分配到不同的\textbf{原子集}中. \textbf{需要特别注意的是}, 如果晶格形状可以随机变换(也即没有晶格标签\verb|#FIX|), 则使用\verb|BLOCK LATTICE_*|晶格数据区块中定义晶胞常数(基矢)所对应的使用全局参数\verb|#TARGVOL=|,\verb|#VARVOL=|定义的体积\(V_{targ}\)\textbf{不是}原胞的初始总体积. 体系最终的总体积算法如下: \(V_{cell} = V_{targ}(N_{all}/N_{lines})N_{symm}\), 其中\(N_{all}\)是考虑\verb|NUM=n|定义后的单胞总原子数, \(N_{lines}\)是\verb|BLOCK POSITIONS_*|区块中定义的原子的总行数, \(N_{symm}\)是体系对称操作群元个数.\\
+ \verb|NUM=|\(n\)\hspace{4em} \verb|NUM=|\(n_{min}-n_{max}\) & \verb|int| & 1 & 定义该行原子实际代表的原子个数. 使用 \verb|NUM| 定义的重复原子会被逐个单独分配到不同的\textbf{原子集}中. \textbf{需要特别注意的是}, 如果晶格形状可以随机变换(也即没有晶格标签 \verb|#FIX|), 则使用 \verb|BLOCK LATTICE_*|晶格数据区块中定义晶胞常数(基矢)所对应的使用全局参数 \verb|#TARGVOL=|, \verb|#VARVOL=|定义的体积\(V_{targ}\)\textbf{不是}原胞的初始总体积. 体系最终的总体积算法如下: \(V_{cell} = V_{targ}(N_{all}/N_{lines})N_{symm}\), 其中\(N_{all}\)是考虑 \verb|NUM=n|定义后的单胞总原子数, \(N_{lines}\)是 \verb|BLOCK POSITIONS_*|区块中定义的原子的总行数, \(N_{symm}\)是体系对称操作群元个数.\\
 \midrule
-\verb|POSAMP=|\(d\)& \verb|float| & -1.0 & 定义该行原子在结构搜索过程中, 能偏离初始位置的最大距离. 若为负值则无限制.\\
+ \verb|POSAMP=|\(d\)& \verb|float| & -1.0 & 定义该行原子在结构搜索过程中, 能偏离初始位置的最大距离. 若为负值则无限制.\\
 \midrule
-\verb|MINAMP=|\(d\)& \verb|float| & 0.0 & 定义该行原子在结构搜索过程中, 偏离初始位置的最小距离.\\
+ \verb|MINAMP=|\(d\)& \verb|float| & 0.0 & 定义该行原子在结构搜索过程中, 偏离初始位置的最小距离.\\
 \midrule
-\verb|XAMP=|\(d\)& \verb|float| & -1.0 & 定义该行原子在结构搜索过程中, 在X轴方向上移动的最大距离. 若为负值则无限制. 设置该项会令POSAMP和MINAMP失效\\
+ \verb|XAMP=|\(d\)& \verb|float| & -1.0 & 定义该行原子在结构搜索过程中, 在X轴方向上移动的最大距离. 若为负值则无限制. 设置该项会令POSAMP和MINAMP失效\\
 \midrule
-\verb|YAMP=|\(d\)& \verb|float| & -1.0 & 定义该行原子在结构搜索过程中, 在Y轴方向上移动的最大距离. 若为负值则无限制. 设置该项会令POSAMP和MINAMP失效.\\
+ \verb|YAMP=|\(d\)& \verb|float| & -1.0 & 定义该行原子在结构搜索过程中, 在Y轴方向上移动的最大距离. 若为负值则无限制. 设置该项会令POSAMP和MINAMP失效.\\
 \midrule
-\verb|ZAMP=|\(d\)& \verb|float| & -1.0 & 定义该行原子在结构搜索过程中, 在Z轴方向上移动的最大距离. 若为负值则无限制. 设置该项会令POSAMP和MINAMP失效.\\
+ \verb|ZAMP=|\(d\)& \verb|float| & -1.0 & 定义该行原子在结构搜索过程中, 在Z轴方向上移动的最大距离. 若为负值则无限制. 设置该项会令POSAMP和MINAMP失效.\\
 \midrule
-\verb|ANGAMP=|\(\theta\)  & \verb|float| \([0,180]\) & -1.0 & 原子绕自身所在\textbf{原子集}中心旋转角度的最大值(与 \verb|POSAMP| 互相独立, 分开作用). 存在晶格标签 \verb|#FIX| 时, \verb|ANGAMP=0|, \verb|POSAMP=0| 与 \verb|NOMOVE(\FIX)| 共用, 可保证原子在原始位置不动. 如果cell文件中所有原子集都只有1个原子, 则该参数失效, \verb|ANGAMP| 强制设为0. 若为负值则无限制.\\
+ \verb|ANGAMP=|\(\theta\)  & \verb|float| \([0,180]\) & -1.0 & 原子绕自身所在\textbf{原子集}中心旋转角度的最大值(与 \verb|POSAMP| 互相独立, 分开作用). 存在晶格标签 \verb|#FIX| 时, \verb|ANGAMP=0|, \verb|POSAMP=0| 与 \verb|NOMOVE(\FIX)| 共用, 可保证原子在原始位置不动. 如果cell文件中所有原子集都只有1个原子, 则该参数失效, \verb|ANGAMP| 强制设为0. 若为负值则无限制.\\
 \midrule
-\verb|RAD=|\(d\) & \verb|float| & 0.0 & 设置原子的半径, 用于判断两个原子间的最小距离, MINSEP. 其优先级低于直接设置全局参数 \verb|#MINSEP=|.\\
+ \verb|RAD=|\(d\) & \verb|float| & 0.0 & 设置原子的半径, 用于判断两个原子间的最小距离. 其优先级低于直接设置全局参数 \verb|#MINSEP=|.\\
 \midrule
-\verb|FIX| & \verb|void| & off & 该原子在产生结构时不受PUSH影响. 任何接近该原子的可移动原子都会以2倍的PUSH步长被PUSH回去. 同时向cell文件中写入指令使其在CASTEP弛豫时也不动. 这一指令仅在晶格被 \verb|#FIX| 时有效. 原子标签中的 \verb|FIX| 与晶格标签中的 \verb|#FIX|, \verb|#CFIX|, \verb|#ABFIX|名称相似, 但作用不同. \\
+ \verb|FIX| & \verb|void| & off & 该原子在产生结构时不受PUSH影响. 任何接近该原子的可移动原子都会以2倍的PUSH步长被PUSH回去. 同时向生成的cell文件中写入相关指令, 使该原子位置在使用CASTEP弛豫时也保持固定. 这一指令仅在晶格被 \verb|#FIX| 时有效. \footnote{原子标签中的 FIX 与晶格标签中的 \#FIX, \#CFIX, \#ABFIX名称相似, 但作用不同.} \\
 \midrule
-\verb|NOMOVE| & \verb|void| & off & 该原子在产生结构时不受PUSH影响, 任何接近该原子的可移动原子都会以2倍的PUSH步长被PUSH回去. 这一指令仅在晶格被 \verb|#FIX| 时有效.\\
+ \verb|NOMOVE| & \verb|void| & off & 该原子在产生结构时不受PUSH影响, 任何接近该原子的可移动原子都会以2倍的PUSH步长被PUSH回去. 这一指令仅在晶格被 \verb|#FIX| 时有效.\\
 \midrule
-\verb|COORD=|\(n\),\hspace{5em} \verb|COORD=|\(n_{min}-n_{max}\) & \verb|int| & -1 & 约束该行原子的配位数(最近邻原子数). 若为负值则无限制.\\
+ \verb|COORD=|\(n\),\hspace{5em} \verb|COORD=|\(n_{min}-n_{max}\) & \verb|int| & -1 & 约束该行原子的配位数(最近邻原子数). 若为负值则无限制.\\
 \midrule
-\verb|NN=|\(\pm{}elm\)  & \verb|string| & null & 规定原子最近邻元素种类, `\(+\)'代表必须近邻该元素, `\(-\)'代表不能近邻该元素. 一个原子只能指定一种元素近邻或不近邻(NN参数仅会被读入一次). 若为空, 则表示无限制\\
+ \verb|NN=|\(\pm{}elm\)  & \verb|string| & null & 规定原子最近邻元素种类, `\(+\)'代表必须近邻该元素, `\(-\)'代表不能近邻该元素. 一个原子只能指定一种元素近邻或不近邻(NN参数仅会被读入一次). 若为空, 则表示无限制\\
 \midrule
-\verb|OCC=|\(p\) & \verb|float| \([0,1]\) & 1.0 & 该点位占据原子的几率, 同种元素在不同位置的占据几率之和必须为大于0的整数. 接收分数形式的输入, 如 \verb|OCC=1/3|. 若该值设为小于0的数, 则强行将该原子的OCC设置为1, 同时不再输出该原子可能因对称性衍生的其他原子位置. 若原子同时有 \verb|FIX| 或 \verb|NOMOVE| 标签, 则 \verb|OCC| 强制设为1. 若该原子OCC大于1, 则将其设置为空位(与将元素名称设为Z的效果相同). 系统存在对称性时, 使用更小的 OCC 可强制某一原子位于对称性更高的点位上. 但更为自然的用法是使用 \verb|MULT| 代替 \verb|OCC| 设置. 若设置了全局参数\verb|#NFORM=n|(n大于0): 在没有对称性条件下, \verb|OCC| 参数失效; 在有对称性条件下, 请参考 \verb|MULT| 中的说明. \\
+ \verb|OCC=|\(p\) & \verb|float| \([0,1]\) & 1.0 & 该点位占据原子的几率, 同种元素在不同位置的占据几率之和必须为大于0的整数. 接收分数形式的输入, 如 \verb|OCC=1/3|. 若该值设为小于0的数, 则强行将该原子的OCC设置为1, 同时不再输出该原子可能因对称性衍生的其他原子位置. 若原子同时有 \verb|FIX| 或 \verb|NOMOVE| 标签, 则 \verb|OCC| 强制设为1. 若该原子OCC大于1, 则将其设置为空位(与将元素名称设为Z的效果相同). 系统存在对称性时, 使用更小的 OCC 可强制某一原子位于对称性更高的点位上. 但更为自然的用法是使用 \verb|MULT| 代替 \verb|OCC| 设置. 若设置了全局参数 \verb|#NFORM=n|(n大于0): 在没有对称性条件下, \verb|OCC| 参数失效; 在有对称性条件下, 请参考 \verb|#NFROM=| 中的说明. \\
 \midrule
-\verb|MULT=|\(m\) & \verb|float| & symm num & 设置该原子点位的 multiplicity.\footnote{这一数值为正时, 会强制将 OCC 参数的值覆盖为 MULT/SYMM\_NUM, 其中 SYMM\_NUM 为晶格对称群元的个数. 也即在AIRSS中, multiplicities 是通过设置分数OCC实现的, 因此不设置MULT而直接设置分数的OCC也可达到一样的效果.} 格点的 multiplicity 告诉我们, 如果我们在该位置上放置一个原子, 那么对称性将产生多少个原子. 使用这一参数, 可以限制某一行原子由晶体对称性实际生成原子的个数, 以及所处位置对称性的高低. 该参数默认大小为群操作个数, 也即默认只寻找 general position. 若该行原子有标签 \verb|FIX| 或 \verb|NOMOVE|, 则MULT失效, 同时将\verb|OCC|强制设为-1. 若设置了全局参数\verb|#NFORM=n|(n大于0), 则等效于将所有原子的 \verb|MULT| 的值设为\(n\). 关于格点 multiplicities 与对称性的更多信息可参考 \href{http://folk.ntnu.no/yingday/NilsYD/PhaseStructure/001Space_Groups.pdf}{PDF: Space Group and Multiplicities}.\\
+ \verb|MULT=|\(m\) & \verb|float| & symm num & 设置该原子点位的 multiplicity.\footnote{这一数值为正时, 程序会强制将 OCC 参数的值覆盖为 MULT/SYMM\_NUM, 其中 SYMM\_NUM 为晶格对称群元的个数. 也即在AIRSS中, multiplicities 是通过设置分数OCC实现的, 因此不设置MULT而直接设置分数的OCC也可达到一样的效果.} 格点的 multiplicity 告诉我们, 如果我们在该位置上放置一个原子, 那么对称性将产生多少个原子. 使用这一参数, 可以限制某一行原子由晶体对称性实际生成原子的个数, 也即控制生成原子位置的对称性高低. 该参数默认大小为群操作个数, 也即默认只寻找 general position. 若该行原子有标签 \verb|FIX| 或 \verb|NOMOVE|, 则MULT失效, 同时将 \verb|OCC|强制设为-1. 除了 \verb|MULT|外, 还可使用全局参数 \verb|#NFORM=|控制体系由对称性生成的原子个数, 具体细节请参考 \verb|#NFROM=|的说明. 关于格点 multiplicities 与对称性的更多信息可参考 \href{http://folk.ntnu.no/yingday/NilsYD/PhaseStructure/001Space_Groups.pdf}{PDF: Space Group and Multiplicities}.\\
 \midrule
-\verb|PERM| & \verb|void| & off & 在完成原子位置选定后, 重排(按一定概率互相交换)指定原子位置间的元素种类. 需要配合全局参数 \verb|#PERMUTE| 使用, 否则该参数将被关闭.\\
+ \verb|PERM| & \verb|void| & off & 在完成原子位置选定后, 重排(按一定概率互相交换)指定原子位置间的元素种类. 需要配合全局参数 \verb|#PERMUTE| 使用, 否则该参数将被关闭.\\
 \midrule
-\verb|ADATOM| & \verb|void| & off & 表明该行原子是等, 未加该标签的所有原子位置生成结束之后, 再加入的原子.\\
+ \verb|ADATOM| & \verb|void| & off & 表明该行原子是等, 未加该标签的所有原子位置生成结束之后, 再加入的原子.\\
 \midrule
-\verb|ATHOLE| & \verb|void| & off & 表明该原子位于被挖掉的孔洞之中, 输出结构中将自动删除该原子. 常与全局变量 \verb|#HOLE=|, \verb|#HOLEPOS=| 联用.\\
+ \verb|ATHOLE| & \verb|void| & off & 表明该原子位于被挖掉的孔洞之中, 输出结构中将自动删除该原子. 常与全局变量 \verb|#HOLE=|, \verb|#HOLEPOS=| 联用.\\
 \bottomrule
 \end{longtable}
 \end{center}
 
 \subsubsection{全局参数}
 
-结构搜索过程中整个体系应遵守的条件由全局参数指定.  AIRSS中的全局参数均以井号（\verb|#|）开头, 对体系中晶格以及全部的原子作用. 另外, 有些全局参数和原子标签有相同的作用, 此时, 原子标签设置的优先级要高于全局参数.\\
+结构搜索过程中整个体系应遵守的条件由全局参数指定.  AIRSS中的全局参数均以井号（ \verb|#|）开头, 对体系中晶格以及全部的原子作用. 另外, 有些全局参数和原子标签有相同的作用, 此时, 原子标签设置的优先级要高于全局参数.\\
 
 AIRSS中全部可用的全局参数的功能和详细使用方法如\textbf{Table \ref{AIRSS_Cheat_Sheet_Pragma}} 所示.
 
@@ -425,141 +425,141 @@ AIRSS中全部可用的全局参数的功能和详细使用方法如\textbf{Tabl
 \midrule \multicolumn{4}{r}{\textit{Continued on next page...}} \\
 \endfoot
 \endlastfoot
-\verb|#CELLCON=|\(a\;b\;c\;\alpha\;\beta\;\gamma\) & \verb|int| & off &定义晶胞应满足的条件: \(a,b,c\)是晶格常数; \(\alpha,\beta,\gamma\)是三个晶角. 晶格常数可选填的值有\(\{0,-1\}\), 晶角可选填的值有\(\{0,-1, \theta\}\). \(0\)表示无约束, \(-1\)表示相等. 如 \verb|#CELLCON=-1-1 -1 90 90 90| 表示立方晶系.\\
+ \verb|#CELLCON=|\(a\;b\;c\;\alpha\;\beta\;\gamma\) & \verb|int| & off &定义晶胞应满足的条件: \(a,b,c\)是晶格常数; \(\alpha,\beta,\gamma\)是三个晶角. 晶格常数可选填的值有\(\{0,-1\}\), 晶角可选填的值有\(\{0,-1, \theta\}\). \(0\)表示无约束, \(-1\)表示相等. 如 \verb|#CELLCON=-1-1 -1 90 90 90| 表示立方晶系.\\
 \midrule
-\verb|#SYSTEM=|\(sys\) & \verb|string| & off & 设置结构所在的晶系, 可选的输入有 [Tric, Mono, Hexa, Rhom(/Trig), Orth, Tetr, Cubi]. 该参数实际为 \verb|'#CELLCON='| 参数的若干特殊组合.\\
+ \verb|#SYSTEM=|\(sys\) & \verb|string| & off & 设置结构所在的晶系, 可选的输入有 [Tric, Mono, Hexa, Rhom(/Trig), Orth, Tetr, Cubi]. 该参数实际为 \verb|#CELLCON=| 参数的若干特殊组合.\\
 \midrule
-\verb|#CONS=|\(p\) & \verb|float| \((0,1]\) & 0.4 & 约束单胞边长. 接近0表示完全没有约束, 等于1表示尽一切可能约束晶胞abc三边等长.\\
+ \verb|#CONS=|\(p\) & \verb|float| \((0,1]\) & 0.4 & 约束单胞边长. 接近0表示完全没有约束, 等于1表示尽一切可能约束晶胞abc三边等长.\\
 \midrule
-\verb|#ACONS=|\(p\)& \verb|float| \((0,1]\) & 0.5 & 约束晶胞晶角, 使其远离某一晶格参数极小、晶胞扁平的情况. 接近0表示完全没有约束, 等于1表示尽一切可能约束三个键角严格等于90度.\\
+ \verb|#ACONS=|\(p\)& \verb|float| \((0,1]\) & 0.5 & 约束晶胞晶角, 使其远离某一晶格参数极小、晶胞扁平的情况. 接近0表示完全没有约束, 等于1表示尽一切可能约束三个键角严格等于90度.\\
 \midrule
-\verb|#CELLAMP=|\(p\)& \verb|float| & -1.0 & 在一定限度内, 随机变化晶格形状. 设为负值时采用晶格形状将完全随机变化. \(p\)越小, 晶格偏离cell文件中给定值越小. 若要启用该参数, 建议不要设置超过1.0的值.\footnote{该参数使用方法详见 airss-0.9.1/src/buildcell/src/build.f90 第100行cellamp变量的使用.} 使用该参数后, 晶格标签 \verb|#ABFIX| 与 \verb|#CFIX|, 原子标签 \verb|#CONS| 与 \verb|#ACONS| 都将被弃用. 若为负数则关闭该参数设置.\\
+ \verb|#CELLAMP=|\(p\)& \verb|float| & -1.0 & 在一定限度内, 随机变化晶格形状. 设为负值时采用晶格形状将完全随机变化. \(p\)越小, 晶格偏离cell文件中给定值越小. 若要启用该参数, 建议不要设置超过1.0的值.\footnote{该参数使用方法详见 airss-0.9.1/src/buildcell/src/build.f90 第100行cellamp变量的使用.} 使用该参数后, 晶格标签 \verb|#ABFIX| 与 \verb|#CFIX|, 原子标签 \verb|#CONS| 与 \verb|#ACONS| 都将被弃用. 若为负数则关闭该参数设置.\\
 \midrule
-\verb|#VACUUM=|\(d\) & \verb|float| & 0.0 & 在晶格(Z方向)中加入\(d\) \r{A}的真空层.\\
+ \verb|#VACUUM=|\(d\) & \verb|float| & 0.0 & 在晶格(Z方向)中加入\(d\) \r{A}的真空层.\\
 \midrule
-\verb|#NFORM=|\(n\)\ \ \ \ \verb|#NFORM=|\(n_{min}-n_{max}\) & \verb|int| & -1 & 声明单胞中实际存在的原子个数是的 \verb|%BLOCK POSITIONS_*| 或 \verb|#SPECIES| 中定义的\(n\)倍. 若为负值则此参数被关闭. 该参数在存在对称性时使用, 可约束原子因对称性而复制的份数, 替代原子标签\verb|MULT|的部分作用. 同时使用该参数, 可将体系总体积计算公式中的\(N_{symm}\)替换为\(N_{fu}\), 也即, \(V_{cell} = V_{targ} N_{fu} N_{all} / N_{lines}\) 或者 \(V_{cell} = V_{targ} N_{fu} N_{atom} \), 其中\(N_{all}\)是考虑\verb|NUM=n|定义后的单胞总原子数, \(N_{lines}\)是\verb|BLOCK POSITIONS_*|区块中定义的原子的总行数, \(N_{fu}\)是\verb|#NFORM=|后跟的整数, \(N_{atom}\)是使用\verb|#NATOM=|定义的原子个数. 而使用原子标签\verb|MULT|或\verb|OCC|限制对称性时则没有此效果. 同时, 在没有对称性时, \verb|#NFORM=|不能(也没有必要)与\verb|#NATOM=|联用.\\
+ \verb|#NFORM=|\(n\)\ \ \ \ \verb|#NFORM=|\(n_{min}-n_{max}\) & \verb|int| & -1 & 声明单胞中实际存在的原子个数(即使在考虑对称性后也必须)是 \verb|%BLOCK POSITIONS_*| 或 \verb|#SPECIES| 中定义的\(n\)倍. 若为负值则此参数被关闭. 与原子标签 \verb|MULT|类似, 使用该参数可约束单胞中定义的原子因对称性而复制的份数, 但在单胞中有重复元素的原子时, \verb|#NFORM=|的效果会与 \verb|MULT|不同. 例如, 在有若干个对称操作的单胞中定义了2个Si原子. 将他们的 \verb|MULT|分别设置为2, 则系统将产生4个原子, 每2个原子单独满足对称性. 而若设值 \verb|#NFROM=2|, 则体系同样会产生4个原子, 但4个原子组合起来才会满足对称性. 该参数的出现会覆盖原子标签 \verb|MULT|的设置. 同时使用该参数, 也会将体系总体积计算公式\footnote{请参考BLOCK LATTICE\_*的说明.}中的\(N_{symm}\)替换为\(N_{fu}\). 也即, \(V_{cell} = V_{targ} N_{fu} N_{all} / N_{lines}\) 或者 \(V_{cell} = V_{targ} N_{fu} N_{atom} \), 其中\(V_{targ}\)是由 \verb|BLOCK LATTICE_*|或 \verb|TARGVOl, VARVOL|定义的初始体积, \(N_{all}\)是考虑 \verb|NUM=n| 定义后的单胞总原子数, \(N_{lines}\)是 \verb|BLOCK POSITIONS_*|区块中定义的原子的总行数, \(N_{fu}\)是 \verb|#NFORM=| 后跟的整数, \(N_{atom}\)是使用 \verb|#NATOM=| 定义的原子个数.\footnote{使用原子标签MULT或OCC限制对称性时没有此效果.} 同时, 在无对称性时, \verb|#NFORM=|不能(也没有必要)与 \verb|#NATOM=|联用.\\
 \midrule
-\verb|#SUPERCELL=|\(n\) \verb|#SUPERCELL=|\(n_a\;n_b\;n_c\;\;\;\;\;\;\) \hspace{2em}\verb|#SUPERCELL=|\(a_x\; a_y\;a_z\;\)\hspace{2em} \(b_x\;b_y\;b_z\;c_x\;c_y\;c_z\) & \verb|int| & off & 定义超胞的尺寸. 可以使用超胞中单胞的的个数\(n\), 超胞晶格基矢在三个方向的数值\(n_a\;n_b\;n_c\), 或是超胞与单胞晶格基矢之间的变换矩阵\([[a_x,a_y,a_z],[b_x,b_y,b_z],[c_x,c_y,c_z]]\)定义新的超胞. 超胞的构建策略是: 首先用单胞构建符合条件的原子构型, 而后根据扩胞参数复制粘贴得到超胞后直接输出.\\
+ \verb|#SUPERCELL=|\(n\) \verb|#SUPERCELL=|\(n_a\;n_b\;n_c\;\;\;\;\;\;\) \hspace{2em} \verb|#SUPERCELL=|\(a_x\; a_y\;a_z\;\)\hspace{2em} \(b_x\;b_y\;b_z\;c_x\;c_y\;c_z\) & \verb|int| & off & 定义超胞的尺寸. 可以使用超胞中单胞的的个数\(n\), 超胞晶格基矢在三个方向的数值\(n_a\;n_b\;n_c\), 或是超胞与单胞晶格基矢之间的变换矩阵\([[a_x,a_y,a_z],[b_x,b_y,b_z],[c_x,c_y,c_z]]\)定义新的超胞. 超胞的构建策略是: 首先用单胞构建符合条件的原子构型, 而后根据扩胞参数复制粘贴得到超胞后直接输出.\\
 \midrule
-\verb|#SLAB| & \verb|void| & off & 声明该结构是一个二维平面结构, 取超胞时将不再向c方向扩胞, 同时检查结构对称性时也将忽略c方向.\\
+ \verb|#SLAB| & \verb|void| & off & 声明该结构是一个二维平面结构, 取超胞时将不再向c方向扩胞, 同时检查结构对称性时也将忽略c方向.\\
 \midrule
-\verb|#SURFACE| & \verb|void| & off & 声明该结构是一个表面结构, 表面结构继承SLAB的全部特性, 同时增加一条与表面相关的对称性限制条件.\footnote{见源码airss-0.9.1/src/buildcell/src/cell.90 第3216行}\\
+ \verb|#SURFACE| & \verb|void| & off & 声明该结构是一个表面结构, 表面结构继承SLAB的全部特性, 同时增加一条与表面相关的对称性限制条件.\footnote{见源码airss-0.9.1/src/buildcell/src/cell.90 第3216行}\\
 \midrule
-\verb|#MOLECULES|& \verb|void| & off & 声明同一个原子集中的原子构成了一个基本分子构型, 检查配位时将不再对同一个原子集内的原子做检查.\\
+ \verb|#MOLECULES|& \verb|void| & off & 声明同一个原子集中的原子构成了一个基本分子构型, 检查配位时将不再对同一个原子集内的原子做检查.\\
 \midrule
-\verb|#CLUSTER| & \verb|void| & off & 声明预测的结构是无周期性的团簇.\\
+ \verb|#CLUSTER| & \verb|void| & off & 声明预测的结构是无周期性的团簇.\\
 \midrule
-\verb|#OCTET|& \verb|void| & off & 检查化学配比是否电子配平(全部电子数是否可以被8整除).\\
+ \verb|#OCTET|& \verb|void| & off & 检查化学配比是否电子配平(全部电子数是否可以被8整除).\\
 \midrule
-\verb|#POSAMP=|\(d\) & \verb|float|  & -1.0 & 与原子标签中的定义相同, 结构搜索中原子偏离初始点的最大位置. 负值为无限制.\\
+ \verb|#POSAMP=|\(d\) & \verb|float|  & -1.0 & 与原子标签中的定义相同, 结构搜索中原子偏离初始点的最大位置. 负值为无限制.\\
 \midrule
-\verb|#MINAMP=|\(d\) & \verb|float| & -1.0 & 与原子标签中的定义相同, 结构搜索中原子偏离初始点的最小位置. 负值为无限制.\\
+ \verb|#MINAMP=|\(d\) & \verb|float| & -1.0 & 与原子标签中的定义相同, 结构搜索中原子偏离初始点的最小位置. 负值为无限制.\\
 \midrule
-\verb|#XAMP=|\(d\) & \verb|float| & -1.0 & 与原子标签中的定义相同, 结构搜索中原子X方向偏离初始点的最大振幅. 负值为无限制. 设置该项会令 POSAMP 和 MINAMP 失效. \\
+ \verb|#XAMP=|\(d\) & \verb|float| & -1.0 & 与原子标签中的定义相同, 结构搜索中原子X方向偏离初始点的最大振幅. 负值为无限制. 设置该项会令 POSAMP 和 MINAMP 失效. \\
 \midrule
-\verb|#YAMP=|\(d\) & \verb|float| & -1.0 & 与原子标签中的定义相同, 结构搜索中原子Y方向偏离初始点的最大振幅. 负值为无限制. 设置该项会令 POSAMP 和 MINAMP 失效.\\
+ \verb|#YAMP=|\(d\) & \verb|float| & -1.0 & 与原子标签中的定义相同, 结构搜索中原子Y方向偏离初始点的最大振幅. 负值为无限制. 设置该项会令 POSAMP 和 MINAMP 失效.\\
 \midrule
-\verb|#ZAMP=|\(d\) & \verb|float| & -1.0 & 与原子标签中的定义相同, 结构搜索中原子Z方向偏离初始点的最大振幅. 负值为无限制. 设置该项会令 POSAMP 和 MINAMP 失效.\\
+ \verb|#ZAMP=|\(d\) & \verb|float| & -1.0 & 与原子标签中的定义相同, 结构搜索中原子Z方向偏离初始点的最大振幅. 负值为无限制. 设置该项会令 POSAMP 和 MINAMP 失效.\\
 \midrule
-\verb|#ANGAMP=|\(\theta\)& \verb|float| \([0,180]\) & -1.0 & 与原子标签中的定义相同, 原子绕自身所在\textbf{原子集}中心旋转角度的最大值. 负值为无限制.\\
+ \verb|#ANGAMP=|\(\theta\)& \verb|float| \([0,180]\) & -1.0 & 与原子标签中的定义相同, 原子绕自身所在\textbf{原子集}中心旋转角度的最大值. 负值为无限制.\\
 \midrule
-\verb|#MINBANGLE=|\(\theta\) & \verb|float| \((0,180]\) & 0.0 & 设置搜索结构中, 原子键角的最小值.\\
+ \verb|#MINBANGLE=|\(\theta\) & \verb|float| \((0,180]\) & 0.0 & 设置搜索结构中, 原子键角的最小值.\\
 \midrule
-\verb|#MAXBANGLE=|\(\theta\) & \verb|float| \((0,180]\) & 180.0 &设置搜索结构中, 原子键角的最大值.\\
+ \verb|#MAXBANGLE=|\(\theta\) & \verb|float| \((0,180]\) & 180.0 &设置搜索结构中, 原子键角的最大值.\\
 \midrule
-\verb|#MINSEP=|\(d\) \verb|#MINSEP=|\(d\;\)\verb|X-X=|\(d_{X−X}\;\)\ \ \  \ \verb|X-Y=|\(d_{X−Y}\;...\) & \verb|float| & 0.0 & 两原子间最小距离, 也可以用来定义两原子距离固定是多少. 比如 \verb|#MINSEP=| \verb|2.0 Li-Li=2.6 Ge-Ge=2.51|\\
+ \verb|#MINSEP=|\(d\) \verb|#MINSEP=|\(d\;\) \verb|X-X=|\(d_{X−X}\;\)\ \ \  \ \verb|X-Y=|\(d_{X−Y}\;...\) & \verb|float| & 0.0 & 两原子间最小距离, 也可以用来定义两原子距离固定是多少. 比如 \verb|#MINSEP=| \verb|2.0 Li-Li=2.6 Ge-Ge=2.51|\\
 \midrule
-\verb|#RAD=|\(d\)& \verb|float|  & 0.0 & 与原子标签中的定义相同, 定义原子的半径大小.\\
+ \verb|#RAD=|\(d\)& \verb|float|  & 0.0 & 与原子标签中的定义相同, 定义原子的半径大小.\\
 \midrule
-\verb|#COORD=|\(n\)& \verb|int| & -1 & 与原子标签中的定义相同, 设置原子的配位数限制. 负值为无限制.\\
+ \verb|#COORD=|\(n\)& \verb|int| & -1 & 与原子标签中的定义相同, 设置原子的配位数限制. 负值为无限制.\\
 \midrule
-\verb|#SPIN=|\(S_{real}\;S_{mod}\;\;\;\;\;\;\) \verb|#SPIN=|\(S_{real}\;S_{mod}\;\;\;\;\;\) \verb|"|elm\(_1\) elm\(_2\)... \verb|"| & \verb|float|,  \verb|string|& off & 随机设置体系每个原子上共线自旋的取值. 并要求 \(S_{t,real}\)/\(N_{ions}\) = \(S_{real}\), \(S_{t,mod}\)/\(N_{ions}\) = \(S_{mod}\), 其中\(S_{t,real}\)是全部指定原子自旋的和, \(S_{t,mod}\)是全部指定原子自旋绝对值的和. 未被指定的原子自旋保持为0. 可以用被双引号包裹的带空格的元素符号指明哪些是指定原子. 若未指定任何原子, 则默认所有原子都是指定原子. 例如 \verb|#SPIN=0 5 "Fe Co "| 或者 \verb|#SPIN=1 4| \\
+ \verb|#SPIN=|\(S_{real}\;S_{mod}\;\;\;\;\;\;\) \verb|#SPIN=|\(S_{real}\;S_{mod}\;\;\;\;\;\) \verb|"|elm\(_1\) elm\(_2\)... \verb|"| & \verb|float|, \verb|string|& off & 随机设置体系每个原子上共线自旋的取值. 并要求 \(S_{t,real}\)/\(N_{ions}\) = \(S_{real}\), \(S_{t,mod}\)/\(N_{ions}\) = \(S_{mod}\), 其中\(S_{t,real}\)是全部指定原子自旋的和, \(S_{t,mod}\)是全部指定原子自旋绝对值的和. 未被指定的原子自旋保持为0. 可以用被双引号包裹的带空格的元素符号指明哪些是指定原子. 若未指定任何原子, 则默认所有原子都是指定原子. 例如 \verb|#SPIN=0 5 "Fe Co "| 或者 \verb|#SPIN=1 4| \\
 \midrule
-\verb|#SPECIES=|\(elm_1\%tags_1,\) \(elm_2\%tags_2,...\;\;\;\;\;\;\) \verb|#SPECIES=|\(elm_1,elm_2...\) & \verb|string|  & off & 使用简化记号定义体系原子组分. 例如, \verb|#SPECIES=Si|\verb|%NUM=1| \verb|COORD=2,|\verb|O%NUM=2|. 该参数不能与\verb|BLOCK POSITIONS_*|同时出现.\\
+ \verb|#SPECIES=|\(elm_1\%tags_1,\) \(elm_2\%tags_2,...\;\;\;\;\;\;\) \verb|#SPECIES=|\(elm_1,elm_2...\) & \verb|string|  & off & 使用简化记号定义体系原子组分. 例如, \verb|#SPECIES=Si| \verb|%NUM=1| \verb|COORD=2,| \verb|O%NUM=2|. 该参数不能与 \verb|BLOCK POSITIONS_*|同时出现.\\
 \midrule
-\verb|#NATOM=|\(n\) \hspace{6em}\verb|#NATOM=|\(n_{min}-n_{max}\)  & 0 & \verb|int| & 与 \verb|#SPECIES| 联用, 定义单胞中总原子数, 一般用于变组分分析(变胞预测). 且使用此全局参数会使 \verb|#SPECIES| 指令包含的\verb|%|后的原子标签全部失效. \footnote{详细原因请参见源码``airss-0.9.1/src/buildcell/src/cell.f90''第493行与514行区别.} 若 \verb|#SPECIES| 中含有多中元素, 则每种元素随机数目, 保持总和为NATOM. 该参数设为0时自动失效. \textbf{需要特别注意的是}, 如果晶格形状可以随机变换(也即没有晶格标签\verb|#FIX|), 则使用\verb|BLOCK LATTICE_*|晶格数据区块中定义晶胞常数(基矢)所对应的、以及使用全局参数\verb|#TARGVOL=|,\verb|#VARVOL=|定义的体积\(V_{targ}\)\textbf{不是}原胞的初始总体积. 体系最终的总体积算法如下: \(V_{cell} = V_{targ} N_{symm} N_{atom} \), 其中\(N_{symm}\)是体系对称操作群元个数, \(N_{atom}\)是使用\verb|#NATOM=|定义的原子个数.\\
+ \verb|#NATOM=|\(n\) \hspace{6em} \verb|#NATOM=|\(n_{min}-n_{max}\)  & 0 & \verb|int| & 与 \verb|#SPECIES| 联用, 定义单胞中总原子数, 一般用于变组分分析(变胞预测). 且使用此全局参数会使 \verb|#SPECIES| 指令包含的 \verb|%|后的原子标签全部失效. \footnote{详细原因请参见源码``airss-0.9.1/src/buildcell/src/cell.f90''第493行与514行区别.} 若 \verb|#SPECIES| 中含有多中元素, 则每种元素随机数目, 保持总和为NATOM. 该参数设为0时自动失效. \textbf{需要特别注意的是}, 如果晶格形状可以随机变换(也即没有晶格标签 \verb|#FIX|), 则使用 \verb|BLOCK LATTICE_*|晶格数据区块中定义晶胞常数(基矢)所对应的、以及使用全局参数 \verb|#TARGVOL=|, \verb|#VARVOL=|定义的体积\(V_{targ}\)\textbf{不是}原胞的初始总体积. 体系最终的总体积算法如下: \(V_{cell} = V_{targ} N_{symm} N_{atom} \), 其中\(N_{symm}\)是体系对称操作群元个数, \(N_{atom}\)是使用 \verb|#NATOM=|定义的原子个数.\\
 \midrule
-\verb|#FOCUS=|\(n\) & \verb|int| & 0 & 与\verb|#NATOM=|联用, 约束最终结构必须是\(n\)组分的(由\(n\)种不同的元素构成). 该参数一般用于变组分分析. 小于等于0表示无约束.\\
+ \verb|#FOCUS=|\(n\) & \verb|int| & 0 & 与 \verb|#NATOM=|联用, 约束最终结构必须是\(n\)组分的(由\(n\)种不同的元素构成). 该参数一般用于变组分分析. 小于等于0表示无约束.\\
 \midrule
-\verb|#TARGVOL=|\(V\) \verb|#TARGVOL=|\(V_{min}-V_{max}\) & \verb|float| & init. cell vol. & 固定晶格体积为\(V\), 或\(V_{min}\)到\(V_{max}\)之间的随机数值, 结构搜索中该体积不再随机变化. 默认为初始给定原胞的体积. 该参数常在不引入 \verb|BLOCK POSITION_*| 区块时使用. \textbf{需要特别注意的是}, 该处定义的体积\(V_{targ}\)\textbf{不是}原胞的初始总体积. 体系最终的总体积算法如下: \(V_{cell} = V_{targ} N_{symm} N_{all} / N_{lines}\)或者\(V_{cell} = V_{targ} N_{symm} N_{atom} \), 其中\(N_{all}\)是考虑\verb|NUM=n|定义后的单胞总原子数, \(N_{lines}\)是\verb|BLOCK POSITIONS_*|区块中定义的原子的总行数, \(N_{symm}\)是体系对称操作群元个数, \(N_{atom}\)是使用\verb|#NATOM=|定义的原子个数.\\
+ \verb|#TARGVOL=|\(V\) \verb|#TARGVOL=|\(V_{min}-V_{max}\) & \verb|float| & init. cell vol. & 固定晶格体积为\(V\), 或\(V_{min}\)到\(V_{max}\)之间的随机数值, 结构搜索中该体积不再随机变化. 默认为初始给定原胞的体积. 该参数常在不引入 \verb|BLOCK POSITION_*| 区块时使用. \textbf{需要特别注意的是}, 该处定义的体积\(V_{targ}\)\textbf{不是}原胞的初始总体积. 体系最终的总体积算法如下: \(V_{cell} = V_{targ} N_{symm} N_{all} / N_{lines}\)或者\(V_{cell} = V_{targ} N_{symm} N_{atom} \), 其中\(N_{all}\)是考虑 \verb|NUM=n|定义后的单胞总原子数, \(N_{lines}\)是 \verb|BLOCK POSITIONS_*|区块中定义的原子的总行数, \(N_{symm}\)是体系对称操作群元个数, \(N_{atom}\)是使用 \verb|#NATOM=|定义的原子个数.\\
 \midrule
-\verb|#VARVOL=|\(V\)& \verb|float| & init. cell vol. & 给定初始晶格体积, 实际的晶格体积会在给定体积的0.95-1.05倍之间随机选取. \textbf{需要特别注意的是}, 则该处定义的体积\(V_{targ}\)\textbf{不是}原胞的初始总体积. 体系最终的总体积算法如下: \(V_{cell} = V_{targ} N_{symm} N_{all} / N_{lines}\)或者\(V_{cell} = V_{targ} N_{symm} N_{atom} \), 其中\(N_{all}\)是考虑\verb|NUM=n|定义后的单胞总原子数, \(N_{lines}\)是\verb|BLOCK POSITIONS_*|区块中定义的原子的总行数, \(N_{symm}\)是体系对称操作群元个数, \(N_{atom}\)是使用\verb|#NATOM=|定义的原子个数.\\
+ \verb|#VARVOL=|\(V\)& \verb|float| & init. cell vol. & 给定初始晶格体积, 实际的晶格体积会在给定体积的0.95-1.05倍之间随机选取. \textbf{需要特别注意的是}, 则该处定义的体积\(V_{targ}\)\textbf{不是}原胞的初始总体积. 体系最终的总体积算法如下: \(V_{cell} = V_{targ} N_{symm} N_{all} / N_{lines}\)或者\(V_{cell} = V_{targ} N_{symm} N_{atom} \), 其中\(N_{all}\)是考虑 \verb|NUM=n|定义后的单胞总原子数, \(N_{lines}\)是 \verb|BLOCK POSITIONS_*|区块中定义的原子的总行数, \(N_{symm}\)是体系对称操作群元个数, \(N_{atom}\)是使用 \verb|#NATOM=|定义的原子个数.\\
 \midrule
-\verb|#SLACK=|\(p\)& \verb|float| \([0,1)\) & 0.0 & 使用此参数可整体降低体系对原子间成键(原子相对位置)的限制, \(p\)越大对原子间间距和角度的要求越低. 默认为0, 推荐值0.1--0.3.\\
+ \verb|#SLACK=|\(p\)& \verb|float| \([0,1)\) & 0.0 & 使用此参数可整体降低体系对原子间成键(原子相对位置)的限制, \(p\)越大对原子间间距和角度的要求越低. 默认为0, 推荐值0.1--0.3.\\
 \midrule
-\verb|#AUTOSLACK=|\(p\)& \verb|float| \([0,1)\) & off & 使用此参数可整体降低体系对原子间成键(原子相对位置)的限制, \(p\)越大对原子间间距和角度的要求越低. 若给定的初始值\(p\)不合适, 则以0.01的步长递增SLACK, 直到找到合适的SLACK值.\\
+ \verb|#AUTOSLACK=|\(p\)& \verb|float| \([0,1)\) & off & 使用此参数可整体降低体系对原子间成键(原子相对位置)的限制, \(p\)越大对原子间间距和角度的要求越低. 若给定的初始值\(p\)不合适, 则以0.01的步长递增SLACK, 直到找到合适的SLACK值.\\
 \midrule
-\verb|#FLIP|& \verb|void| & off & 搜索结构时, 对\textbf{原子集}引入随机翻转操作. 若体系中所有原子集中均只有一个原子, 则该参数失效.\\
+ \verb|#FLIP|& \verb|void| & off & 搜索结构时, 对\textbf{原子集}引入随机翻转操作. 若体系中所有原子集中均只有一个原子, 则该参数失效.\\
 \midrule
-\verb|#REMOVE|& \verb|void| & off & 删除(PUSH后)重叠的原子(之一). 可以用于高初始原子密度的结构预测.\\
+ \verb|#REMOVE|& \verb|void| & off & 删除(PUSH后)重叠的原子(之一). 可以用于高初始原子密度的结构预测.\\
 \midrule
-\verb|#TIGHT|& \verb|void| & off & 使得生成的结构(键长)更加紧密. 该参数仅在原子标签\verb|RAD|生效时有作用.\\
+ \verb|#TIGHT|& \verb|void| & off & 使得生成的结构(键长)更加紧密. 该参数仅在原子标签 \verb|RAD|生效时有作用.\\
 \midrule
-\verb|#SYMMOPS=|\(n\)\hspace{6em}\verb|#SYMMOPS=~|\(n\;\;\;\;\;\;\;\;\;\;\;\)\hspace{6em}\verb|#SYMMOPS=|\(n_{min}-n_{max}\) & \verb|int| &  off & 声明生成的结构中必须含有\(n\)种对称操作. 若体系是周期性晶体结构, 推荐从下述整数中选取: 1,2,3,4,5,6,8,12,16,24,48. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量\footnote{这里的``数量''是指, 满足对称操作所需的最少同类原子数量, 也即该点位的 multiplicities. }更少的 special position 不予考虑. 若使用\verb|MULT|逐个原子指定 multiplicity, 则波浪号(\(\sim\))被忽略, 但若使用\verb|#NFORM=n|(\(n\)大于0), 则会与波浪号(\(\sim\))冲突. 因此在含有波浪号(\(\sim\))的模式下不能使用\verb|MULT|或\verb|#NFORM=|限制原子对称复制的个数. \textbf{需要补充说明的是,} AIRSS中实现锁定对称性的方法是: 接将原子按对称性复制n份. 例如原子有\(C_4\)对称性, 则最终输出的总原子数将是设定的4倍. 但如果结合原子标签 \verb|OCC, MULT, #NFORM=| 等的使用, 可实现在更高对称的点位安放更少原子的操作. \\
+ \verb|#SYMMOPS=|\(n\)\hspace{6em} \verb|#SYMMOPS=~|\(n\;\;\;\;\;\;\;\;\;\;\;\)\hspace{6em} \verb|#SYMMOPS=|\(n_{min}-n_{max}\) & \verb|int| &  off & 声明生成的结构中必须含有\(n\)种对称操作. 若体系是周期性晶体结构, 推荐从下述整数中选取: 1,2,3,4,5,6,8,12,16,24,48. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量\footnote{这里的``数量''是指, 满足对称操作所需的最少同类原子数量, 也即该点位的 multiplicities. }更少的 special position 不予考虑. 若使用 \verb|MULT|逐个原子指定 multiplicity, 则波浪号(\(\sim\))被忽略, 但若使用 \verb|#NFORM=n|(\(n\)大于0), 则会与波浪号(\(\sim\))冲突. 因此在含有波浪号(\(\sim\))的模式下不能使用 \verb|MULT|或 \verb|#NFORM=|限制原子对称复制的个数. \textbf{需要补充说明的是,} AIRSS中实现锁定对称性的方法是: 接将原子按对称性复制n份. 例如原子有\(C_4\)对称性, 则最终输出的总原子数将是设定的4倍. 但如果结合原子标签 \verb|OCC, MULT, #NFORM=| 等的使用, 可实现在更高对称的点位安放更少原子的操作. \\
 \midrule
-\verb|#SYMM=|\(spg\)\hspace{6em} \verb|#SYMM=~|\(spg\)& \verb|string| & off & 生成的结构必须在\(spg\)空间群中, \(spg\)是空间群的名称. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量更少的 special position 不予考虑, 在此模式下不能使用\verb|MULT|或\verb|NFORM|限制原子对称复制的个数.\\
+ \verb|#SYMM=|\(spg\)\hspace{6em} \verb|#SYMM=~|\(spg\)& \verb|string| & off & 生成的结构必须在\(spg\)空间群中, \(spg\)是空间群的名称. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量更少的 special position 不予考虑, 在此模式下不能使用 \verb|MULT|或 \verb|NFORM|限制原子对称复制的个数.\\
 \midrule
-\verb|#SYMMNO=|\(n\)\hspace{6em} \verb|#SYMMNO=~|\(n\) & \verb|int| & off & 生成的结构必须在第\(n\)号空间群中, \(n\)是空间群的序号. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量更少的 special position 不予考虑, 在此模式下不能使用\verb|MULT|或\verb|NFORM|限制原子对称复制的个数.\\
+ \verb|#SYMMNO=|\(n\)\hspace{6em} \verb|#SYMMNO=~|\(n\) & \verb|int| & off & 生成的结构必须在第\(n\)号空间群中, \(n\)是空间群的序号. 若输入中含有波浪号(\(\sim\))则表明, 结构搜索时将只在general positions上放置原子, 对于对称性更高但数量更少的 special position 不予考虑, 在此模式下不能使用 \verb|MULT|或 \verb|NFORM|限制原子对称复制的个数.\\
 \midrule
-\verb|#SYMMORPHIC| & \verb|void| & off & 只检查体系是否存在点式对称操作.\\
+ \verb|#SYMMORPHIC| & \verb|void| & off & 只检查体系是否存在点式对称操作.\\
 \midrule
-\verb|#SGRANK=|\(n\) & \verb|int| & 230 & 设置空间群寻找/锁定的序号上限\(n\). 此值设为230时, 接受任何空间群的对称性锁定.\\
+ \verb|#SGRANK=|\(n\) & \verb|int| & 230 & 设置空间群寻找/锁定的序号上限\(n\). 此值设为230时, 接受任何空间群的对称性锁定.\\
 \midrule
-\verb|#ADJGEN=|\(n\)\hspace{4em}\verb|#ADJGEN=|\(n_{min}-n_{max}\)  & \verb|int|  & 0 & 调整晶胞中使用 general positions(GP) 的个数. 该值为0时, 会最大程度地使用GP点位. 增大该值则将逐渐更多地使用 Special positions(SP)点位. 如果尝试后发现难以生成符合条件结构, 则程序将动态增加该值. 关于 SP/GP 与晶体空间群的关系请参考: \href{https://en.wikipedia.org/wiki/Wyckoff_positions}{Wiki: Wyckoff Position}.\\
+ \verb|#ADJGEN=|\(n\)\hspace{4em} \verb|#ADJGEN=|\(n_{min}-n_{max}\)  & \verb|int|  & 0 & 调整晶胞中使用 general positions(GP) 的个数. 该值为0时, 会最大程度地使用GP点位. 增大该值则将逐渐更多地使用 Special positions(SP)点位. 如果尝试后发现难以生成符合条件结构, 则程序将动态增加该值. 关于 SP/GP 与晶体空间群的关系请参考: \href{https://en.wikipedia.org/wiki/Wyckoff_positions}{Wiki: Wyckoff Position}.\\
 \midrule
-\verb|#BREAKAMP=|\(d\) & \verb|float| & 0.0 & 在晶格矢量a方向随机移动原子破坏原有对称性, 原子分数坐标移动距离: \(d^{(frac)}_a=(random(0,1)\times{}d)^{1/3}\)\\
+ \verb|#BREAKAMP=|\(d\) & \verb|float| & 0.0 & 在晶格矢量a方向随机移动原子破坏原有对称性, 原子分数坐标移动距离: \(d^{(frac)}_a=(random(0,1)\times{}d)^{1/3}\)\\
 \midrule
-\verb|#NOPUSH|& \verb|void| & off & 对于距离过近的原子不引入PUSH步, 直接拒绝该构型. 该关键字不会关闭 \verb|#SPHERE| 等关键字引入的晶体中心势场的PUSH步.\\
+ \verb|#NOPUSH|& \verb|void| & off & 对于距离过近的原子不引入PUSH步, 直接拒绝该构型. 该关键字不会关闭 \verb|#SPHERE| 等关键字引入的晶体中心势场的PUSH步.\\
 \midrule
-\verb|#PUSHSTEP=|\(p\)& \verb|float| & 0.25 & 每一步PUSH移动距离大小(stepsize)的比例参数.\\
+ \verb|#PUSHSTEP=|\(p\)& \verb|float| & 0.25 & 每一步PUSH移动距离大小(stepsize)的比例参数.\\
 \midrule
-\verb|#PUSHMAX=|\(n\)& \verb|int| & 100 &设置最大PUSH步数. 在 \verb|buildcell| 的输出有六中:\verb!~, X, -, :, |, *!. \verb|~|代表结构产生成功; \verb|X|代表产生失败, 失败原因可能是结构生成失败, 或者PUSH步失败, 而PUSH失败的判断标准就是经过PUSHMAX步的PUSH后, 体系是否满足要求; \verb!-, :, |, *!四个字符反映了体系中所有原子被PUSH的总次数, 从左到右依次代表被PUSH了0-9, 10-99, 100-999, 1000+ 次, 当前PUSH步刷新了之前单步PUSH内PUSH次数的记录时, 相应的符号才会输出. \\
+ \verb|#PUSHMAX=|\(n\)& \verb|int| & 100 &设置最大PUSH步数.\footnote{请注意区分`PUSH步数'和`单步PUSH次数'这两个概念. 前者是体系PUSH这个动作(PUSH函数)循环执行的总次数, 后者则代表在每一次PUSH动作中(在PUSH函数内部)体系中原子被PUSH的次数.} 在 \verb|buildcell| 的输出有六种: \verb!~, X, -, :, |, *!. 波浪号(\verb|~|)代表结构产生成功; 叉(\verb|X|)代表产生失败, 失败原因可能是结构生成失败, 或者PUSH步失败, 而PUSH失败的判断标准就是经过PUSHMAX步的PUSH后, 体系是否满足要求; 短线,冒号,竖线,星号(\verb!-, :, |, *!)四个字符反映了单次PUSH步中体系所有原子被PUSH的总次数, 从左到右依次代表被PUSH了0-9, 10-99, 100-999, 1000+ 次, 当前PUSH步刷新了之前单步PUSH内PUSH次数的记录时, 相应的符号才会输出. \\
 \midrule
-\verb|#OVERLAP=|\(cov\)& \verb|float| & off & 结束PUSH之后, 再附加采用TPSD\footnote{Two-point Step Size Gradient Methods - Barzilai and Borwein, IMA Journal of Numerical Analysis (1988) 8, 141-148}对势对晶体结构进行简单弛豫. \(cov\)为收敛判据, 其值越小对晶格收敛限制越高, 推荐值为0.1--0.2.\\
+ \verb|#OVERLAP=|\(cov\)& \verb|float| & off & 结束PUSH之后, 再附加采用TPSD\footnote{Two-point Step Size Gradient Methods - Barzilai and Borwein, IMA Journal of Numerical Analysis (1988) 8, 141-148}对势对晶体结构进行简单弛豫. \(cov\)为收敛判据, 其值越小对晶格收敛限制越高, 推荐值为0.1--0.2.\\
 \midrule
-\verb|#RASH|& \verb|float| & off & 在使用TPSD对势弛豫结束后再引入原子集之间的随机位移和旋转(SHAKE step). 设置过 \verb|#OVERLAP| 之后此参数才有效.\\
+ \verb|#RASH|& \verb|float| & off & 在使用TPSD对势弛豫结束后再引入原子集之间的随机位移和旋转(SHAKE step). 设置过 \verb|#OVERLAP| 之后此参数才有效.\\
 \midrule
-\verb|#RASH_POSAMP=|\(d\)& \verb|float| & 1.0 & 设置由 RASH 引入的 SHAKE 步移动原子集的最大距离, 与POSAMP类似. 该项必须为一个小的正值, \textbf{不可设为负数}.\\
+ \verb|#RASH_POSAMP=|\(d\)& \verb|float| & 1.0 & 设置由 RASH 引入的 SHAKE 步移动原子集的最大距离, 与POSAMP类似. 该项必须为一个小的正值, \textbf{不可设为负数}.\\
 \midrule
-\verb|#RASH_ANGAMP=|\(\theta\) & \verb|float| \((0,180]\) & 30.0 & 设置由 RASH 引入的 SHAKE 步原子集绕自身中点转动的最大角度, 与ANGAMP类似. 该项必须为一个小的正值, \textbf{不可设为负数}.\\
+ \verb|#RASH_ANGAMP=|\(\theta\) & \verb|float| \((0,180]\) & 30.0 & 设置由 RASH 引入的 SHAKE 步原子集绕自身中点转动的最大角度, 与ANGAMP类似. 该项必须为一个小的正值, \textbf{不可设为负数}.\\
 \midrule
-\verb|#CELLADAPT|& \verb|void| & off & 在设置\verb|#OVERLAP|的情况下附加设置此项, 可强制要求TPSD简单结构弛豫时同时尝试在保持体积不变的情况下改变单胞的形状. 体系默认不会在TPSD结构优化步改变单胞形状. 若存在晶格标记\verb|#FIX| 或者设置了 \verb|#CELLAMP=0| 则此参数失效. \\
+ \verb|#CELLADAPT|& \verb|void| & off & 在设置 \verb|#OVERLAP|的情况下附加设置此项, 可强制要求TPSD简单结构弛豫时同时尝试在保持体积不变的情况下改变单胞的形状. 体系默认不会在TPSD结构优化步改变单胞形状. 若存在晶格标记 \verb|#FIX| 或者设置了 \verb|#CELLAMP=0| 则此参数失效. \\
 \midrule
-\verb|#THREE=|\(p\)& \verb|float| & TODO & 使用三体势能代替TPSD弛豫结构, \textbf{该参数对应的功能尚未在airss-0.9.1中实现}.\\
+ \verb|#THREE=|\(p\)& \verb|float| & [todo] & 使用三体势代替TPSD弛豫结构, \textbf{该参数对应的功能尚未在airss-0.9.1中实现}.\\
 \midrule
-\verb|#COMPACT|& \verb|void| & on & 对最终生成的单胞进行 niggli reduce 操作. 在晶格形状没有被锁定时(未引入晶格标签\verb|#FIX, #CFIX, #ABFIX|), 该项默认打开. \href{http://atztogo.github.io/niggli/#algorithm}{R. W. Grosse-Kunstleve, N. K. Sauter and P. D. Adams, Acta Cryst., A60, 1-6 (2004)} \\
+ \verb|#COMPACT|& \verb|void| & on & 对最终生成的单胞进行 niggli reduce 操作. 在晶格形状没有被锁定时(未引入晶格标签 \verb|#FIX, #CFIX, #ABFIX|), 该项默认打开. \href{http://atztogo.github.io/niggli/#algorithm}{R. W. Grosse-Kunstleve, N. K. Sauter and P. D. Adams, Acta Cryst., A60, 1-6 (2004)} \\
 \midrule
-\verb|#NOCOMPACT| & \verb|void| & off & 强制关闭 COMPACT 操作.\\
+ \verb|#NOCOMPACT| & \verb|void| & off & 强制关闭 COMPACT 操作.\\
 \midrule
-\verb|#PERMUTE| & \verb|void| & off & 在完成原子位置选定后, 重排(按一定概率互相交换)指定原子位置间的元素种类. 可以联合原子标签 \verb|PERM| 使用.\\
+ \verb|#PERMUTE| & \verb|void| & off & 在完成原子位置选定后, 重排(按一定概率互相交换)指定原子位置间的元素种类. 可以联合原子标签 \verb|PERM| 使用.\\
 \midrule
-\verb|#PERMFRAC=|\(p\) & \verb|float| \([0,1]\)  & 1.0 & 设置重排发生的概率.\\
+ \verb|#PERMFRAC=|\(p\) & \verb|float| \([0,1]\)  & 1.0 & 设置重排发生的概率.\\
 \midrule
-\verb|#HOLE=|\(d\) & \verb|float| & -1.0 & 设置在晶格上切割球洞的半径. 设为负数时不对成型的结构做任何处理.\\
+ \verb|#HOLE=|\(d\) & \verb|float| & -1.0 & 设置在晶格上切割球洞的半径. 设为负数时不对成型的结构做任何处理.\\
 \midrule
-\verb|#HOLEPOS=|\(f_a\;f_b\;f_c\) & \verb|float| & random & 设置在晶格上切割球洞的位置(分数坐标). 默认为随机位置. 可与原子标签中的\verb|ATHOLE|联用.\\
+ \verb|#HOLEPOS=|\(f_a\;f_b\;f_c\) & \verb|float| & random & 设置在晶格上切割球洞的位置(分数坐标). 默认为随机位置. 可与原子标签中的 \verb|ATHOLE|联用.\\
 \midrule
-\verb|#VACANCIES=|\(n\)\verb|@|\(elm\)& \verb|float|, \verb|string| & off & 等待结构生成完毕后, 选取\(n\)个元素种类为elm的原子替换为空位. \footnote{该参数本来还设计了一种不加@符号的输入, 但目前在airss-0.9.1中, 这种输入在后续处理中存在一些BUG, 因此在此未予说明.}\\
+ \verb|#VACANCIES=|\(n\) \verb|@|\(elm\)& \verb|float|, \verb|string| & off & 等待结构生成完毕后, 选取\(n\)个元素种类为elm的原子替换为空位. \footnote{该参数本来还设计了一种不加@符号的输入, 但目前在airss-0.9.1中, 这种输入在后续处理中存在一些BUG, 因此在此未予说明.}\\
 \midrule
-\verb|#MAXTIME=|\(t\)& \verb|float| & 1.0 & 设置对一个猜测结构PUSH步使用时间的上限, 超过该时间程序将停止PUSH并重新猜测新结构. 默认\(t=1\)s.\\
+ \verb|#MAXTIME=|\(t\)& \verb|float| & 1.0 & 设置对一个猜测结构PUSH步使用时间的上限, 超过该时间程序将放弃当前结构, 并重新猜测新结构. 默认\(t=1\)s.\\
 \midrule
-\verb|#NFAILS=|\(n\)& \verb|int| & 0 & 每个结构允许的失败次数(在 \verb|buildcell| 命令输出中出现 \verb|X| 的次数). 若其值为0, 则无限制.\\
+ \verb|#NFAILS=|\(n\)& \verb|int| & 0 & 每个结构允许的失败次数(在 \verb|buildcell| 命令输出中出现 \verb|X| 的次数). 若其值为0, 则无限制.\\
 \midrule
-\verb|#SPHERE=|\(r\) & \verb|float| & off & 在单胞中心处引入一球状势能. 设置球势能的吸引半径为\(r\). 当原子与晶格中心距离大于\(r\)时, 会受到指向晶格中心的PUSH.\\
+ \verb|#SPHERE=|\(r\) & \verb|float| & off & 在单胞中心处引入一球状势能. 设置球势能的吸引半径为\(r\). 当原子与晶格中心距离大于\(r\)时, 会受到指向晶格中心的PUSH.\\
 \midrule
-\verb|#ELLIPSOID=|\(r\;\varepsilon\) & \verb|float|  & off & 在单胞中心处引入一椭球状吸引势. \(r\) 为椭球势能半长轴长度, \(\varepsilon\)为形变程度. 当原子与晶格中心距离大于\(r\)时, 会受到指向晶格中心的PUSH. \(\varepsilon=0\)为球形, \(\varepsilon\)越大畸变越严重. \\
+ \verb|#ELLIPSOID=|\(r\;\varepsilon\) & \verb|float|  & off & 在单胞中心处引入一椭球状吸引势. \(r\) 为椭球势能半长轴长度, \(\varepsilon\)为形变程度. 当原子与晶格中心距离大于\(r\)时, 会受到指向晶格中心的PUSH. \(\varepsilon=0\)为球形, \(\varepsilon\)越大畸变越严重. \\
 \midrule
-\verb|#PANCAKE=|\(r\;\varepsilon\) & \verb|float|  & off & 在单胞中心处引入一圆饼状吸引势. \(r\)为圆饼半径, \(\varepsilon\)为形变程度. 当原子与晶格中心距离大于\(r\)时, 会受到指向晶格中心的PUSH. \(\varepsilon=0\)为偏平圆饼, \(\varepsilon=1\)为接近球形的势能. \\
+ \verb|#PANCAKE=|\(r\;\varepsilon\) & \verb|float|  & off & 在单胞中心处引入一圆饼状吸引势. \(r\)为圆饼半径, \(\varepsilon\)为形变程度. 当原子与晶格中心距离大于\(r\)时, 会受到指向晶格中心的PUSH. \(\varepsilon=0\)为偏平圆饼, \(\varepsilon=1\)为接近球形的势能. \\
 \midrule
-\verb|#CIGAR=|\(r\;\varepsilon\) & \verb|float| & off & 在单胞中心处引入一雪茄状吸引势. \(r\)为雪茄长度, \(\varepsilon\)为形变程度. 当原子与晶格中心距离大于\(r\)时, 会受到指向晶格中心的PUSH. \(\varepsilon=0\)为针尖状势能, \(\varepsilon=1\)为接近球形的势能. \\
+ \verb|#CIGAR=|\(r\;\varepsilon\) & \verb|float| & off & 在单胞中心处引入一雪茄状吸引势. \(r\)为雪茄长度, \(\varepsilon\)为形变程度. 当原子与晶格中心距离大于\(r\)时, 会受到指向晶格中心的PUSH. \(\varepsilon=0\)为针尖状势能, \(\varepsilon=1\)为接近球形的势能. \\
 \midrule
-\verb|#CYLINDER=|\(r\) & \verb|float| & off & 在单胞中心处引入一圆筒状势能(原子在Z方向不受力). \(r\)为圆筒势能吸引半径. 当原子与晶格中心距离大于\(r\)时, 会受到指向晶格中心的XY方向的PUSH.\\
+ \verb|#CYLINDER=|\(r\) & \verb|float| & off & 在单胞中心处引入一圆筒状势能(原子在Z方向不受力). \(r\)为圆筒势能吸引半径. 当原子与晶格中心距离大于\(r\)时, 会受到指向晶格中心的XY方向的PUSH.\\
 \midrule
-\verb|#CORE=|\(r\) & \verb|float| & off & 对定义的球状(椭球状, 圆饼状, 雪茄状, 圆筒状)吸引势附加排斥核心. 设置排斥核心半径(长轴长度, 半径, 雪茄长度, 圆筒半径)为\(r\). 当原子与晶格中心距离小于\(r\)时, 会受到远离晶格中心方向的PUSH.\\
+ \verb|#CORE=|\(r\) & \verb|float| & off & 对定义的球状(椭球状, 圆饼状, 雪茄状, 圆筒状)吸引势附加排斥核心. 设置排斥核心半径(长轴长度, 半径, 雪茄长度, 圆筒半径)为\(r\). 当原子与晶格中心距离小于\(r\)时, 会受到远离晶格中心方向的PUSH.\\
 \midrule
-\verb|#WIDTH=|\(l\)& \verb|float| & off & 使用平面状势能(原子在X和Y方向均不受力), 附加计算PUSH步的距离. \(l\)为平面状势能吸引长度. 当原子与原点(origin)距离大于\(l\)时, 会受到指向原点的Z方向的PUSH.\\
+ \verb|#WIDTH=|\(l\)& \verb|float| & off & 使用平面状势能(原子在X和Y方向均不受力), 附加计算PUSH步的距离. \(l\)为平面状势能吸引长度. 当原子与原点(origin)距离大于\(l\)时, 会受到指向原点的Z方向的PUSH.\\
 \midrule
-\verb|#SHIFT=|\(h\)& \verb|float|& 0.0  & 将平面势移动至Z=\(h\)的位置(origin的位置), 默认\(h=0\).\\
+ \verb|#SHIFT=|\(h\)& \verb|float|& 0.0  & 将平面势移动至Z=\(h\)的位置(origin的位置), 默认\(h=0\).\\
 \bottomrule
 \end{longtable}
 \end{center}
@@ -611,7 +611,7 @@ Al 0.0 0.0 0.0 # Al1 % NUM=7-13 COORD=4
 \subsection{联合airss-pp3模块弛豫}
 使用 AIRSS 联合 \verb|airss-pp3| 计算模块预测结构时, 除了要准备一个 *.cell 的文件外, 还需要准备一个名为 *.pp 文件. 
 
-\verb|airss-pp3|是AIRSS自带的pp3对势(pair potential)计算模块. 其功能是使用化学上经典的分子势场(如6-12势)弛豫原子结构并输出体系能量. 由于这一模块使用的是维象的晶体能量模型, 不涉及任何第一性原理的复杂运算, 因此其实现简单、效果稳定、计算速度极快, 适用于简单组分的小体系. 更具体的, \verb|airss-pp3| 采用了如下势能计算原子的受力和体系总能:
+ \verb|airss-pp3|是AIRSS自带的pp3对势(pair potential)计算模块. 其功能是使用化学上经典的分子势场(如6-12势)弛豫原子结构并输出体系能量. 由于这一模块使用的是维象的晶体能量模型, 不涉及任何第一性原理的复杂运算, 因此其实现简单、效果稳定、计算速度极快, 适用于简单组分的小体系. 更具体的, \verb|airss-pp3| 采用了如下势能计算原子的受力和体系总能:
 \begin{subequations}
   \label{eq:pp3}
   \begin{align}
@@ -720,9 +720,9 @@ user@machine_name$
 \begin{lstlisting}
 [keywords] : [value]
 \end{lstlisting}
-其中的`\verb|:|'是为了书写美观便于区分内容所加, 程序实际执行时会自动忽略, 您也可以完全不加入这一符号转而用空格代替.
+其中的` \verb|:|'是为了书写美观便于区分内容所加, 程序实际执行时会自动忽略, 您也可以完全不加入这一符号转而用空格代替.
 
-CASTEP中\verb|[keywords]|的定义和使用方法, 可参考: \href{http://www.tcm.phy.cam.ac.uk/castep/documentation/WebHelp/content/modules/castep/keywords/k_main_structure.htm}{CASTEP cell keywords and data blocks}.
+CASTEP中 \verb|[keywords]|的定义和使用方法, 可参考: \href{http://www.tcm.phy.cam.ac.uk/castep/documentation/WebHelp/content/modules/castep/keywords/k_main_structure.htm}{CASTEP cell keywords and data blocks}.
 
 AIRSS默认联合CASTEP计算, 因此运行下述命令即可启动结构搜索.
 \begin{lstlisting}[language={bash},numbers=left]
@@ -739,7 +739,7 @@ user@machine_name$ airss.pl -vasp -max 3 -seed Al
 
 a4v可以看做是AIRSS的改版, 无需安装原生AIRSS便可独立运行. 其主要基于AIRSS原生的 \verb|buildcell| 模块, 同时内嵌了PBS, NSCC, Slurm等作业提交系统指令, 真正做到了一键提交 AIRSS+VASP 任务的功能, 同时对计算的并行也有较好的支持. 其具体用法可参见项目内部的 \href{https://github.com/kYangLi/airss4vasp/blob/master/README.md}{README.md} 文件. \footnote{事实上, 该说明手册也在此项目中.(笑} 
 
-在 *.cell 文件设置方面: a4v增加了对应原子位置弛豫固定的\verb|SD-XYZ|, \verb|SD-XY|, \verb|SD-X|等原子标签; 同时删减了原先buildcell中设置共线自旋数值的全局参数, \verb|#SPIN=|. 此外由于VASP本身对团簇(cluster)计算不是十分友好, 因此a4v中并未集成有关cluster的计算组件(如对称性判断组件等).
+在 *.cell 文件设置方面: a4v增加了对应原子位置弛豫固定的 \verb|SD-XYZ|, \verb|SD-XY|, \verb|SD-X|等原子标签; 同时删减了原先buildcell中设置共线自旋数值的全局参数, \verb|#SPIN=|. 此外由于VASP本身对团簇(cluster)计算不是十分友好, 因此a4v中并未集成有关cluster的计算组件(如对称性判断组件等).
 
 \newpage
 \section{数据后处理}
@@ -780,14 +780,14 @@ user@machine_name$
 \end{maineu}}}\\
 
 \subsection{数据批量化处理}
-有了计算数据*.res文件后, 就可以使用\verb|ca|指令进行数据处理了. \verb|ca| 是对AIRSS中基本分析套件 \verb|cryan| 的封装. 
+有了计算数据*.res文件后, 就可以使用 \verb|ca|指令进行数据处理了. \verb|ca| 是对AIRSS中基本分析套件 \verb|cryan| 的封装. 
 \begin{lstlisting}[language={bash}]
 user@machine_name$ ca
 ca [-R(recurcsive)] [command line arguments for cryan]
 user@machine_name$
 \end{lstlisting}
 
-\verb|cryan|的使用方法如下:\footnote{为了行文简洁, 对参数的说明做了少许简化, 请自行运行上述指令查看更详细的信息.}
+ \verb|cryan|的使用方法如下:\footnote{为了行文简洁, 对参数的说明做了少许简化, 请自行运行上述指令查看更详细的信息.}
 \begin{lstlisting}[language={bash}]
 user@machine_name$ cryan
 
@@ -837,7 +837,7 @@ cryan options (note - the order matters):
 user@machine_name$
 \end{lstlisting}
 
-使用\verb|ca|就可以对之前的计算结果进行分析.
+使用 \verb|ca|就可以对之前的计算结果进行分析.
 \begin{lstlisting}[language={bash}]
 user@machine_name$ ca -r > analysis.data
 user@machine_name$ cat analysis.data
@@ -860,7 +860,7 @@ user@machine_name$
   \item 第八列是所有搜索结果中出现该结构的次数.
 \end{maineu}}}\\
 
-如果您认为所列结果过多, 可以使用\verb|-u|选项, 但是要注意, \verb|-u| 一定要排在\verb|-r|之前使用.\footnote{事实上, 所有排在 rank (-r) 任务之后的参数都会被自动忽略.} 如果您仔细看过 \verb|cryan| 的 help 信息就不难发现这样一个提醒: ``note - the order matters''.
+如果您认为所列结果过多, 可以使用 \verb|-u|选项, 但是要注意, \verb|-u| 一定要排在 \verb|-r|之前使用.\footnote{事实上, 所有排在 rank (-r) 任务之后的参数都会被自动忽略.} 如果您仔细看过 \verb|cryan| 的 help 信息就不难发现这样一个提醒: ``note - the order matters''.
 \begin{lstlisting}[language={bash}]
 user@machine_name$ ca -u 0.01 -r > analysis.data
 user@machine_name$ cat analysis.data
@@ -880,11 +880,11 @@ user@machine_name$
 AIRSS只支持在命令行(Command Line)使用, 且仅能安装在*nix系统中. 安装此软件前, 您最好已经了解 \href{https://www.gnu.org/software/make/manual/}{GNU make} 的使用方法. 当然, 如果您实在对此不感兴趣, 这不是必须的. 前提是您能完全按照以下步骤操作.
 
 \subsection{软件主体安装}
-具体的安装分为以下几步, 非必须步骤已使用\verb|*|标出:
+具体的安装分为以下几步, 非必须步骤已使用 \verb|*|标出:
 \begin{description}
-\item [*(I) 建立安装包文件管理系统] 在开始一切安装之前, 建议作为非\verb|root|用户但是有\verb|sudo|权限的您: 在自己能进行任意操作的家目录\verb|~/|中建立一个安装包管理文件夹, 如\verb|~/install_package|; 同时在系统目录\verb|/usr/local|中建立一个存放airss和其他程序二进制可执行文件的目录, 如\verb|/usr/local/| \verb|airss-0.9/bin|. 
+\item [*(I) 建立安装包文件管理系统] 在开始一切安装之前, 建议作为非 \verb|root|用户但是有 \verb|sudo|权限的您: 在自己能进行任意操作的家目录 \verb|~/|中建立一个安装包管理文件夹, 如 \verb|~/install_package|; 同时在系统目录 \verb|/usr/local|中建立一个存放airss和其他程序二进制可执行文件的目录, 如 \verb|/usr/local/| \verb|airss-0.9/bin|. 
 
-之所以这样建议, 是为了减少您安装过程中在系统目录下需要进行的操作, 降低由此可能引发的事故的概率, 同时让安装过程更简洁(避免每个命令都要使用前缀\verb|sudo ...|, \verb|sudo sh -c "...>..."|). 
+之所以这样建议, 是为了减少您安装过程中在系统目录下需要进行的操作, 降低由此可能引发的事故的概率, 同时让安装过程更简洁(避免每个命令都要使用前缀 \verb|sudo ...|, \verb|sudo sh -c "...>..."|). 
 
 当然, 您也可以完全不将软件安装在系统目录, 一切都凭您的个人喜好.
 \begin{lstlisting}[language={bash}]
@@ -903,14 +903,14 @@ AIRSS/
 
 \item [(II) AIRSS安装包下载]您可以访问前文所述\href{https://www.mtg.msm.cam.ac.uk/Codes/AIRSS}{官方网站}下载 airss-0.9.0.
 
-您可以选择在浏览器上下载, 也可以使用\verb|wget|指令.
+您可以选择在浏览器上下载, 也可以使用 \verb|wget|指令.
 
 \begin{lstlisting}[language={bash}]
 user@machine_name$ wget -P ~/Downloads https://www.mtg.msm.
 cam.ac.uk/files/airss-0.9.tgz
 \end{lstlisting}
 
-\item [(III) 拷贝并解压安装包] 将您下载的\verb|airss-0.9-2.tag|拷贝到安装包管理文件夹中, 并使用\verb|tar|解压.
+\item [(III) 拷贝并解压安装包] 将您下载的 \verb|airss-0.9-2.tag|拷贝到安装包管理文件夹中, 并使用 \verb|tar|解压.
 \begin{lstlisting}[language={bash}]
 user@machine_name$ cd AIRSS
 user@machine_name$ cp ~/Downloads/airss-0.9-2.tgz .
@@ -924,7 +924,7 @@ x airss-0.9/VERSION
 ...
 \end{lstlisting}
 
-\item[(IV) 使用 GNU make 指令安装 AIRSS] 使用\verb|make|等指令安装编译安装AIRSS.
+\item[(IV) 使用 GNU make 指令安装 AIRSS] 使用 \verb|make|等指令安装编译安装AIRSS.
 \begin{lstlisting}[language={bash}]
 user@machine_name$ cd airss-0.9
 user@machine_name$ make
@@ -946,7 +946,7 @@ user@machine_name$ cat make_install.log
 user@machine_name$
 \end{lstlisting}
 
-十分鼓励您今后使用\verb|make isntall|指令时, 将其输出重定向到一个记录文件中, 这样会给您卸载软件时提供便利.
+十分鼓励您今后使用 \verb|make isntall|指令时, 将其输出重定向到一个记录文件中, 这样会给您卸载软件时提供便利.
 
 \item[*(V)安放可执行文件] \verb|~/install_package/AIRSS/airss-0.9/bin|存放了安装完毕的可执行文件, 将其拷贝至系统目录下.
 \begin{lstlisting}[language={bash}]
@@ -964,21 +964,21 @@ spawn        symm
 
 \end{lstlisting}
 
-\item[(VI) 设置系统环境变量] 完成以上所有设置后, 您实际上就可以通过使用使用命令\verb|/usr/local/airss-0.9/bin/airss.pl -[option] [parameter] ...|来运行AIRSS了. 为了简便, 可以考虑在\verb|~/.bash_profile|文件中加入如下内容
+\item[(VI) 设置系统环境变量] 完成以上所有设置后, 您实际上就可以通过使用使用命令 \verb|/usr/local/airss-0.9/bin/airss.pl -[option] [parameter] ...|来运行AIRSS了. 为了简便, 可以考虑在 \verb|~/.bash_profile|文件中加入如下内容
 \begin{lstlisting}[language={bash}]
 ## Setting PATH for AIRSS
 export PATH="/usr/local/airss-0.9/bin:${PATH}"
 \end{lstlisting}
 
-修改储存并退出后, 请重新登入终端, 或运行\verb|source|指令完成环境变量的更新.
+修改储存并退出后, 请重新登入终端, 或运行 \verb|source|指令完成环境变量的更新.
 \begin{lstlisting}[language={bash}]
 user@machine_name$ source ~/.bash_profile 
 \end{lstlisting}
 
-这样您就可以在系统中的任何路径上执行\verb|airss.pl|等AIRSS的指令了.
+这样您就可以在系统中的任何路径上执行 \verb|airss.pl|等AIRSS的指令了.
 
-\item[(VII) 检查安装情况] 设置好环境变量后, 您可以在\verb|~/install_package/AIRSS/|
-\\\verb|airss-0.9/|下输入\verb|make check|指令检查AIRSS安装情况. 
+\item[(VII) 检查安装情况] 设置好环境变量后, 您可以在 \verb|~/install_package/AIRSS/|
+\\ \verb|airss-0.9/|下输入 \verb|make check|指令检查AIRSS安装情况. 
 \begin{lstlisting}[language={bash}]
 user@machine_name$ make check
 (sh bin/check_airss)
@@ -1053,31 +1053,31 @@ Skipping example 3.1 (Gulp)
 Skipping example 2.1a (Castep)
 \end{lstlisting}       
 \end{description}
-如果您仔细阅读了上述输出文件, 会发现必要的组件中还有\verb|cellsym|和\verb|symmol|没有安装. 这直接导致了晶体和团簇空间群符号输出为\verb|n/a|. 
+如果您仔细阅读了上述输出文件, 会发现必要的组件中还有 \verb|cellsym|和 \verb|symmol|没有安装. 这直接导致了晶体和团簇空间群符号输出为 \verb|n/a|. 
 \subsection{辅助插件安装}
-AIRSS支持的全部插件信息可查询\verb|~/install_package/AIRSS/airss-0.9/|
-\verb|README|文件.下面只演示最核心的\verb|cellsym|和\verb|symmol|插件的安装过程.
+AIRSS支持的全部插件信息可查询 \verb|~/install_package/AIRSS/airss-0.9/|
+ \verb|README|文件.下面只演示最核心的 \verb|cellsym|和 \verb|symmol|插件的安装过程.
 \begin{description}
 \item[(I) 下载插件安装包]
-\verb|cellsym|的安装包官方网站是:
+ \verb|cellsym|的安装包官方网站是:
 
 \url{http://www.tcm.phy.cam.ac.uk/sw/check2xsf/cellsym.html}
 
-需要注意的是, \verb|cellsym|源码是使用C语言编写的, 安装此程序前, 需要下载并安装库文件\verb|spglib.h|.
+需要注意的是, \verb|cellsym|源码是使用C语言编写的, 安装此程序前, 需要下载并安装库文件 \verb|spglib.h|.
 
-\verb|spglib.h|的下载地址是:
+ \verb|spglib.h|的下载地址是:
 
 \url{http://www.tcm.phy.cam.ac.uk/sw/check2xsf/spglib-1.9.4.tar.gz}
 
-\verb|cellsym|的下载地址是:
+ \verb|cellsym|的下载地址是:
 
 \url{http://www.tcm.phy.cam.ac.uk/sw/check2xsf/cellsym.tgz}
 
-\verb|symmol|插件安装包的下载地址是:
+ \verb|symmol|插件安装包的下载地址是:
 
 \url{http://www.ccp14.ac.uk/ccp/web-mirrors/symmol/~pila/symmol.zip}
 
-您可以通过浏览器下载上述文件, 也可以使用\verb|wget|指令下载.
+您可以通过浏览器下载上述文件, 也可以使用 \verb|wget|指令下载.
 \begin{lstlisting}[language={bash}]
 user@machine_name$ wget -P ~/Downloads 
 www.tcm.phy.cam.ac.uk/sw/check2xsf/spglib-1.9.4.tar.gz 
@@ -1085,7 +1085,7 @@ www.tcm.phy.cam.ac.uk/sw/check2xsf/cellsym.tgz
 www.ccp14.ac.uk/ccp/web-mirrors/symmol/~pila/symmol.zip
 \end{lstlisting}
 
-\item[(II) 拷贝并解压插件]将您下载的三个压缩包拷贝到安装包管理文件夹中, 并使用\verb|tar|和\verb|unzip|解压.
+\item[(II) 拷贝并解压插件]将您下载的三个压缩包拷贝到安装包管理文件夹中, 并使用 \verb|tar|和 \verb|unzip|解压.
 \begin{lstlisting}[language={bash}]
 user@machine_name$ cd ~/Downloads
 user@machine_name$ cp cellsym.tar spglib-1.9.4.tar 
@@ -1151,7 +1151,7 @@ make[1]: Nothing to be done for `check-am'.
 user@machine_name$
 \end{lstlisting}
 
-使用\verb|make install check|检查PASS后, 就可以开始编译\verb|cellsym|了.
+使用 \verb|make install check|检查PASS后, 就可以开始编译 \verb|cellsym|了.
 \begin{lstlisting}[language={bash}]
 user@machine_name$ cd ../cellsym-0.16a/
 user@machine_name$ make
@@ -1161,12 +1161,12 @@ user@machine_name$ ls -all cellsym
 user@machine_name$ 
 \end{lstlisting}
 
-顺利编译完成后, 会生成一个名为\verb|cellsym|的可执行文件.
+顺利编译完成后, 会生成一个名为 \verb|cellsym|的可执行文件.
 注意, \verb|make|执行过程中可能会出现编译警告, 但这并不影响程序执行, 可忽略.
 
-编译并确认生成了\verb|cellsym|文件后, 就可以开始编译另一个插件\verb|symmol|了.
-\verb|symmol|是使用Fortran写成的. 在网站上下载的是其源码, 需要编译使其变为可执行文件.
-需要注意的是, 原版的\verb|symmol.f|并不兼容AIRSS, 需要为其打上\verb|~/install_package/AIRSS/airss-0.9/misc|中提供的\verb|symmol.patch|补丁.
+编译并确认生成了 \verb|cellsym|文件后, 就可以开始编译另一个插件 \verb|symmol|了.
+ \verb|symmol|是使用Fortran写成的. 在网站上下载的是其源码, 需要编译使其变为可执行文件.
+需要注意的是, 原版的 \verb|symmol.f|并不兼容AIRSS, 需要为其打上 \verb|~/install_package/AIRSS/airss-0.9/misc|中提供的 \verb|symmol.patch|补丁.
 \begin{lstlisting}[language={bash}]
 user@machine_name$ cd ../airss-0.9/misc/
 user@machine_name$ cp ../../symmol/symmol.f .
@@ -1184,10 +1184,10 @@ user@machine_name$ ls -all symmol
 user@machine_name$
 \end{lstlisting}
 
-至此, 我们完成了所有插件的编译. 生成了\verb|symmol|和\verb|cellsym|两个可执行文件.
+至此, 我们完成了所有插件的编译. 生成了 \verb|symmol|和 \verb|cellsym|两个可执行文件.
 
 \item[(IV) 将插件导入AIRSS]
-这一步的操作十分简单, 将编译好的两个插件复制到系统目录下的\verb|bin/|文件夹即可. 为了以防万一, 可以在安装包管理文件夹保存一个\verb|bin/|的备份
+这一步的操作十分简单, 将编译好的两个插件复制到系统目录下的 \verb|bin/|文件夹即可. 为了以防万一, 可以在安装包管理文件夹保存一个 \verb|bin/|的备份
 \begin{lstlisting}[language={bash}]
 user@machine_name$ pwd
 /home/user_name/install_package/AIRSS/airss-0.9/misc
@@ -1200,7 +1200,7 @@ user@machine_name$ sudo cp cellsym /usr/local/airss-0.9/bin
 \end{lstlisting}
 
 \item[(V) 安装最终检查]
-回到\verb|airss-0.9|中执行\verb|make|的文件夹. 重新输入\verb|make check|检查安装情况.
+回到 \verb|airss-0.9|中执行 \verb|make|的文件夹. 重新输入 \verb|make check|检查安装情况.
 \begin{lstlisting}[language={bash}]
 user@machine_name$ cd ../airss-0.9
 user@machine_name$ make check
@@ -1261,7 +1261,7 @@ AIRSS是受GPL许可证保护的开源软件. 对此程序您有以下三种权�
 \subsection{卸载软件}
 AIRSS卸载可分为三步:
 \begin{description}
-\item [(I)卸载spglib] 进入安装包管理文件夹, 使用\verb|make uninstall|卸载spglib.
+\item [(I)卸载spglib] 进入安装包管理文件夹, 使用 \verb|make uninstall|卸载spglib.
 \begin{lstlisting}[language={bash}]
 user@machine_name$ cd ~/install_package/AIRSS/spglib-1.9.4
 user@machine_name$ sudo make uninstall
@@ -1278,7 +1278,7 @@ user@machine_name$ cd ~/install_package/
 user@machine_name$ rm -r AIRSS
 \end{lstlisting}
 
-\item [(III)恢复PATH变量] 进入\verb|~/.bashrc|文件, 删除修改环境变量的语句即可.
+\item [(III)恢复PATH变量] 进入 \verb|~/.bashrc|文件, 删除修改环境变量的语句即可.
 \begin{lstlisting}[language={bash}]
 ###Setting PATH for AIRSS
 export PATH="/usr/local/airss-0.9/bin:${PATH}"
