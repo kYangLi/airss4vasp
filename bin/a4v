@@ -580,7 +580,7 @@ case ${sys_type} in
   echo '#!/bin/bash'                             > _SHOWJOB.sh
   echo '#'                                      >> _SHOWJOB.sh
   echo "pids=\$(cat JOBID.record | awk -F '.' '{print \$2}' | awk '{print \$1}' | xargs)" >> _SHOWJOB.sh
-  echo "ps -o \"%p  %r   %a %t\" > .jobs.temp"  >> _SHOWJOB.sh
+  echo "ps x -o \"%p  %r   %a %t\" > .jobs.temp"  >> _SHOWJOB.sh
   echo "printf \"%-11s\" 'NO.'; head -1 .jobs.temp"   >> _SHOWJOB.sh
   echo 'for pid in ${pids}; do'                 >> _SHOWJOB.sh
   echo "  printf \"%-11s\" \$(cat JOBID.record | grep \"\\.\${pid}\"| awk '{print \$2\" \"}')"   >> _SHOWJOB.sh

@@ -86,10 +86,10 @@ spend_time=$(echo ${start_time} ${end_time} |
 echo "[spend_time_raw] Task ${task_stamp}: ${spend_time_raw}" >> VASP.log
 echo "[spend_time] Task ${task_stamp}: ${spend_time}" >> VASP.log
 ## Collect the calc. res.
-# If not reach required accuracy
-reach_reqacc=$(grep "reached required accuracy" OUTCAR)
-if [ -z "${reach_reqacc}" ]; then 
-  echo "[error] Task ${task_stamp}: Not reach the required accuracy!!!"  >> VASP.log
+# If it has a bad init. str.
+bad_poscar=$(tail -1 OUTCAR | grep 'Error EDDDAV: Call to ZHEGV failed.')
+if ! [ -z "${bad_poscar}" ]; then
+  echo "[error] Task ${task_stamp}: Bad initial structure!!!" >> VASP.log
   exit 1
 fi
 # If do not obtain the final result
@@ -97,10 +97,10 @@ if ! [ -s CONTCAR ]; then
   echo "[error] Task ${task_stamp}: CONTCAR not found!!!" >> VASP.log
   exit 1
 fi
-# If it has a bad init. str.
-bad_poscar=$(tail -1 OUTCAR | grep 'Error EDDDAV: Call to ZHEGV failed.')
-if ! [ -z "${bad_poscar}" ]; then
-  echo "[error] Task ${task_stamp}: Bad initial structure!!!" >> VASP.log
+# If not reach required accuracy
+reach_reqacc=$(grep "reached required accuracy" OUTCAR)
+if [ -z "${reach_reqacc}" ]; then 
+  echo "[error] Task ${task_stamp}: Not reach the required accuracy!!!"  >> VASP.log
   exit 1
 fi
 # Generate the referance *.res file 
