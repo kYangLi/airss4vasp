@@ -51,8 +51,10 @@ rm -r  POSCAR-POOL
 rm -r  RES-POOL
 rm     TRAIN.record
 rm     JOBID.record
+rm     IO-BUSY-COACH*.remark
 rm     ${task_name}.o*
 rm     slurm-*.o*
+rm     log-*.out
 rm     a4v.*.sh
 rm     a4v.allparas
 rm     _KILLJOB.sh
@@ -559,7 +561,7 @@ case ${sys_type} in
 'direct')
   str_repalce "__task_name__"        "${task_name}__tag__" "${curr_sub_scrp}"
   str_repalce "__vasp_calc_script__" "${vasp_calc_script}" "${curr_sub_scrp}"
-  submit_command="nohup bash ${curr_sub_scrp} < /dev/null > ${task_name}.out 2>&1 & echo \$!"
+  submit_command="nohup bash ${curr_sub_scrp} < /dev/null >> ../log-${task_name}.out 2>&1 & echo \$!"
   kill_command='kill -TERM --'
   ;;
 esac

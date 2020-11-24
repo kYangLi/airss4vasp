@@ -24,10 +24,15 @@ fi
 cat /dev/null > VASP.log.temp
 coach_list=$(ls . | grep COACH- | sed 's/-/ /g' | sort -n -k 2 | sed 's/ /-/g')
 current_coach_num=0
+total_cores=0
+current_cores=0
 for coach in ${coach_list}; do 
+  cores=$(grep CORES_PER_COACH ${coach}/a4v.allparas | awk -F '=' '{print $2}')
+  ((total_cores+=cores))
   if [ -e ${coach}/VASP.log ]; then 
     grep '\[' ${coach}/VASP.log >> VASP.log.temp
     ((current_coach_num++))
+    ((current_cores+=cores))
   else
     echo "[info] ${coach} is not working..."
   fi
@@ -101,6 +106,7 @@ printf "${run_state}\n"
 echo "  Seed Name                  :  ${seed_name}"
 if ! ${calc_done}; then
   echo "  Started Work Coach         :  ${current_coach_num}/${total_coach_num}"
+  echo "  Working Cores              :  ${current_cores}/${total_cores}"
 fi
 echo "  -----------------------------------------------"
 echo "  Total Str.                 :  ${total_str_num}"
