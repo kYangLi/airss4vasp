@@ -49,7 +49,7 @@ case ${SYS_TYPE} in
   vasp_mpirun="${INTEL_MODULE}; yhrun -N ${NODES_PER_COACH} -n ${CORES_PER_COACH} --time=${VASP_WALLTIME_INM} ${VASP_PROG}"
   ;;
 'direct')
-  vasp_mpirun="export I_MPI_JOB_TIMEOUT=${VASP_WALLTIME_INS}; ${INTEL_MODULE}; mpirun -machinefile ${MPI_MECHINEFILE} -np ${CORES_PER_COACH} -envall ${VASP_PROG}"
+  vasp_mpirun="export I_MPI_JOB_TIMEOUT=${VASP_WALLTIME_INS}; ${INTEL_MODULE}; mpirun -np ${CORES_PER_COACH} -envall ${VASP_PROG}"
   ;;
 esac
 

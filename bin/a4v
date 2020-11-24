@@ -44,9 +44,7 @@ echo "[do] Create _CLEAN.sh"
 cat > _CLEAN.sh << EOF
 #!/bin/bash
 #
-if [ -e _KILLJOB.sh ]; then 
-  echo "[warning] _KILLJOB still exist, make sure the job is done..."
-fi
+echo "[tips] Make sure the jobs is killed..."
 read -p '[input] Press <Enter> to confirm the delete. '
 rm -rf COACH-*
 rm -r  POSCAR-POOL
@@ -58,6 +56,7 @@ rm     slurm-*.o*
 rm     a4v.*.sh
 rm     a4v.allparas
 rm     _KILLJOB.sh
+rm     _SHOWJOB.sh
 rm     _CLEAN.sh
 EOF
 chmod 740 _CLEAN.sh
@@ -560,13 +559,50 @@ case ${sys_type} in
 'direct')
   str_repalce "__task_name__"        "${task_name}__tag__" "${curr_sub_scrp}"
   str_repalce "__vasp_calc_script__" "${vasp_calc_script}" "${curr_sub_scrp}"
-  submit_command="nohup bash ${curr_sub_scrp} > ${task_name}__tag__.out 2>&1 &"
-  kill_command='kill'
+  submit_command="nohup bash ${curr_sub_scrp} < /dev/null > ${task_name}.out 2>&1 & echo \$!"
+  kill_command='kill -TERM --'
   ;;
 esac
 echo "[done] ${curr_sub_scrp}"
 read -p "Press <Enter> to confirm the submition..."
 echo ""
+# Genrate Kill job script
+echo "[do] Generating _KILLJOB.sh"
+case ${sys_type} in
+  'direct')
+  echo '#!/bin/bash'                             > _KILLJOB.sh
+  echo '#'                                      >> _KILLJOB.sh
+  echo "jobs_id=\$(cat JOBID.record | awk -F '.' '{print \$1}' | uniq | xargs)" >> _KILLJOB.sh
+  echo 'for job_id in ${jobs_id}; do'           >> _KILLJOB.sh
+  echo '  echo "'${kill_command}' -${job_id}"'  >> _KILLJOB.sh
+  echo "${kill_command}"' -${job_id}'           >> _KILLJOB.sh
+  echo 'done'                                   >> _KILLJOB.sh
+  echo '#!/bin/bash'                             > _SHOWJOB.sh
+  echo '#'                                      >> _SHOWJOB.sh
+  echo "pids=\$(cat JOBID.record | awk -F '.' '{print \$2}' | awk '{print \$1}' | xargs)" >> _SHOWJOB.sh
+  echo "ps -o \"%p  %r   %a %t\" > .jobs.temp"  >> _SHOWJOB.sh
+  echo "printf \"%-11s\" 'NO.'; head -1 .jobs.temp"   >> _SHOWJOB.sh
+  echo 'for pid in ${pids}; do'                 >> _SHOWJOB.sh
+  echo "  printf \"%-11s\" \$(cat JOBID.record | grep \"\\.\${pid}\"| awk '{print \$2\" \"}')"   >> _SHOWJOB.sh
+  echo "  declare -i job_line=\$(cat .jobs.temp | awk '{print \$1}' | grep -n \${pid} | cut -d ':' -f 1)" >> _SHOWJOB.sh
+  echo '  if [ "${job_line}" == "0" ]; then '   >> _SHOWJOB.sh
+  echo '    echo "-------------------------- STOP --------------------------" '    >> _SHOWJOB.sh
+  echo '  else '                                >> _SHOWJOB.sh
+  echo "    cat .jobs.temp | sed -n \"\${job_line}p\" " >> _SHOWJOB.sh
+  echo '  fi '                                  >> _SHOWJOB.sh
+  echo 'done'                                   >> _SHOWJOB.sh
+  echo 'rm .jobs.temp'                          >> _SHOWJOB.sh
+  chmod 740 _SHOWJOB.sh
+  ;;
+*) 
+  echo '#!/bin/bash'                           > _KILLJOB.sh
+  echo '#'                                    >> _KILLJOB.sh
+  echo 'job_id=$(cat JOBID.record | xargs)'   >> _KILLJOB.sh
+  echo 'echo "'${kill_command}' ${job_id}"'   >> _KILLJOB.sh
+  echo "${kill_command}"' ${job_id}'          >> _KILLJOB.sh
+  ;;
+esac
+chmod 740 _KILLJOB.sh
 # Submit the jobs
 echo "[do] Submitting the jobs..."
 cat /dev/null > JOBID.record
@@ -591,23 +627,26 @@ for ((gen_index=1; gen_index<=${coach_num}; gen_index++)); do
     mv ${kpoints} ${kpoints##*\.} 2>/dev/null
   done
   echo " |--[sub-do] ${submit_command}"
-  job_id=$(${submit_command})
-  if [ "${sys_type}" == "nscc" ] || [ "${sys_type}" == "slurm" ]; then 
+  case ${sys_type} in
+  'direct')
+    sjob_id=$(echo "${submit_command}" | bash)
+    ps x -o  "%p %r" > .psxopr.temp
+    job_id_line=$(cat .psxopr.temp | awk '{print " "$1" "}' | grep -n " ${sjob_id} " | cut -d ':' -f 1)
+    job_id="$(sed -n "${job_id_line}p" .psxopr.temp | awk '{print $2}').${sjob_id}  COACH-${coach_index}"
+    rm .psxopr.temp
+    ;;
+  'nscc' | 'slurm') 
     job_id=$(echo ${job_id} | awk '{print $NF}')
-  fi 
+    ;;
+  *)
+    job_id=$(${submit_command})
+    ;;
+  esac
   echo ${job_id} >> ../JOBID.record
   echo " +--[info] Job ID: ${job_id}"
   cd ..
   sleep 1
 done
-# Kill job script
-echo "[do] Generating _KILLJOB.sh"
-echo '#!/bin/bash' >> _KILLJOB.sh
-echo '#          ' >> _KILLJOB.sh
-echo 'job_id=$(cat JOBID.record | xargs)' >> _KILLJOB.sh
-echo 'echo "'${kill_command}' ${job_id}"' >> _KILLJOB.sh
-echo "${kill_command}"' ${job_id}' >> _KILLJOB.sh
-chmod 740 _KILLJOB.sh
 echo '[done]'
 echo ""
 echo "============== a4v Over =============="
