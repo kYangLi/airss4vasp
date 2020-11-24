@@ -157,9 +157,7 @@ a4v-prg
 
 ### Result Output
 
-After or during the searching process, you can enter the `RES-POOL` folder and use `match` to check the result. You may need to learn how to use the `cryan` in `AIRSS` first.
-
-For example, (`-r` is no longer need to stay at the end of the command in `a4v-res`.)
+After or during the searching process, you can enter the `RES-POOL` folder and use `a4v-res` to check the result. You may need to learn how to use the `cryan` in `AIRSS` first.
 
 ```bash
 a4v-res -r -u 0.01 -t 5
@@ -175,4 +173,9 @@ a4v-res -r -u 0.01 -t 5
 
 ```bash
 ./_CLEAN.sh
+```
+### Show job excution (under `direct` mode only)
+
+```bash
+./_SHOWJOB.sh
 ```
