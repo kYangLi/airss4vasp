@@ -145,7 +145,7 @@ a4v
 
 The `COACH` is a parallel unit among the whole task. Each `COACH` will run independently. They will pick up the structure from the `POSCAR-POOL`, push the result to the `RES-POOL`. The POSCAR that already be calculated will be marked in the `TRAIN.record` file.
 
-The total `COACH` number is simply calculated as **nodes_num*(cores_per_node/cores_per_coach)**, where cores_per_node/cores_per_coach = n or 1/n. 
+The total `COACH` number is simply calculated as **nodes_num(cores_per_node/cores_per_coach)**, where cores_per_node/cores_per_coach = n or 1/n. 
 
 ### Process Check
 
