@@ -638,6 +638,7 @@ for ((gen_index=1; gen_index<=${coach_num}; gen_index++)); do
     rm .psxopr.temp
     ;;
   'nscc' | 'slurm') 
+    job_id=$(${submit_command})
     job_id=$(echo ${job_id} | awk '{print $NF}')
     ;;
   *)
