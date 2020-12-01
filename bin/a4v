@@ -260,7 +260,7 @@ read -p '[input]> ' sys_type
 if [ -z "${sys_type}" ];then
   sys_type="${default_sys_type}"
 fi
-is_correct_sys_type=$(echo 'pbs,slrum,nscc,direct' | grep ${sys_type})
+is_correct_sys_type=$(echo 'pbs,slurm,nscc,direct' | grep ${sys_type})
 if [ -z "${is_correct_sys_type}" ];then
   echo "[error] Invalid system type."
   echo "[tips] choice one from: pbs, slurm, nscc, direct."
