@@ -92,7 +92,7 @@ KEEP_CALC_DETAILS = F
 
 ### `<seedname>.cell`
 
-This is the key file for the whole structure searching task. Please first learn how to use `AIRSS` before using `a4v`. You could reference the AIRSS manual writen by me in ./doc/AIRSS-0.9.1_manual/main.pdf.
+This is the key file for the whole structure searching task. Please first learn how to use `AIRSS` before using `a4v`. You could reference the AIRSS manual writen by me in ./doc/AIRSS-0.9.1_manual/ch-CN/main.pdf.
 
 There is one thing need to be explained more specifically.
 
