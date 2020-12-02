@@ -14,6 +14,8 @@
 
 [`AIRSS`](https://www.mtg.msm.cam.ac.uk/Codes/AIRSS)(Ab Initio Random Structure Searching) is a fantastic, efficient, and easy to parallel structure searching package, but with pool supporting for `VASP`. `airss4vasp`(a4v), based on `PBS` ,`Slurm`,or `NSCC(Tianhe)` job management system, is an interface program design for the better communication between AIRSS and VASP.
 
+Visit [https://www.bilibili.com/video/BV12v411r7i9](https://www.bilibili.com/video/BV12v411r7i9) to watch the video tutorial!
+
 ## Installtion
 
 Before the `make`, please check the `Makefile` to modify some setting for libs. There also are some tips for the installtion inside the `Makefile`.
