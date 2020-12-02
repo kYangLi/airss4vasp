@@ -9,6 +9,6 @@ declare -r VASP_CALC_SCRIPT=__vasp_calc_script__
 # Enter the Calculate Folder
 cd ${PBS_O_WORKDIR}
 # Copy the Machinefile
-cp ${PBS_NODEFILE} __mpi_mechinefile__
+cp ${PBS_NODEFILE} __mpi_machinefile__
 
 ${VASP_CALC_SCRIPT}

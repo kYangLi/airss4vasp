@@ -2,7 +2,7 @@
 #
 
 declare -r A4V_PATH=$(cd "$(dirname "$0")";pwd)
-declare -r MPI_MECHINEFILE='cores-list'
+declare -r MPI_MACHINEFILE='cores-list'
 declare -r INPUT_FILE='a4v.input'
 
 a4v_in_path=$(echo ${PATH} | grep "${A4V_PATH}")
@@ -332,7 +332,7 @@ echo "[do] Generate a4v.allparas"
 cat > a4v.allparas << EOF
 A4V_PATH          = ${A4V_PATH}
 PBS_SUBMIT_SCRIPT = ${PBS_SUBMIT_SCRIPT}
-MPI_MECHINEFILE   = ${MPI_MECHINEFILE}
+MPI_MACHINEFILE   = ${MPI_MACHINEFILE}
 INPUT_FILE        = ${INPUT_FILE}
 #
 SEED_NAME         = ${seed_name}
@@ -527,7 +527,7 @@ case ${sys_type} in
   str_repalce "__nodes_num__"        "${nodes_pre_coach}"  "${curr_sub_scrp}"
   str_repalce "__ppn__"              "${ppn}"              "${curr_sub_scrp}"
   str_repalce "__pbs_walltime__"     "${pbs_walltime}"     "${curr_sub_scrp}"
-  str_repalce "__mpi_mechinefile__"  "${MPI_MECHINEFILE}"  "${curr_sub_scrp}"
+  str_repalce "__mpi_machinefile__"  "${MPI_MACHINEFILE}"  "${curr_sub_scrp}"
   str_repalce "__vasp_calc_script__" "${vasp_calc_script}" "${curr_sub_scrp}"
   if [ "${pbs_queue}" == "unset-pbs-queue" ]; then 
     str_repalce '#PBS -q' '##PBS -q' "${curr_sub_scrp}"

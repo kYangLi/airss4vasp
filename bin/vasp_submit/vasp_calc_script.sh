@@ -25,7 +25,7 @@ declare -r  SYMM_PREC=$(grep_input_file 'SYMM_PREC')
 declare -r  VASP_WALLTIME_INS=$(grep_input_file 'VASP_WALLTIME')
 declare -r  VASP_WALLTIME_INM=$((VASP_WALLTIME_INS/60))
 declare -r  KEEP_CALC_DETAILS=$(grep_input_file 'KEEP_CALC_DETAILS')
-declare -r  MPI_MECHINEFILE=$(grep_input_file 'MPI_MECHINEFILE')
+declare -r  MPI_MACHINEFILE=$(grep_input_file 'MPI_MACHINEFILE')
 declare -r  SYS_TYPE=$(grep_input_file 'SYS_TYPE')
 declare -r  A4V_PATH=$(grep_input_file 'A4V_PATH')
 declare -r  RELAX4RES="${A4V_PATH}/vasp_submit/relax4res"
@@ -40,7 +40,7 @@ current_coach_index=${current_coach##*-}
 # Parallel Calculation Parameters
 case ${SYS_TYPE} in
 'pbs')
-  vasp_mpirun="export I_MPI_JOB_TIMEOUT=${VASP_WALLTIME_INS}; ${INTEL_MODULE}; mpirun -machinefile ${MPI_MECHINEFILE} -np ${CORES_PER_COACH} -envall ${VASP_PROG}"
+  vasp_mpirun="export I_MPI_JOB_TIMEOUT=${VASP_WALLTIME_INS}; ${INTEL_MODULE}; mpirun -machinefile ${MPI_MACHINEFILE} -np ${CORES_PER_COACH} -envall ${VASP_PROG}"
   ;;
 'slurm')
   vasp_mpirun="${INTEL_MODULE}; srun --time=${VASP_WALLTIME_INM} ${VASP_PROG}"

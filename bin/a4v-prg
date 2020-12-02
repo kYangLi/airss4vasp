@@ -47,21 +47,23 @@ succeed_str_num=$(ls RES-POOL/*.res 2>/dev/null | wc -w)
 error_str_num=$(grep '\[error\]' VASP.log.temp | wc -l)
 finished_str_num=$((error_str_num+succeed_str_num))
 process_str_num=$((total_str_num-finished_str_num-untouched_str_num))
-not_conv_str_num=$(grep '\[error\]' VASP.log.temp | 
-                   grep 'Not reach the required accuracy' | wc -l)
-no_contcar_str_num=$(grep '\[error\]' VASP.log.temp | 
-                     grep 'CONTCAR not found' | wc -l)
 bad_poscar_str_num=$(grep '\[error\]' VASP.log.temp | 
                      grep 'Bad initial structure' | wc -l)
+no_contcar_str_num=$(grep '\[error\]' VASP.log.temp | 
+                     grep 'CONTCAR not found' | wc -l)
+huge_ediff_str_num=$(grep '\[error\]' VASP.log.temp | 
+                     grep 'Too huge EDIFF' | wc -l)
+not_conv_str_num=$(grep '\[error\]' VASP.log.temp | 
+                   grep 'Not reach the required accuracy' | wc -l)
 calc_done=false
 color_red='\033[01;31m'
 color_green='\033[01;32m'
 color_none='\033[0m'
 if [ "${total_str_num}" == "${finished_str_num}" ]; then 
   calc_done=true
-  run_state="${color_green}[done] Random searching done!${color_none}"
+  run_state="${color_green}[done] Random structure searching done!${color_none}"
 else 
-  run_state="${color_red}[doing] Random searching in processing...${color_none}"
+  run_state="${color_red}[doing] Random structure searching in progress...${color_none}"
 fi
 start_time=$(grep '\[start_time\]' VASP.log.temp | awk '{print $2}' | 
              sort -n | head -1)
@@ -103,26 +105,27 @@ fi
 # Process Summary Output
 echo "================== Process Check =================="
 printf "${run_state}\n"
-echo "  Seed Name                  :  ${seed_name}"
+printf "  Seed Name                  :  ${seed_name}\n"
 if ! ${calc_done}; then
-  echo "  Started Work Coach         :  ${current_coach_num}/${total_coach_num}"
-  echo "  Working Cores              :  ${current_cores}/${total_cores}"
+printf "  Started Work Coach         :  %-5s [%s]\n" "${current_coach_num}"  "${total_coach_num}"
+printf "  Working Cores              :  %-5s [%s]\n" "${current_cores}"      "${total_cores}"
 fi
-echo "  -----------------------------------------------"
-echo "  Total Str.                 :  ${total_str_num}"
-echo "  |--Processing Str.         :  ${process_str_num}/${current_coach_num}"
-echo "  |--Untouched Str.          :  ${untouched_str_num}/${total_str_num}"
-echo "  +--Finished Str.           :  ${finished_str_num}/${total_str_num}"
-echo "     |--Succeed Str.         :  ${succeed_str_num}/${finished_str_num}"
-echo "     +--Error Str.           :  ${error_str_num}/${finished_str_num}"
-echo "        |--Not Converged     :  ${not_conv_str_num}/${error_str_num}"
-echo "        |--Missing CONTCAR   :  ${no_contcar_str_num}/${error_str_num}"
-echo "        +--Bad Init. POSCAR  :  ${bad_poscar_str_num}/${error_str_num}"
-echo "  -----------------------------------------------"
-echo "  Running Time               :  ${total_time_spend_format}"
-echo "  Average Time Per Str.      :  ${average_time_spend_format}"
-echo "  Estimated Remaining Time   :  ${esti_remain_time_format}"
-echo "==================================================="
+printf "  -----------------------------------------------\n"
+printf "  Total Str.                 :  ${total_str_num}\n"
+printf "  |--Processing Str.         :  %-8s [%s]\n" "${process_str_num}"    "${current_coach_num}"
+printf "  |--Untouched Str.          :  %-8s [%s]\n" "${untouched_str_num}"  "${total_str_num}"
+printf "  +--Finished Str.           :  %-8s [%s]\n" "${finished_str_num}"   "${total_str_num}"
+printf "     |--Succeed Str.         :  %-8s [%s]\n" "${succeed_str_num}"    "${finished_str_num}"
+printf "     +--Error Str.           :  %-8s [%s]\n" "${error_str_num}"      "${finished_str_num}"
+printf "        |--Bad Init. POSCAR  :  %-8s [%s]\n" "${bad_poscar_str_num}" "${error_str_num}"
+printf "        |--Missing CONTCAR   :  %-8s [%s]\n" "${no_contcar_str_num}" "${error_str_num}"
+printf "        |--Too huge EDIFF    :  %-8s [%s]\n" "${huge_ediff_str_num}" "${error_str_num}"
+printf "        +--Not Converged     :  %-8s [%s]\n" "${not_conv_str_num}"   "${error_str_num}"
+printf "  -----------------------------------------------\n"
+printf "  Running Time               :  ${total_time_spend_format}\n"
+printf "  Average Time Per Str.      :  ${average_time_spend_format}\n"
+printf "  Estimated Remaining Time   :  ${esti_remain_time_format}\n"
+printf "===================================================\n"
 
 # Useless file remove 
 rm VASP.log.temp

@@ -51,10 +51,13 @@ if [ ! -e ${check_incar_file} ]; then
 fi
 incar_quantity=$(ls INCAR-* | wc -w)
 echo "[do] Task ${task_stamp} start..." >> VASP.log
+echo "[do] Task ${task_stamp} start..." >> VASP.detail.log
 start_time=$(date +%s)
 echo "[start_time] ${start_time} sec." >> VASP.log
+echo "[start_time] ${start_time} sec." >> VASP.detail.log
 for ((incar_index=1; incar_index<=incar_quantity; incar_index++)); do
   echo "[sub-do] Calculating ${task_stamp}::${incar_index}..." >> VASP.log
+  echo "[sub-do] Calculating ${task_stamp}::${incar_index}..." >> VASP.detail.log
   cp INCAR-${incar_index} INCAR
   if [ -s  KPOINTS-${incar_index} ]; then 
     cp KPOINTS-${incar_index} KPOINTS
@@ -66,16 +69,18 @@ for ((incar_index=1; incar_index<=incar_quantity; incar_index++)); do
       ${GENKP} -s ${kp_sep}
     fi
   fi
-  date >> VASP.log
-  echo "${vasp_mpiprun} >> VASP.log"
-  echo "${vasp_mpiprun} >> VASP.log" | bash
-  date >> VASP.log
+  date >> VASP.detail.log
+  echo "${vasp_mpiprun} > VASP.curr.log" >> VASP.detail.log
+  echo "${vasp_mpiprun} > VASP.curr.log" | bash
+  cat VASP.curr.log >> VASP.detail.log
+  date >> VASP.detail.log
   cp POSCAR POSCAR-${incar_index}
   cp CONTCAR CONTCAR-${incar_index}
   cp CONTCAR POSCAR
 done
 end_time=$(date +%s)
 echo "[end_time] ${end_time} sec." >> VASP.log
+echo "[end_time] ${end_time} sec." >> VASP.detail.log
 spend_time_raw=$(echo ${start_time} ${end_time} | 
                  awk '{print $2-$1}')
 spend_time=$(echo ${start_time} ${end_time} | 
@@ -84,25 +89,41 @@ spend_time=$(echo ${start_time} ${end_time} |
                          int(($2-$1)%3600/60)"m:"\
                          ($2-$1)%60"s"}')
 echo "[spend_time_raw] Task ${task_stamp}: ${spend_time_raw}" >> VASP.log
+echo "[spend_time_raw] Task ${task_stamp}: ${spend_time_raw}" >> VASP.detail.log
 echo "[spend_time] Task ${task_stamp}: ${spend_time}" >> VASP.log
+echo "[spend_time] Task ${task_stamp}: ${spend_time}" >> VASP.detail.log
 ## Collect the calc. res.
 # If it has a bad init. str.
 bad_poscar=$(tail -1 OUTCAR | grep 'Error EDDDAV: Call to ZHEGV failed.')
 if ! [ -z "${bad_poscar}" ]; then
   echo "[error] Task ${task_stamp}: Bad initial structure!!!" >> VASP.log
+  echo "[error] Task ${task_stamp}: Bad initial structure!!!" >> VASP.detail.log
   exit 1
 fi
 # If do not obtain the final result
 if ! [ -s CONTCAR ]; then 
   echo "[error] Task ${task_stamp}: CONTCAR not found!!!" >> VASP.log
+  echo "[error] Task ${task_stamp}: CONTCAR not found!!!" >> VASP.detail.log
+  exit 1
+fi
+# If too huge EDIFF
+too_huge_ediff=$(grep "ZBRENT: fatal error in bracketing" VASP.curr.log)
+if [ -z "${too_huge_ediff}" ]; then 
+  echo "[error] Task ${task_stamp}: Too huge EDIFF!!!" >> VASP.log
+  echo "[error] Task ${task_stamp}: Too huge EDIFF!!!" >> VASP.detail.log
   exit 1
 fi
 # If not reach required accuracy
 reach_reqacc=$(grep "reached required accuracy" OUTCAR)
 if [ -z "${reach_reqacc}" ]; then 
-  echo "[error] Task ${task_stamp}: Not reach the required accuracy!!!"  >> VASP.log
+  echo "[error] Task ${task_stamp}: Not reach the required accuracy!!!" >> VASP.log
+  echo "[error] Task ${task_stamp}: Not reach the required accuracy!!!" >> VASP.detail.log
   exit 1
 fi
+echo "[done]" >> VASP.log
+echo "[done]" >> VASP.detail.log
+echo "" >> VASP.log
+echo "" >> VASP.detail.log
 # Generate the referance *.res file 
 sed '/Selective dynamics/d' CONTCAR > ${task_stamp}.vasp
 cabal poscar res < ${task_stamp}.vasp > ${task_stamp}.res
