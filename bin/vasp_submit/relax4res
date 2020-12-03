@@ -98,19 +98,25 @@ bad_poscar=$(tail -1 OUTCAR | grep 'Error EDDDAV: Call to ZHEGV failed.')
 if ! [ -z "${bad_poscar}" ]; then
   echo "[error] Task ${task_stamp}: Bad initial structure!!!" >> VASP.log
   echo "[error] Task ${task_stamp}: Bad initial structure!!!" >> VASP.detail.log
+  echo "" >> VASP.log
+  echo "" >> VASP.detail.log
   exit 1
 fi
 # If do not obtain the final result
 if ! [ -s CONTCAR ]; then 
   echo "[error] Task ${task_stamp}: CONTCAR not found!!!" >> VASP.log
   echo "[error] Task ${task_stamp}: CONTCAR not found!!!" >> VASP.detail.log
+  echo "" >> VASP.log
+  echo "" >> VASP.detail.log
   exit 1
 fi
 # If too huge EDIFF
 too_huge_ediff=$(grep "ZBRENT: fatal error in bracketing" VASP.curr.log)
-if [ -z "${too_huge_ediff}" ]; then 
+if [ ! -z "${too_huge_ediff}" ]; then 
   echo "[error] Task ${task_stamp}: Too huge EDIFF!!!" >> VASP.log
   echo "[error] Task ${task_stamp}: Too huge EDIFF!!!" >> VASP.detail.log
+  echo "" >> VASP.log
+  echo "" >> VASP.detail.log
   exit 1
 fi
 # If not reach required accuracy
@@ -118,6 +124,8 @@ reach_reqacc=$(grep "reached required accuracy" OUTCAR)
 if [ -z "${reach_reqacc}" ]; then 
   echo "[error] Task ${task_stamp}: Not reach the required accuracy!!!" >> VASP.log
   echo "[error] Task ${task_stamp}: Not reach the required accuracy!!!" >> VASP.detail.log
+  echo "" >> VASP.log
+  echo "" >> VASP.detail.log
   exit 1
 fi
 echo "[done]" >> VASP.log

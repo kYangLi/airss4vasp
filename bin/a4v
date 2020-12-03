@@ -495,7 +495,7 @@ fi
 cd POSCAR-POOL
 cp ../${seed_name}.cell .
 genpos ${seed_name} ${str_num}
-gen_str_num=$(ls -1 *.vasp | wc -l)
+gen_str_num=$(find . -maxdepth 1 -name "*.vasp" | wc -l)
 echo "[info] There are ${gen_str_num} structures in the POSCAR-POOL, now."
 cd ..
 ## Make the Result directory

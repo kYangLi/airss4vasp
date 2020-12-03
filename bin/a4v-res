@@ -7,6 +7,18 @@ if [ -e 'TRAIN.record' ]; then
   cd RES-POOL
 fi 
 
+has_res_file=$(find . -maxdepth 1 -name "*.res" | head -1)
+if [ -z "${has_res_file}" ]; then
+  echo '[error] No *.res file was found...'
+  exit 1
+fi
+
+if [ -d 'STR-OUT' ]; then
+  rm ./STR-OUT/*
+else
+  mkdir STR-OUT
+fi 
+
 # Tips for usage
 if [ -z "$1" ]; then  
   echo "[error] Not enough input"
@@ -15,17 +27,11 @@ if [ -z "$1" ]; then
 fi
 
 # Check if need read the *.res file rescurively 
-read_res_recursively=false
 if [ "$1" == "-R" ]; then
-  shift 1;
-  read_res_recursively=true
-fi
-
-# Get the *.res file list
-if ${read_res_recursively}; then
-  res_file_list=$(find . -follow -name "*.res" | grep -v temp.res)
+  shift 1
+  res_file_list=$(find . -follow -name "*.res")
 else
-  res_file_list=$(find . -maxdepth 1 -name "*.res" | grep -v temp.res)
+  res_file_list=$(find . -maxdepth 1 -name "*.res")
 fi
 
 # Get the input options for cryan
@@ -38,5 +44,26 @@ if [ ! -z "${delete_files}" ]; then
 fi
 
 # Analysis *.res files use cryan
-echo "Str.Stamp                P(kbar) V(A^3)      E(eV)    N Formula      Symm. Repeat"
-echo ${res_file_list} | xargs cat 2>/dev/null | cryan ${options_input}
+echo "NO. Str.Stamp P[kbar] V[A^3] E[eV] N Formula Symm. Repeat" > a4v-res.record
+echo ${res_file_list} | xargs cat 2>/dev/null | cryan -l ${options_input} | cat -n >> a4v-res.record
+res_file_length=$(cat a4v-res.record | awk '{print $2}' | awk '{print length}' | sort -n | tail -1)
+((res_file_length+=1))
+cat a4v-res.record | awk '{printf "%3s %-'${res_file_length}'s %7s %8s %8s %2s %-10s %-6s %6s\n", $1, $2, $3, $4, $5, $6, $7, $8, $9}' > a4v-res.record.tmp
+mv a4v-res.record.tmp a4v-res.record
+sed '1a-----------------------------------------------------------------------------------------' a4v-res.record > a4v-res.record.tmp
+mv a4v-res.record.tmp a4v-res.record
+
+# Output the result
+echo "===================================== Result Analyze ===================================="
+cat a4v-res.record
+printf "[do] Result writing in 'RES-POOL/STR-OUT/'...\r"
+total_str=$(tail -1 a4v-res.record | awk '{print $1}')
+for((i_str=1;i_str<=total_str;++i_str)); do
+  ((read_line=i_str+2))
+  curr_line=$(sed -n "${read_line}p" a4v-res.record)
+  str_name=$(echo "${curr_line}" | awk '{print $2}').vasp
+  repeat_time=$(echo "${curr_line}" | awk '{print $9}')
+  cp ${str_name} STR-OUT/${i_str}-${repeat_time}.vasp
+done
+mv a4v-res.record STR-OUT/a4v-res.record
+echo "========================================================================================="

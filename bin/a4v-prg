@@ -21,16 +21,16 @@ if [ ! -e a4v.input ]; then
 fi
 
 # Traverse and Record all Coaches' Info
-cat /dev/null > VASP.log.temp
-coach_list=$(ls . | grep COACH- | sed 's/-/ /g' | sort -n -k 2 | sed 's/ /-/g')
+coach_list=$(find . -maxdepth 1 -name "COACH-*" | sed 's/-/ /g' | sort -n -k 2 | sed 's/ /-/g')
 current_coach_num=0
 total_cores=0
 current_cores=0
+cat /dev/null > VASP.log.temp
 for coach in ${coach_list}; do 
   cores=$(grep CORES_PER_COACH ${coach}/a4v.allparas | awk -F '=' '{print $2}')
   ((total_cores+=cores))
   if [ -e ${coach}/VASP.log ]; then 
-    grep '\[' ${coach}/VASP.log >> VASP.log.temp
+    cat ${coach}/VASP.log >> VASP.log.temp
     ((current_coach_num++))
     ((current_cores+=cores))
   else
@@ -41,9 +41,11 @@ done
 # Get some necessary parameters
 seed_name=$(grep_input_file 'SEED_NAME')
 total_coach_num=$(echo ${coach_list} | wc -w)
-total_str_num=$(ls POSCAR-POOL/${seed_name}-*.cell 2>/dev/null | wc -w)
-untouched_str_num=$(ls POSCAR-POOL/${seed_name}-*.vasp 2>/dev/null | wc -w)
-succeed_str_num=$(ls RES-POOL/*.res 2>/dev/null | wc -w)
+total_str_num=$(find POSCAR-POOL/ -maxdepth 1 -name "${seed_name}-*.cell" |
+                wc -l)
+untouched_str_num=$(find POSCAR-POOL/ -maxdepth 1 -name "${seed_name}-*.vasp" |
+                    wc -l)
+succeed_str_num=$(find RES-POOL/ -maxdepth 1 -name "${seed_name}-*.res" | wc -l)
 error_str_num=$(grep '\[error\]' VASP.log.temp | wc -l)
 finished_str_num=$((error_str_num+succeed_str_num))
 process_str_num=$((total_str_num-finished_str_num-untouched_str_num))
@@ -75,20 +77,21 @@ else
              sort -n | tail -1)
   ((total_time_spend=end_time-start_time))
 fi
+total_time_spend_format=$(echo ${total_time_spend} | 
+                          awk '{print int($1/86400)"d:"\
+                                      int($1%86400/3600)"h:"\
+                                      int($1%3600/60)"m:"\
+                                      $1%60"s"}')
+job_is_done_one=$(grep '\[spend_time_raw\]' VASP.log.temp)
 average_time_spend=$(grep '\[spend_time_raw\]' VASP.log.temp | 
                      awk -F ':' '{print $2}' |
                      awk '{sum+=$1}END{print sum/NR}')
 average_time_spend=${average_time_spend%.*}
-if [ -z "${average_time_spend}" ]; then
-  total_time_spend_format='null'
-  average_time_spend_format='null'
-  esti_remain_time_format='null'
+
+if [ -z "${job_is_done_one}" ]; then
+  average_time_spend_format='observing...'
+  esti_remain_time_format='estimating...'
 else
-  total_time_spend_format=$(echo ${total_time_spend} | 
-                            awk '{print int($1/86400)"d:"\
-                                        int($1%86400/3600)"h:"\
-                                        int($1%3600/60)"m:"\
-                                        $1%60"s"}')
   average_time_spend_format=$(echo ${average_time_spend} | 
                               awk '{print int($1/86400)"d:"\
                                           int($1%86400/3600)"h:"\

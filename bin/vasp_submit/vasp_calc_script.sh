@@ -60,9 +60,9 @@ esac
 while true; do
   # Pick up POSCAR from the POSCAR POOL, if in BUILD BEFORE RUN mode.
   # Get the current POSCAR list in the POSCAR POOL
-  current_poscar_list=$(ls -1 ../POSCAR-POOL/*.vasp 2>/dev/null | 
+  current_poscar_list=$(find ../POSCAR-POOL/ -maxdepth 1 -name "*.vasp" | 
                         awk -F '/' '{print $NF}' | sed 's/-/ /g' | 
-                        sort -k 4 -n | sed 's/ /-/g')
+                        sort -k2,2 -k3,3 -k4,4 -n | sed 's/ /-/g')
   # Check if the job done, on the BUILD BEFORE RELAX mode.
   if [ -z "${current_poscar_list}" ]; then
     echo "[info] ${current_coach} JOB DONE!"
