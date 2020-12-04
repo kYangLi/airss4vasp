@@ -169,6 +169,7 @@ if [ "${cores_per_node}" -gt "${cores_per_coach}" ]; then
   fi 
   coach_num=$((coaches_per_node*nodes_num))
   nodes_pre_coach=1
+  str_nodes_pre_coach="1/${coaches_per_node}"
 else
   nodes_pre_coach=$(echo ${cores_per_coach} ${cores_per_node} | \
                     awk '{print $1/$2}')
@@ -178,6 +179,7 @@ else
     exit 0
   fi 
   coach_num=$((nodes_num/nodes_pre_coach))
+  str_nodes_pre_coach="${nodes_pre_coach}"
 fi
 if ! [ "${coach_num}" -gt "0" ] 2>/dev/null; then
   echo "[error] COACH NUM input invalid..."
@@ -185,7 +187,7 @@ if ! [ "${coach_num}" -gt "0" ] 2>/dev/null; then
 fi
 
 printf "[info] Coach number: \033[01;31m${coach_num}\033[0m.\n"
-printf "[info] Each coach will use \033[01;31m${nodes_pre_coach}\033[0m nodes.\n"
+printf "[info] Each coach will use \033[01;31m${str_nodes_pre_coach}\033[0m nodes.\n"
 echo ""
 ## Structure Number
 default_str_num=$(grep_input_file 'STR_NUM')

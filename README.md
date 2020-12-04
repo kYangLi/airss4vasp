@@ -6,9 +6,9 @@
 
 `Start Date` 2019.9.21
 
-`Last Update` 2020.10.29
+`Last Update` 2020.12.4
 
-`Version` 1.0.1
+`Version` 1.1.0
 
 ## Description
 
@@ -60,12 +60,12 @@ NODES_NUM         | Int   | Total Nodes number used in task.
 CORES_PER_NODE    | Int   | The number of cores of each nodes in your machine(or you want to use).
 CORES_PER_COACH   | Int   | The number of cores used by each coach.
 STR_NUM           | Int   | AIRSS random structure number. 
-IS_2D_MATERIAL    | T/F   | Whether the structure is 2D system, useful only when generate KPOINTS using `genkp`.
-KP_SEP_LIST       | List  | Kpoints sepration list, useful only when generate KPOINTS using `genkp`.
+IS_2D_MATERIAL    | T/F   | Whether the structure is 2D system, only effective when generate KPOINTS using `genkp`.
+KP_SEP_LIST       | List  | Kpoints sepration list, only effective when generate KPOINTS using `genkp`.
 SYMM_PREC         | Float | Symmetry precise used in `cellsym`.
 SYS_TYPE          | Char  | Job system type, choice one from [pbs, nscc, slurm, direct]. The `nscc` is job manage system for TianHe, and the `direct` means run vasp on current node directly.
-PBS_WALLTIME      | Int   | PBS walltime in hours, useful only when using PBS job system.
-PBS_QUEUE         | Char  | PBS queue, useful only when using PBS job system. Use 'unset-pbs-queue' to comment it out.
+PBS_WALLTIME      | Int   | PBS walltime in hours, only effective when using PBS job system.
+PBS_QUEUE         | Char  | PBS queue, only effective when using PBS job system. Use 'unset-pbs-queue' to comment it out.
 VASP_WALLTIME     | Int   | Walltime for a single VASP relazation(one INCAR step) in seconds.
 KEEP_CALC_DETAILS | T/F   | Whether keep all VASP calculation details or not.
 
@@ -92,7 +92,7 @@ KEEP_CALC_DETAILS = F
 
 ### `<seedname>.cell`
 
-This is the key file for the whole structure searching task. Please first learn how to use `AIRSS` before using `a4v`. You could reference the AIRSS manual writen by me in ./doc/AIRSS-0.9.1_manual/zh-CN/main.pdf.
+This is the key file for the whole structure searching task. Please first learn how to use `AIRSS` before using `a4v`. You could reference the AIRSS manual writen by me in ./doc/AIRSS-0.9.1_manual/*/main.pdf.
 
 There is one thing need to be explained more specifically.
 
@@ -127,7 +127,7 @@ Si 0.0 0.0 0.0 # Si2 % NUM=1
 
 The `INCAR` is a input file for VASP relaxzation. The quantity of `INCAR` decided how many times will the structure be relaxed.
 
-E.g. If there are `Si.INCAR-1`, `Si.INCAR-2`, `Si.INCAR-3` in the calculation file, then the same `Si` structure will first be relaxed using `INCAR-1`, then `INCAR-2`, and at last `INCAR-3`. You can also setting KPOINTS for each INCAR with name `Si.KPOINTS-[1-9]`
+E.g. If there are `Si.INCAR-1`, `Si.INCAR-2`, `Si.INCAR-3` in the calculation file, then the same `Si` structure will first be relaxed using `INCAR-1`, then `INCAR-2`, and at last `INCAR-3`. You can also indicate the KPOINTS for each INCAR with name `Si.KPOINTS-[1-9]`
 
 ### `<seedname>.POTCAR`
 
@@ -135,9 +135,9 @@ The order of the elements in `POTCAR` must agree with that in `<seedname>.cell`.
 
 ## Start the Search
 
-### Submit Task
+### Submit task
 
-Afte the input file getting ready, input the following command to submit the job.
+Afte the input files getting ready, type the following command to submit the job.
 
 ```bash
 a4v
@@ -149,15 +149,15 @@ The `COACH` is a parallel unit among the whole task. Each `COACH` will run indep
 
 The total `COACH` number is simply calculated as **nodes_num(cores_per_node/cores_per_coach)**, where cores_per_node/cores_per_coach = n or 1/n. 
 
-### Process Check
+### Process check
 
-During the calculation, after enter the main calulation folder(the folder has `PARAM.CONF`), you can use the command below to check the current processing.
+During the calculation, after enter the main calulation folder(the folder that has `a4v.input`), you can use the command below to check the current processing.
 
 ```bash
 a4v-prg
 ```
 
-### Result Output
+### Result output
 
 After or during the searching process, you can enter the `RES-POOL` folder and use `a4v-res` to check the result. You may need to learn how to use the `cryan` in `AIRSS` first.
 
@@ -165,18 +165,18 @@ After or during the searching process, you can enter the `RES-POOL` folder and u
 a4v-res -r -u 0.01 -t 5
 ```
 
-### Kill the Job
+### Kill the job
 
 ```bash
 ./_KILLJOB.sh
 ```
 
-### Clean the Foder to Initial
+### Clean the foder to initial
 
 ```bash
 ./_CLEAN.sh
 ```
-### Show job excution (under `direct` mode only)
+### Show job excution (in `direct` mode only)
 
 ```bash
 ./_SHOWJOB.sh
