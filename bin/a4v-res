@@ -3,6 +3,7 @@
 # Descripution: ca
 #
 
+# Check if in RESULT file
 if [ -e 'TRAIN.record' ]; then
   cd RES-POOL
 fi 
@@ -13,18 +14,11 @@ if [ -z "${has_res_file}" ]; then
   exit 1
 fi
 
-if [ -d 'STR-OUT' ]; then
-  rm ./STR-OUT/*
-else
-  mkdir STR-OUT
-fi 
-
-# Tips for usage
-if [ -z "$1" ]; then  
-  echo "[error] Not enough input"
-  echo '[tips] a4v-res [-R(recursive)] [command line arguments for cryan]'
-  exit 999
+# Initial the A4V-RES folder
+if [ -d 'A4V-RES' ]; then
+  rm -r A4V-RES
 fi
+mkdir A4V-RES
 
 # Check if need read the *.res file rescurively 
 if [ "$1" == "-R" ]; then
@@ -36,6 +30,10 @@ fi
 
 # Get the input options for cryan
 options_input=$*
+if [ -z "${options_input}" ]; then
+  options_input='-u 0.05 -r'
+fi
+echo "[do] a4v-res -l ${options_input}"
 
 # Double check for option: '--delete'
 delete_files=$(echo ${options_input} | grep -oh "\-\-delete")
@@ -43,12 +41,24 @@ if [ ! -z "${delete_files}" ]; then
   read -p "[input] Deleting files. To confirm type <Enter>"
 fi
 
+# Summary options 
+summ_opt=$(echo "${options_input} " | grep -oh "\-\-summary")
+summ_opt=${summ_opt}$(echo "${options_input} " | grep -oh "\-s ")
+if [ ! -z "${summ_opt}" ]; then
+  echo "[info] Option 'summary' is not supported in a4v-res, run cryan directly..."
+  echo ""
+  echo "[do] echo \${res_file_list} | xargs cat 2>/dev/null | cryan ${options_input}"
+  echo ${res_file_list} | xargs cat 2>/dev/null | cryan ${options_input}
+  exit 0
+fi
+
 # Analysis *.res files use cryan
 echo "NO. Str.Stamp P[kbar] V[A^3] E[eV] N Formula Symm. Repeat" > a4v-res.record
-echo ${res_file_list} | xargs cat 2>/dev/null | cryan -l ${options_input} | cat -n >> a4v-res.record
+echo ${res_file_list} | xargs cat 2>/dev/null | cryan -l ${options_input} > a4v-res.record.tmp
+cat -n a4v-res.record.tmp >> a4v-res.record
 res_file_length=$(cat a4v-res.record | awk '{print $2}' | awk '{print length}' | sort -n | tail -1)
 ((res_file_length+=1))
-cat a4v-res.record | awk '{printf "%3s %-'${res_file_length}'s %7s %8s %8s %2s %-10s %-6s %6s\n", $1, $2, $3, $4, $5, $6, $7, $8, $9}' > a4v-res.record.tmp
+cat a4v-res.record | awk '{printf "%3s %-'${res_file_length}'s %7s %8s %8s %3s %-10s %-8s %6s\n", $1, $2, $3, $4, $5, $6, $7, $8, $9}' > a4v-res.record.tmp
 mv a4v-res.record.tmp a4v-res.record
 sed '1a-----------------------------------------------------------------------------------------' a4v-res.record > a4v-res.record.tmp
 mv a4v-res.record.tmp a4v-res.record
@@ -56,14 +66,14 @@ mv a4v-res.record.tmp a4v-res.record
 # Output the result
 echo "===================================== Result Analyze ===================================="
 cat a4v-res.record
-printf "[do] Result writing in 'RES-POOL/STR-OUT/'...\r"
+printf "[do] Result writing in 'RES-POOL/A4V-RES/'...\r"
 total_str=$(tail -1 a4v-res.record | awk '{print $1}')
 for((i_str=1;i_str<=total_str;++i_str)); do
   ((read_line=i_str+2))
   curr_line=$(sed -n "${read_line}p" a4v-res.record)
   str_name=$(echo "${curr_line}" | awk '{print $2}').vasp
   repeat_time=$(echo "${curr_line}" | awk '{print $9}')
-  cp ${str_name} STR-OUT/${i_str}-${repeat_time}.vasp
+  cp ${str_name} A4V-RES/${i_str}-${repeat_time}.vasp
 done
-mv a4v-res.record STR-OUT/a4v-res.record
+mv a4v-res.record A4V-RES/a4v-res.record
 echo "========================================================================================="
