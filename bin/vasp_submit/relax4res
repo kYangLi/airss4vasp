@@ -70,6 +70,7 @@ for ((incar_index=1; incar_index<=incar_quantity; incar_index++)); do
     fi
   fi
   date >> VASP.detail.log
+  echo "${vasp_mpiprun} > VASP.curr.log"
   echo "${vasp_mpiprun} > VASP.curr.log" >> VASP.detail.log
   echo "${vasp_mpiprun} > VASP.curr.log" | bash
   cat VASP.curr.log >> VASP.detail.log

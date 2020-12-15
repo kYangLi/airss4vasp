@@ -11,6 +11,6 @@ KP_SEP_LIST       = 0.2,0.1
 SYMM_PREC         = 0.05
 SYS_TYPE          = pbs
 PBS_WALLTIME      = 96
-PBS_QUEUE         = unset-pbs-queue
+JOB_QUEUE         = unset-queue
 VASP_WALLTIME     = 43200
 KEEP_CALC_DETAILS = F

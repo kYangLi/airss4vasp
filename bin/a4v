@@ -285,17 +285,17 @@ if [ "${sys_type}" == "pbs" ]; then
   printf "[info] Using PBS walltime: \033[01;31m${pbs_walltime}\033[0m hours.\n"
   echo ""
   ## PBS Queue
-  default_pbs_queue=$(grep_input_file 'PBS_QUEUE')
-  if [ -z "${default_pbs_queue}" ]; then
-    default_pbs_queue='unset_pbs_queue'
+  default_job_queue=$(grep_input_file 'JOB_QUEUE')
+  if [ -z "${default_job_queue}" ]; then
+    default_job_queue='unset_job_queue'
   fi
   echo "[input] Please input PBS queue."
-  echo "[input] Default: ${default_pbs_queue}"
-  read -p '[input]> ' pbs_queue
-  if [ -z "${pbs_queue}" ];then
-    pbs_queue="${default_pbs_queue}"
+  echo "[input] Default: ${default_job_queue}"
+  read -p '[input]> ' job_queue
+  if [ -z "${job_queue}" ];then
+    job_queue="${default_job_queue}"
   fi
-  printf "[info] Using PBS queue: \033[01;31m${pbs_queue}\033[0m.\n"
+  printf "[info] Using PBS queue: \033[01;31m${job_queue}\033[0m.\n"
   echo ""
 fi
 ## VASP walltime
@@ -351,7 +351,7 @@ KP_SEP_LIST       = ${kp_sep_list}
 SYMM_PREC         = ${symm_prec}
 SYS_TYPE          = ${sys_type}
 PBS_WALLTIME      = ${pbs_walltime}
-PBS_QUEUE         = ${pbs_queue}
+JOB_QUEUE         = ${job_queue}
 VASP_WALLTIME     = ${vasp_walltime}
 KEEP_CALC_DETAILS = ${keep_calc_details}
 EOF
@@ -370,7 +370,7 @@ KP_SEP_LIST       = ${kp_sep_list}
 SYMM_PREC         = ${symm_prec}
 SYS_TYPE          = ${sys_type}
 PBS_WALLTIME      = ${pbs_walltime}
-PBS_QUEUE         = ${pbs_queue}
+JOB_QUEUE         = ${job_queue}
 VASP_WALLTIME     = ${vasp_walltime}
 KEEP_CALC_DETAILS = ${keep_calc_details}
 EOF
@@ -531,10 +531,10 @@ case ${sys_type} in
   str_repalce "__pbs_walltime__"     "${pbs_walltime}"     "${curr_sub_scrp}"
   str_repalce "__mpi_machinefile__"  "${MPI_MACHINEFILE}"  "${curr_sub_scrp}"
   str_repalce "__vasp_calc_script__" "${vasp_calc_script}" "${curr_sub_scrp}"
-  if [ "${pbs_queue}" == "unset-pbs-queue" ]; then 
+  if [ "${job_queue}" == "unset-queue" ]; then 
     str_repalce '#PBS -q' '##PBS -q' "${curr_sub_scrp}"
   else 
-    str_repalce "__pbs_queue__" "${pbs_queue}" "${curr_sub_scrp}"
+    str_repalce "__job_queue__" "${job_queue}" "${curr_sub_scrp}"
   fi
   submit_command="qsub ${curr_sub_scrp}"
   kill_command='qdel'
@@ -544,10 +544,10 @@ case ${sys_type} in
   str_repalce "__nodes_num__"        "${nodes_pre_coach}"  "${curr_sub_scrp}"
   str_repalce "__cores_per_coach__"  "${cores_per_coach}"  "${curr_sub_scrp}"
   str_repalce "__vasp_calc_script__" "${vasp_calc_script}" "${curr_sub_scrp}"
-  if [ "${pbs_queue}" == "unset-pbs-queue" ]; then 
+  if [ "${job_queue}" == "unset-queue" ]; then 
     str_repalce '#SBATCH -p' '##SBATCH -p' "${curr_sub_scrp}"
   else 
-    str_repalce "__pbs_queue__" "${pbs_queue}" "${curr_sub_scrp}"
+    str_repalce "__job_queue__" "${job_queue}" "${curr_sub_scrp}"
   fi
   submit_command="sbatch ${curr_sub_scrp}"
   kill_command='scancel'
@@ -556,6 +556,11 @@ case ${sys_type} in
   str_repalce "__task_name__"        "${task_name}__tag__" "${curr_sub_scrp}"
   str_repalce "__nodes_num__"        "${nodes_pre_coach}"  "${curr_sub_scrp}"
   str_repalce "__cores_per_coach__"  "${cores_per_coach}"  "${curr_sub_scrp}"
+  if [ "${job_queue}" == "unset-queue" ]; then 
+    str_repalce '#SBATCH -p' '##SBATCH -p' "${curr_sub_scrp}"
+  else 
+    str_repalce "__job_queue__" "${job_queue}" "${curr_sub_scrp}"
+  fi
   str_repalce "__vasp_calc_script__" "${vasp_calc_script}" "${curr_sub_scrp}"
   submit_command="yhbatch ${curr_sub_scrp}"
   kill_command='yhcancel'

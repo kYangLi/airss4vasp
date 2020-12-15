@@ -26,6 +26,7 @@ declare -r  VASP_WALLTIME_INS=$(grep_input_file 'VASP_WALLTIME')
 declare -r  VASP_WALLTIME_INM=$((VASP_WALLTIME_INS/60))
 declare -r  KEEP_CALC_DETAILS=$(grep_input_file 'KEEP_CALC_DETAILS')
 declare -r  MPI_MACHINEFILE=$(grep_input_file 'MPI_MACHINEFILE')
+declare -r  JOB_QUEUE=$(grep_input_file 'JOB_QUEUE')
 declare -r  SYS_TYPE=$(grep_input_file 'SYS_TYPE')
 declare -r  A4V_PATH=$(grep_input_file 'A4V_PATH')
 declare -r  RELAX4RES="${A4V_PATH}/vasp_submit/relax4res"
@@ -46,7 +47,10 @@ case ${SYS_TYPE} in
   vasp_mpirun="${INTEL_MODULE}; srun --time=${VASP_WALLTIME_INM} ${VASP_PROG}"
   ;;
 'nscc')
-  vasp_mpirun="${INTEL_MODULE}; yhrun -N ${NODES_PER_COACH} -n ${CORES_PER_COACH} --time=${VASP_WALLTIME_INM} ${VASP_PROG}"
+  vasp_mpirun="${INTEL_MODULE}; yhrun -p ${JOB_QUEUE} -N ${NODES_PER_COACH} -n ${CORES_PER_COACH} --time=${VASP_WALLTIME_INM} ${VASP_PROG}"
+  if [ "${JOB_QUEUE}" == "unset-queue" ]; then
+    vasp_mpirun="${INTEL_MODULE}; yhrun -N ${NODES_PER_COACH} -n ${CORES_PER_COACH} --time=${VASP_WALLTIME_INM} ${VASP_PROG}"
+  fi
   ;;
 'direct')
   vasp_mpirun="export I_MPI_JOB_TIMEOUT=${VASP_WALLTIME_INS}; ${INTEL_MODULE}; mpirun -np ${CORES_PER_COACH} -envall ${VASP_PROG}"
