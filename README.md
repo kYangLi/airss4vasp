@@ -63,7 +63,7 @@ KP_SEP_LIST       | List  | Kpoints sepration list, only effective when generate
 SYMM_PREC         | Float | Symmetry precise used in `cellsym`.
 SYS_TYPE          | Char  | Job system type, choice one from [pbs, nscc, slurm, direct]. The `nscc` is job manage system for TianHe, and the `direct` means run vasp on current node directly.
 PBS_WALLTIME      | Int   | PBS walltime in hours, only effective when using PBS job system.
-JOB_QUEUE         | Char  | PBS queue, only effective when using PBS job system. Use 'unset-queue' to comment it out.
+JOB_QUEUE         | Char  | Job queue or partition, use 'unset-queue' to disable it.
 VASP_WALLTIME     | Int   | Walltime for a single VASP relazation(one INCAR step) in seconds.
 KEEP_CALC_DETAILS | T/F   | Whether keep all VASP calculation details or not.
 
