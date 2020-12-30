@@ -96,15 +96,15 @@ fi
 printf "[info] Task name: \033[01;31m${task_name}\033[0m.\n"
 echo ""
 ## Intel Module
-default_intel_module=$(grep_input_file 'INTEL_MODULE')
+default_prog_module=$(grep_input_file 'PROG_MODULE')
 echo "[input] Please input the INTEL MODULE:"
-echo "[input] Default: ${default_intel_module}"
-read -p '[input]> ' intel_module
-if [ -z "${intel_module}" ];then
-  intel_module="${default_intel_module}"
+echo "[input] Default: ${default_prog_module}"
+read -p '[input]> ' prog_module
+if [ -z "${prog_module}" ];then
+  prog_module="${default_prog_module}"
 fi
-echo "[info] Intel module: ${intel_module}"
-mklroot=$(echo "${intel_module}; echo \${MKLROOT}" | bash)
+echo "[info] Intel module: ${prog_module}"
+mklroot=$(echo "${prog_module}; echo \${MKLROOT}" | bash)
 printf "[info] You are using MKL: \033[01;31m${mklroot}\033[0m.\n"
 echo ""
 ## Vasp Program
@@ -270,32 +270,34 @@ if [ -z "${is_correct_sys_type}" ];then
 fi
 printf "[info] System type: \033[01;31m${sys_type}\033[0m.\n"
 echo ""
+## PBS walltime
 if [ "${sys_type}" == "pbs" ]; then
-  ## PBS walltime
-  default_pbs_walltime=$(grep_input_file 'PBS_WALLTIME')
-  if ! [ "${default_pbs_walltime}" -gt "0" ] 2>/dev/null; then
-    default_pbs_walltime=96
+  default_job_walltime=$(grep_input_file 'JOB_WALLTIME')
+  if ! [ "${default_job_walltime}" -gt "0" ] 2>/dev/null; then
+    default_job_walltime=96
   fi
-  echo "[input] Please input the Max Time Limit for the PBS job."
-  echo "[input] Default: ${default_pbs_walltime} (h)"
-  read -p '[input]> ' pbs_walltime
-  if [ -z "${pbs_walltime}" ];then
-    pbs_walltime="${default_pbs_walltime}"
+  echo "[input] Please input the Max Time Limit for the job."
+  echo "[input] Default: ${default_job_walltime} (h)"
+  read -p '[input]> ' job_walltime
+  if [ -z "${job_walltime}" ];then
+    job_walltime="${default_job_walltime}"
   fi
-  printf "[info] Using PBS walltime: \033[01;31m${pbs_walltime}\033[0m hours.\n"
+  printf "[info] Using job walltime: \033[01;31m${job_walltime}\033[0m hours.\n"
   echo ""
-  ## PBS Queue
+fi
+## Job Queue
+if [ "${sys_type}" != "direct" ]; then
   default_job_queue=$(grep_input_file 'JOB_QUEUE')
   if [ -z "${default_job_queue}" ]; then
     default_job_queue='unset_job_queue'
   fi
-  echo "[input] Please input PBS queue."
+  echo "[input] Please input job queue."
   echo "[input] Default: ${default_job_queue}"
   read -p '[input]> ' job_queue
   if [ -z "${job_queue}" ];then
     job_queue="${default_job_queue}"
   fi
-  printf "[info] Using PBS queue: \033[01;31m${job_queue}\033[0m.\n"
+  printf "[info] Using job queue: \033[01;31m${job_queue}\033[0m.\n"
   echo ""
 fi
 ## VASP walltime
@@ -339,7 +341,7 @@ INPUT_FILE        = ${INPUT_FILE}
 #
 SEED_NAME         = ${seed_name}
 TASK_NAME         = ${task_name}
-INTEL_MODULE      = ${intel_module}
+PROG_MODULE       = ${prog_module}
 VASP_PROG         = ${vasp_prog}
 NODES_NUM         = ${nodes_num}
 CORES_PER_NODE    = ${cores_per_node}
@@ -350,7 +352,7 @@ IS_2D_MATERIAL    = ${is_2d_material}
 KP_SEP_LIST       = ${kp_sep_list}
 SYMM_PREC         = ${symm_prec}
 SYS_TYPE          = ${sys_type}
-PBS_WALLTIME      = ${pbs_walltime}
+JOB_WALLTIME      = ${job_walltime}
 JOB_QUEUE         = ${job_queue}
 VASP_WALLTIME     = ${vasp_walltime}
 KEEP_CALC_DETAILS = ${keep_calc_details}
@@ -359,7 +361,7 @@ echo "[do] Update a4v.input"
 cat > a4v.input << EOF
 SEED_NAME         = ${seed_name}
 TASK_NAME         = ${task_name}
-INTEL_MODULE      = ${intel_module}
+PROG_MODULE       = ${prog_module}
 VASP_PROG         = ${vasp_prog}
 NODES_NUM         = ${nodes_num}
 CORES_PER_NODE    = ${cores_per_node}
@@ -369,7 +371,7 @@ IS_2D_MATERIAL    = ${is_2d_material}
 KP_SEP_LIST       = ${kp_sep_list}
 SYMM_PREC         = ${symm_prec}
 SYS_TYPE          = ${sys_type}
-PBS_WALLTIME      = ${pbs_walltime}
+JOB_WALLTIME      = ${job_walltime}
 JOB_QUEUE         = ${job_queue}
 VASP_WALLTIME     = ${vasp_walltime}
 KEEP_CALC_DETAILS = ${keep_calc_details}
@@ -523,53 +525,42 @@ if [ "${cores_per_node}" -gt "${cores_per_coach}" ]; then
 else
   ppn=${cores_per_node}
 fi
+str_repalce "__task_name__"        "${task_name}__tag__" "${curr_sub_scrp}"
+str_repalce "__nodes_num__"        "${nodes_pre_coach}"  "${curr_sub_scrp}"
+str_repalce "__ppn__"              "${ppn}"              "${curr_sub_scrp}"
+str_repalce "__job_walltime__"     "${job_walltime}"     "${curr_sub_scrp}"
+str_repalce "__mpi_machinefile__"  "${MPI_MACHINEFILE}"  "${curr_sub_scrp}"
+str_repalce "__vasp_calc_script__" "${vasp_calc_script}" "${curr_sub_scrp}"
+str_repalce "__cores_per_coach__"  "${cores_per_coach}"  "${curr_sub_scrp}"
+str_repalce "__vasp_prog__"        "${vasp_prog}"        "${curr_sub_scrp}"
+str_repalce "__prog_module__"      "${prog_module}"      "${curr_sub_scrp}"
+str_repalce "__vasp_walltime__"    "${vasp_walltime}"    "${curr_sub_scrp}"
+if [ "${job_queue}" == "unset-queue" ]; then 
+  str_repalce '#PBS -q' '##PBS -q' "${curr_sub_scrp}"
+  str_repalce '#SBATCH -p' '##SBATCH -p' "${curr_sub_scrp}"
+else
+  str_repalce "__job_queue__" "${job_queue}" "${curr_sub_scrp}"
+fi
 case ${sys_type} in
 'pbs')
-  str_repalce "__task_name__"        "${task_name}__tag__" "${curr_sub_scrp}"
-  str_repalce "__nodes_num__"        "${nodes_pre_coach}"  "${curr_sub_scrp}"
-  str_repalce "__ppn__"              "${ppn}"              "${curr_sub_scrp}"
-  str_repalce "__pbs_walltime__"     "${pbs_walltime}"     "${curr_sub_scrp}"
-  str_repalce "__mpi_machinefile__"  "${MPI_MACHINEFILE}"  "${curr_sub_scrp}"
-  str_repalce "__vasp_calc_script__" "${vasp_calc_script}" "${curr_sub_scrp}"
-  if [ "${job_queue}" == "unset-queue" ]; then 
-    str_repalce '#PBS -q' '##PBS -q' "${curr_sub_scrp}"
-  else 
-    str_repalce "__job_queue__" "${job_queue}" "${curr_sub_scrp}"
-  fi
   submit_command="qsub ${curr_sub_scrp}"
   kill_command='qdel'
   ;;
 'slurm')
-  str_repalce "__task_name__"        "${task_name}__tag__" "${curr_sub_scrp}"
-  str_repalce "__nodes_num__"        "${nodes_pre_coach}"  "${curr_sub_scrp}"
-  str_repalce "__cores_per_coach__"  "${cores_per_coach}"  "${curr_sub_scrp}"
-  str_repalce "__vasp_calc_script__" "${vasp_calc_script}" "${curr_sub_scrp}"
-  if [ "${job_queue}" == "unset-queue" ]; then 
-    str_repalce '#SBATCH -p' '##SBATCH -p' "${curr_sub_scrp}"
-  else 
-    str_repalce "__job_queue__" "${job_queue}" "${curr_sub_scrp}"
-  fi
   submit_command="sbatch ${curr_sub_scrp}"
   kill_command='scancel'
   ;;
 'nscc')
-  str_repalce "__task_name__"        "${task_name}__tag__" "${curr_sub_scrp}"
-  str_repalce "__nodes_num__"        "${nodes_pre_coach}"  "${curr_sub_scrp}"
-  str_repalce "__cores_per_coach__"  "${cores_per_coach}"  "${curr_sub_scrp}"
-  if [ "${job_queue}" == "unset-queue" ]; then 
-    str_repalce '#SBATCH -p' '##SBATCH -p' "${curr_sub_scrp}"
-  else 
-    str_repalce "__job_queue__" "${job_queue}" "${curr_sub_scrp}"
-  fi
-  str_repalce "__vasp_calc_script__" "${vasp_calc_script}" "${curr_sub_scrp}"
   submit_command="yhbatch ${curr_sub_scrp}"
   kill_command='yhcancel'
   ;;
 'direct')
-  str_repalce "__task_name__"        "${task_name}__tag__" "${curr_sub_scrp}"
-  str_repalce "__vasp_calc_script__" "${vasp_calc_script}" "${curr_sub_scrp}"
   submit_command="nohup bash ${curr_sub_scrp} < /dev/null >> ../log-${task_name}.out 2>&1 & echo \$!"
   kill_command='kill -TERM --'
+  ;;
+*)
+  echo "[error] No matched system..."
+  exit 1
   ;;
 esac
 echo "[done] ${curr_sub_scrp}"

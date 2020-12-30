@@ -52,7 +52,7 @@ Parameter Name | Type | Descripution
 :-|:-|:-
 SEED_NAME         | Char  | AIRSS seed name.
 TASK_NAME         | Char  | A4V task name.
-INTEL_MODULE      | Char  | Intel Module load command, if you are using Intel lib for VASP.
+PROG_MODULE       | Char  | Module load command, if you are using some module lib for VASP.
 VASP_PROG         | Char  | Path of VASP executive program.
 NODES_NUM         | Int   | Total Nodes number used in task.
 CORES_PER_NODE    | Int   | The number of cores of each nodes in your machine(or you want to use).
@@ -62,30 +62,29 @@ IS_2D_MATERIAL    | T/F   | Whether the structure is 2D system, only effective w
 KP_SEP_LIST       | List  | Kpoints sepration list, only effective when generate KPOINTS using `genkp`.
 SYMM_PREC         | Float | Symmetry precise used in `cellsym`.
 SYS_TYPE          | Char  | Job system type, choice one from [pbs, nscc, slurm, direct]. The `nscc` is job manage system for TianHe, and the `direct` means run vasp on current node directly.
-PBS_WALLTIME      | Int   | PBS walltime in hours, only effective when using PBS job system.
+JOB_WALLTIME      | Int   | JOB walltime in hours, only effective when using PBS job system.
 JOB_QUEUE         | Char  | Job queue or partition, use 'unset-queue' to disable it.
 VASP_WALLTIME     | Int   | Walltime for a single VASP relazation(one INCAR step) in seconds.
 KEEP_CALC_DETAILS | T/F   | Whether keep all VASP calculation details or not.
 
 Here is a example of `a4v.input`:
 ```bash
-SEED_NAME         = Si
+SEED_NAME         = Si2
 TASK_NAME         = a4v-Si2
-INTEL_MODULE      = source /intel/cl2020/linux/bin/compilervars.sh intel64 
-VASP_PROG         = /bin/vasp_ncl
-NODES_NUM         = 4
-CORES_PER_NODE    = 40
-CORES_PER_COACH   = 20
-STR_NUM           = 100
+PROG_MODULE       = module load intel/20u1
+VASP_PROG         = /home/bin/vasp_ncl
+NODES_NUM         = 2
+CORES_PER_NODE    = 24
+CORES_PER_COACH   = 24
+STR_NUM           = 10
 IS_2D_MATERIAL    = F
 KP_SEP_LIST       = 0.2,0.1
 SYMM_PREC         = 0.05
 SYS_TYPE          = pbs
-PBS_WALLTIME      = 96
-JOB_QUEUE         = cmt
-VASP_WALLTIME     = 3600
+JOB_WALLTIME      = 48
+JOB_QUEUE         = unset-queue
+VASP_WALLTIME     = 43200
 KEEP_CALC_DETAILS = F
-
 ```
 
 ### `<seedname>.cell`

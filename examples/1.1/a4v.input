@@ -1,16 +1,17 @@
 SEED_NAME         = Si
 TASK_NAME         = a4v-Si2
-INTEL_MODULE      = ml intel/20u1
-VASP_PROG         = /home/liyang1/Software/CalcProg/VASP/Main/vasp-544-patched_20u1/bin/vasp_ncl
+PROG_MODULE       = module purge; module load intel/18.0.1
+VASP_PROG         = /GPUFS/thu_xuyong_2/Apps/VASP/Main/vasp-544-patched/vasp_mvapich2-2.3.2+icc-18.0.1/bin/vasp_ncl
 NODES_NUM         = 2
-CORES_PER_NODE    = 24
-CORES_PER_COACH   = 12
+CORES_PER_NODE    = 36
+CORES_PER_COACH   = 36
 STR_NUM           = 10
 IS_2D_MATERIAL    = F
 KP_SEP_LIST       = 0.2,0.1
 SYMM_PREC         = 0.05
-SYS_TYPE          = pbs
-PBS_WALLTIME      = 96
-JOB_QUEUE         = unset-queue
+SYS_TYPE          = nscc
+JOB_WALLTIME      = 96
+JOB_QUEUE         = work
 VASP_WALLTIME     = 43200
 KEEP_CALC_DETAILS = F
+
