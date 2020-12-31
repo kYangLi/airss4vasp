@@ -63,6 +63,13 @@ mv a4v-res.record.tmp a4v-res.record
 sed '1a-----------------------------------------------------------------------------------------' a4v-res.record > a4v-res.record.tmp
 mv a4v-res.record.tmp a4v-res.record
 
+# Check the result
+res_line_num=$(cat a4v-res.record | wc -l)
+if [ "${res_line_num}" == "2" ]; then 
+  echo "[error] a4v-res get nothing! Pls, check if a4v 'make' well."
+  exit 1
+fi
+
 # Output the result
 echo "===================================== Result Analyze ===================================="
 cat a4v-res.record

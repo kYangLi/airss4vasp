@@ -146,6 +146,10 @@ The `COACH` is a parallel unit among the whole task. Each `COACH` will run indep
 
 The total `COACH` number is simply calculated as **nodes_num(cores_per_node/cores_per_coach)**, where cores_per_node/cores_per_coach = n or 1/n. 
 
+## Kill one COACH: A4VSTOP
+
+By creat a file named `A4VSTOP` in a specific COACH folder, one can safely stop that working coach. Once there is a file called `A4VSTOP` in a coach folder, then the next time when the coach trying to pick up a POSCAR from poscar pool, it will be killed.
+
 ### Process check
 
 During the calculation, after enter the main calulation folder(the folder that has `a4v.input`), you can use the command below to check the current processing.

@@ -29,12 +29,14 @@ cat /dev/null > VASP.log.temp
 for coach in ${coach_list}; do 
   cores=$(grep CORES_PER_COACH ${coach}/a4v.allparas | awk -F '=' '{print $2}')
   ((total_cores+=cores))
-  if [ -e ${coach}/VASP.log ]; then 
+  if [ -e ${coach}/VASP.log ] && [ ! -e ${coach}/A4VSTOP ]; then 
     cat ${coach}/VASP.log >> VASP.log.temp
     ((current_coach_num++))
     ((current_cores+=cores))
+  elif [ -e ${coach}/A4VSTOP ]; then 
+    echo "[info] ${coach} has been stoped by user."
   else
-    echo "[info] ${coach} is not working..."
+    echo "[info] ${coach} not start to work yet..."
   fi
 done
 
@@ -110,7 +112,7 @@ echo "================== Process Check =================="
 printf "${run_state}\n"
 printf "  Seed Name                  :  ${seed_name}\n"
 if ! ${calc_done}; then
-printf "  Started Work Coach         :  %-5s [%s]\n" "${current_coach_num}"  "${total_coach_num}"
+printf "  Working Coach              :  %-5s [%s]\n" "${current_coach_num}"  "${total_coach_num}"
 printf "  Working Cores              :  %-5s [%s]\n" "${current_cores}"      "${total_cores}"
 fi
 printf "  -----------------------------------------------\n"
