@@ -148,7 +148,7 @@ The total `COACH` number is simply calculated as **nodes_num(cores_per_node/core
 
 ## Kill one COACH: A4VSTOP
 
-By creat a file named `A4VSTOP` in a specific COACH folder, one can safely stop that working coach. Once there is a file called `A4VSTOP` in a coach folder, then the next time when the coach trying to pick up a POSCAR from poscar pool, it will be killed.
+By creating a file named `A4VSTOP` in a specific COACH folder, one can safely stop that working coach. Once there is a file called `A4VSTOP` in a coach folder, then the next time when the coach trying to pick up a POSCAR from poscar pool, it will be killed.
 
 ### Process check
 
