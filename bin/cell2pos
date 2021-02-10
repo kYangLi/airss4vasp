@@ -21,6 +21,19 @@ str_poscar="${str_cell%.cell}.vasp"
 # Generate the ref POSCAR file
 cabal cell poscar < ${str_cell} > ${str_poscar}
 
+# Check if there are Direct line format error
+direct_line_number=$(sed '1d' ${str_poscar} | grep -n "Direct" | head -1 | awk -F ':' '{print $1}')
+((direct_line_number++))
+if [ "${direct_line_number}" != "8" ]; then 
+  beg_line_num=7
+  end_line_num=$((direct_line_number-1))
+  ele_number_line=$(sed -n "${beg_line_num},${end_line_num}p" ${str_poscar})
+  sed -n '1,6p' ${str_poscar} > poscar.tmp
+  echo ${ele_number_line} >> poscar.tmp
+  sed -n "${direct_line_number},\$p"  ${str_poscar} >> poscar.tmp
+  mv poscar.tmp ${str_poscar}
+fi 
+
 # Read the cell generater file
 if [ ! -z "${str_gen_cell}" ]; then 
   # If there are atoms need to fix position during vasp relaxzation

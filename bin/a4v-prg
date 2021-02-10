@@ -84,16 +84,16 @@ total_time_spend_format=$(echo ${total_time_spend} |
                                       int($1%86400/3600)"h:"\
                                       int($1%3600/60)"m:"\
                                       $1%60"s"}')
-job_is_done_one=$(grep '\[spend_time_raw\]' VASP.log.temp)
-average_time_spend=$(grep '\[spend_time_raw\]' VASP.log.temp | 
-                     awk -F ':' '{print $2}' |
-                     awk '{sum+=$1}END{print sum/NR}')
-average_time_spend=${average_time_spend%.*}
 
+job_is_done_one=$(grep '\[spend_time_raw\]' VASP.log.temp)
 if [ -z "${job_is_done_one}" ]; then
   average_time_spend_format='observing...'
   esti_remain_time_format='estimating...'
 else
+  average_time_spend=$(grep '\[spend_time_raw\]' VASP.log.temp | 
+                      awk -F ':' '{print $2}' |
+                      awk '{sum+=$1}END{print sum/NR}')
+  average_time_spend=${average_time_spend%.*}
   average_time_spend_format=$(echo ${average_time_spend} | 
                               awk '{print int($1/86400)"d:"\
                                           int($1%86400/3600)"h:"\
