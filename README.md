@@ -12,7 +12,9 @@
 
 ## Description
 
-[`AIRSS`](https://www.mtg.msm.cam.ac.uk/Codes/AIRSS)(Ab Initio Random Structure Searching) is a fantastic, efficient, and easy to parallel structure searching package, but with pool supporting for `VASP`. `airss4vasp`(a4v), based on `PBS` ,`Slurm`,or `NSCC(Tianhe)` job management system, is an interface program design for the better communication between AIRSS and VASP.
+[`AIRSS`](https://www.mtg.msm.cam.ac.uk/Codes/AIRSS)(Ab Initio Random Structure Searching) is a fantastic, efficient, and easy to parallel structure searching package, but with pool supporting for `VASP`. `airss4vasp`(a4v), based on `PBS` ,`Slurm`,or `NSCC(Tianhe)` job management system, is an interface program design for the better communication between AIRSS and VASP. 
+
+Just like the `AIRSS`, `a4v` only support the `*nix` system.
 
 ## Installtion
 
@@ -63,11 +65,11 @@ KP_SEP_LIST       | List  | Kpoints sepration list, only effective when generate
 SYMM_PREC         | Float | Symmetry precise used in `cellsym`.
 SYS_TYPE          | Char  | Job system type, choice one from [pbs, nscc, slurm, direct]. The `nscc` is job manage system for TianHe, and the `direct` means run vasp on current node directly.
 JOB_WALLTIME      | Int   | JOB walltime in hours, only effective when using PBS job system.
-JOB_QUEUE         | Char  | Job queue or partition, use 'unset-queue' to disable it.
+JOB_QUEUE         | Char  | Job queue or partition, use `unset-queue` to disable it.
 VASP_WALLTIME     | Int   | Walltime for a single VASP relazation(one INCAR step) in seconds.
 KEEP_CALC_DETAILS | T/F   | Whether keep all VASP calculation details or not.
 
-Here is a example of `a4v.input`:
+Here is an example of `a4v.input`:
 ```bash
 SEED_NAME         = Si2
 TASK_NAME         = a4v-Si2
@@ -89,7 +91,7 @@ KEEP_CALC_DETAILS = F
 
 ### `<seedname>.cell`
 
-This is the key file for the whole structure searching task. Please first learn how to use `AIRSS` before using `a4v`. You could reference the AIRSS manual writen by me in ./doc/AIRSS-0.9.1_manual/*/main.pdf.
+This is the key file for the whole structure searching task. Please first learn how to use `AIRSS` before using `a4v`. You could reference the AIRSS manual writen by me in `./doc/AIRSS-0.9.1_manual/*/main.pdf`.
 
 There is one thing need to be explained more specifically.
 
@@ -124,7 +126,7 @@ Si 0.0 0.0 0.0 # Si2 % NUM=1
 
 The `INCAR` is a input file for VASP relaxzation. The quantity of `INCAR` decided how many times will the structure be relaxed.
 
-E.g. If there are `Si.INCAR-1`, `Si.INCAR-2`, `Si.INCAR-3` in the calculation file, then the same `Si` structure will first be relaxed using `INCAR-1`, then `INCAR-2`, and at last `INCAR-3`. You can also indicate the KPOINTS for each INCAR with name `Si.KPOINTS-[1-9]`
+E.g. If there are `Si.INCAR-1`, `Si.INCAR-2`, `Si.INCAR-3` in the calculation file, then the `Si` structure will first be relaxed using `INCAR-1`, next `INCAR-2`, and at last `INCAR-3`. You can also indicate the KPOINTS for each INCAR with name `Si.KPOINTS-[1-9]`
 
 ### `<seedname>.POTCAR`
 
@@ -146,7 +148,7 @@ The `COACH` is a parallel unit among the whole task. Each `COACH` will run indep
 
 The total `COACH` number is simply calculated as **nodes_num(cores_per_node/cores_per_coach)**, where cores_per_node/cores_per_coach = n or 1/n. 
 
-## Kill one COACH: A4VSTOP
+### Kill one COACH: A4VSTOP
 
 By creating a file named `A4VSTOP` in a specific COACH folder, one can safely stop that working coach. Once there is a file called `A4VSTOP` in a coach folder, then the next time when the coach trying to pick up a POSCAR from poscar pool, it will be killed.
 
