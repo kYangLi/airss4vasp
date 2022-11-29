@@ -1,25 +1,22 @@
-## Please Change the parameters below...
-# [tips] You may need to check: 
-# [tips]  https://software.intel.com/en-us/articles/intel-mkl-link-line-advisor 
-# [tips]  to confirm the FFLAGS, FLIBS, CFLAGS, CLIBS, if you are using intel
-# [tips]  compilers.
-FC=ifort
-FLIBS=${MKLROOT}/lib/intel64/libmkl_lapack95_ilp64.a -Wl,--start-group ${MKLROOT}/lib/intel64/libmkl_intel_ilp64.a ${MKLROOT}/lib/intel64/libmkl_sequential.a ${MKLROOT}/lib/intel64/libmkl_core.a -Wl,--end-group -lpthread -lm -ldl
-FFLAGS=-i8 -I${MKLROOT}/include/intel64/ilp64 -I${MKLROOT}/include 
+FC=gfortran   # GCC family only
+FFLAGS=-O0 -g # Do not optimise
+#FFLAGS=-O0 -g -fimplicit-none -Wall -Wline-truncation -Wcharacter-truncation -Wsurprising -Waliasing -Wimplicit-interface -Wunused-parameter -fwhole-file -fcheck=all -std=f2008 -pedantic -fbacktrace -fall-intrinsics -ffpe-trap=invalid,zero,overflow -fbounds-check -Wuninitialized
 
-CC=icc
-CLIBS=${MKLROOT}/lib/intel64/libmkl_blas95_ilp64.a ${MKLROOT}/lib/intel64/libmkl_lapack95_ilp64.a -Wl,--start-group ${MKLROOT}/lib/intel64/libmkl_intel_ilp64.a ${MKLROOT}/lib/intel64/libmkl_sequential.a ${MKLROOT}/lib/intel64/libmkl_core.a -Wl,--end-group -lpthread -lm -ldl
-CFLAGS=-DMKL_ILP64 -I${MKLROOT}/include/intel64/ilp64 -I${MKLROOT}/include
-
-
-## DO NOT CHANGE BELOW ##
-DFLAGS=-DCOMPAT
+CC=gcc # GCC family only
+CFLAGS=-lm
 
 LD=$(FC)
-LDFLAGS=$(FFLAGS) -L$(FLIBS)
+LDFLAGS=-llapack
+
+
+GCC_VER_GTE46 := $(shell echo `$(FC) -dumpfullversion -dumpversion | \
+                   cut -f1-2 -d.` \>= 4.6 | bc )
+ifeq ($(GCC_VER_GTE46),0)
+DFLAGS=-DCOMPAT
+endif
 
 LDC=$(CC)
-LDCFLAGS=$(CFLAGS) -L$(CLIBS)
+LDCFLAGS=$(CFLAGS)
 
 PREFIX=$(PWD)
 

@@ -21,7 +21,7 @@ else
   declare -i str_quantity=$2
 fi
 str_gen_cell=${seed_name}.cell
- 
+
 # POSCAR generate
 start_time=$(date +%s)
 echo "[do] Start generating the structures..."

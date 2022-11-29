@@ -24,7 +24,7 @@ export
 
 all: internal external install
 
-internal: cabal buildcell cryan
+internal: cabal buildcell cryan genkp
 
 external: spglib cellsym
 
@@ -37,6 +37,9 @@ buildcell:
 cryan:
 	(cd src/cryan/src; make)
 
+genkp:
+	(cd src/genkp; make)
+
 spglib:
 	(cd external/spglib; make)
 
@@ -47,6 +50,7 @@ install:
 	(cp src/cabal/src/cabal bin/)
 	(cp src/buildcell/src/buildcell bin/)
 	(cp src/cryan/src/cryan bin/)
+	(cp src/genkp/genkp bin/)
 	(cp external/cellsym/cellsym-0.16a/cellsym bin/)
 	@echo
 	@echo 'Add '$(PWD)'/bin to your path by placing this line in your ~/.bashrc:'
@@ -57,6 +61,7 @@ neat_internal:
 	(cd src/cabal/src; make clean)
 	(cd src/buildcell/src; make clean)
 	(cd src/cryan/src; make clean)
+	(cd src/genkp; make clean)
 
 neat_external:
 	(cd external/cellsym; make clean)

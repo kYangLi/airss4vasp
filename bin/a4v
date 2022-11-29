@@ -2,7 +2,7 @@
 #
 
 declare -r A4V_PATH=$(cd "$(dirname "$0")";pwd)
-declare -r MPI_MACHINEFILE='cores-list'
+declare -r MPI_MACHINEFILE='mpi-nodes.info'
 declare -r INPUT_FILE='a4v.input'
 
 a4v_in_path=$(echo ${PATH} | grep "${A4V_PATH}")
@@ -64,9 +64,9 @@ EOF
 chmod 740 _CLEAN.sh
 echo ""
 
-#===================#
-#   Paras Read In   #
-#===================#
+#====================#
+#   Para.s Read In   #
+#====================#
 echo "================== Read In Paras =================="
 ## Seed Name
 default_seed_name=$(ls -1 *.cell | sed 's/.cell//g' | head -1)
@@ -95,7 +95,7 @@ if [ -z "${task_name}" ];then
 fi
 printf "[info] Task name: \033[01;31m${task_name}\033[0m.\n"
 echo ""
-## Intel Module
+## Module Load
 default_prog_module=$(grep_input_file 'PROG_MODULE')
 echo "[input] Please input the PROG MODULE:"
 echo "[input] Default: ${default_prog_module}"
@@ -335,7 +335,6 @@ echo "================== Record the Paras =================="
 echo "[do] Generate a4v.allparas"
 cat > a4v.allparas << EOF
 A4V_PATH          = ${A4V_PATH}
-PBS_SUBMIT_SCRIPT = ${PBS_SUBMIT_SCRIPT}
 MPI_MACHINEFILE   = ${MPI_MACHINEFILE}
 INPUT_FILE        = ${INPUT_FILE}
 #
