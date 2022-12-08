@@ -1,4 +1,4 @@
-This project is closed. A new version of airss4vasp will be expressed under this repository: [cp-a4v](https://github.com/kYangLi/cp-a4v)
+This project is closed. A new version of airss4vasp will be expressed under this repository: [airss4vasp-cp](https://github.com/kYangLi/airss4vasp-cp)
 
 
 
